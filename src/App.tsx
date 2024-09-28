@@ -105,7 +105,7 @@ function SubmissionList() {
 
   return (
     <>
-      <dialog
+      <div
         className={`${submissionId === 0 ? "hidden" : ""} relative z-10`}
         aria-labelledby="modal-title"
         role="dialog"
@@ -143,7 +143,7 @@ function SubmissionList() {
             </div>
           </div>
         </div>
-      </dialog>
+      </div>
 
       <Submission id={1} voteHandler={handleVote} />
       <Submission id={2} voteHandler={handleVote} />
