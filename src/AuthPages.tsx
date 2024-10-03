@@ -164,12 +164,12 @@ export function LoginPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       });
       if (!error) {
-        console.log("Logged in", data);
+        console.log("Successfully logged in");
       } else {
         console.error(error.message);
       }
