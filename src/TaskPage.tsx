@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { elements } from "@code-wallet/elements";
 import type { CurrencyCode } from "@code-wallet/currency";
+import { SERVER_URL } from "@/config";
 
 export function TaskPage() {
   return (
@@ -51,16 +52,13 @@ function SubmissionList() {
 
     async function createCodeButton() {
       try {
-        const res = await fetch(
-          "http://192.168.2.10:8080/codewallet/create-intent",
-          {
-            method: "POST",
-            body: "{}",
-            headers: {
-              "Content-Type": "application/json",
-            },
+        const res = await fetch(`${SERVER_URL}/codewallet/create-intent`, {
+          method: "POST",
+          body: "{}",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+        });
         const result = (await res.json()) as CreateIntentResponse;
 
         const { amount, currency, destination, clientSecret } =
