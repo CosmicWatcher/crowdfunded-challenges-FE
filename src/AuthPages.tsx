@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -20,9 +20,25 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { supabase } from "@/utils/supabase";
+import { isUserAuthenticated, supabase } from "@/utils/supabase";
+import { SitePages } from "@/config";
+import { useEffect, useState } from "react";
 
 export function SignupPage() {
+  const [_location, setLocation] = useLocation();
+  const [isAuthenticated, setAuthenticated] = useState<undefined | boolean>(
+    undefined,
+  );
+
+  useEffect(() => {
+    async function checkAuth() {
+      const is = await isUserAuthenticated();
+      if (is) setLocation(SitePages.HOME);
+      else setAuthenticated(false);
+    }
+    checkAuth().catch((err) => console.error(err));
+  }, [setLocation]);
+
   const formSchema = z
     .object({
       email: z.string().email({ message: "Invalid email address" }),
@@ -61,7 +77,7 @@ export function SignupPage() {
     }
   }
 
-  return (
+  return isAuthenticated === undefined ? null : (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
         <CardTitle className="text-xl">Sign Up</CardTitle>
@@ -147,6 +163,20 @@ export function SignupPage() {
 }
 
 export function LoginPage() {
+  const [_location, setLocation] = useLocation();
+  const [isAuthenticated, setAuthenticated] = useState<undefined | boolean>(
+    undefined,
+  );
+
+  useEffect(() => {
+    async function checkAuth() {
+      const is = await isUserAuthenticated();
+      if (is) setLocation(SitePages.HOME);
+      else setAuthenticated(false);
+    }
+    checkAuth().catch((err) => console.error(err));
+  }, [setLocation]);
+
   const formSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
     password: z.string().min(6, {
@@ -170,6 +200,7 @@ export function LoginPage() {
       });
       if (!error) {
         console.log("Successfully logged in");
+        setLocation(SitePages.HOME);
       } else {
         console.error(error.message);
       }
@@ -178,7 +209,7 @@ export function LoginPage() {
     }
   }
 
-  return (
+  return isAuthenticated === undefined ? null : (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
