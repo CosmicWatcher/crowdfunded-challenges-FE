@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { Link } from "wouter";
+import { ReactNode, useEffect, useState } from "react";
+import { Link, useLocation } from "wouter";
 import { CircleUser, Menu, House, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,13 +12,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { ModeToggle } from "@/components/mode-toggle";
-import { SitePages } from "@/config";
+import { ModeToggle } from "@/components/theme/toggle";
+import { SitePages } from "@/configs/routes";
+import { isUserAuthenticated, supabase } from "@/utils/supabase";
 
-interface DashboardProps {
+interface AppLayoutProps {
   children: ReactNode;
 }
-export function Dashboard({ children }: DashboardProps) {
+export function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="flex min-h-screen w-full flex-col">
       <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
@@ -107,12 +108,7 @@ export function Dashboard({ children }: DashboardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <AccountDropdown />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -121,5 +117,47 @@ export function Dashboard({ children }: DashboardProps) {
         {children}
       </main>
     </div>
+  );
+}
+
+function AccountDropdown() {
+  const [_location, setLocation] = useLocation();
+  const [isAuthenticated, setAuthenticated] = useState<undefined | boolean>(
+    undefined,
+  );
+
+  useEffect(() => {
+    async function checkAuth() {
+      const is = await isUserAuthenticated();
+      if (is) setAuthenticated(true);
+      else setAuthenticated(false);
+    }
+    checkAuth().catch((err) => console.error(err));
+  }, []);
+
+  async function handleLogout() {
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      setLocation(SitePages.HOME);
+    } else {
+      console.error(error.message);
+    }
+  }
+
+  return isAuthenticated ? (
+    <>
+      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem>Settings</DropdownMenuItem>
+      <DropdownMenuItem>Support</DropdownMenuItem>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+    </>
+  ) : (
+    <>
+      <DropdownMenuItem>
+        <Link href={SitePages.LOGIN}>Login</Link>
+      </DropdownMenuItem>
+    </>
   );
 }

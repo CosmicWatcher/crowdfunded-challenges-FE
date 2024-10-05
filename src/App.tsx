@@ -1,16 +1,17 @@
 import { Route, Switch } from "wouter";
 import { DollarSign } from "lucide-react";
 
-import { TaskPage } from "@/TaskPage";
-import { SignupPage, LoginPage } from "@/AuthPages";
-import { Dashboard } from "@/Dashboard";
-import { ThemeProvider } from "@/components/theme-provider";
-import { SitePages } from "@/config";
+import { TaskPage } from "@/pages/TaskPage";
+import { SignupPage } from "@/pages/SignupPage";
+import { LoginPage } from "@/pages/LoginPage";
+import { AppLayout } from "@/components/layout/AppLayout";
+import { ThemeProvider } from "@/components/theme/provider";
+import { SitePages } from "@/configs/routes";
 
 export default function App() {
   return (
     <ThemeProvider storageKey="vite-ui-theme">
-      <Dashboard>
+      <AppLayout>
         <Switch>
           <Route path={SitePages.HOME}>
             <DollarSign className="animate-ping fixed left-1/3 top-1/3 size-32" />
@@ -33,7 +34,7 @@ export default function App() {
             <h1 className="fixed left-1/2 top-1/4">404, Not Found!</h1>
           </Route>
         </Switch>
-      </Dashboard>
+      </AppLayout>
     </ThemeProvider>
   );
 }

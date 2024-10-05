@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { elements } from "@code-wallet/elements";
 import type { CurrencyCode } from "@code-wallet/currency";
-import { SERVER_URL } from "@/config";
+import { SERVER_URL } from "@/configs/env";
 
 export function TaskPage() {
   return (
