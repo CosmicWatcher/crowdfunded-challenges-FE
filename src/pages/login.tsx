@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { Link, useLocation } from "wouter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -20,9 +19,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { isUserAuthenticated, supabase } from "@/utils/supabase";
+import { getUserSession, login } from "@/lib/supabase";
 import { SitePages } from "@/configs/routes";
 import { useEffect, useState } from "react";
+import { handleError } from "@/lib/error";
+import { notifySuccess } from "@/lib/notification";
 
 export function LoginPage() {
   const [_location, setLocation] = useLocation();
@@ -32,11 +33,15 @@ export function LoginPage() {
 
   useEffect(() => {
     async function checkAuth() {
-      const is = await isUserAuthenticated();
-      if (is) setLocation(SitePages.HOME);
-      else setAuthenticated(false);
+      try {
+        const session = await getUserSession();
+        if (!session) setAuthenticated(false);
+        else setLocation(SitePages.HOME);
+      } catch (err) {
+        handleError(err);
+      }
     }
-    checkAuth().catch((err) => console.error(err));
+    void checkAuth();
   }, [setLocation]);
 
   const formSchema = z.object({
@@ -56,18 +61,11 @@ export function LoginPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      });
-      if (!error) {
-        console.log("Successfully logged in");
-        setLocation(SitePages.HOME);
-      } else {
-        console.error(error.message);
-      }
+      await login(values.email, values.password);
+      notifySuccess("Successfully Logged In");
+      setLocation(SitePages.HOME);
     } catch (err) {
-      console.error("Error with login:", err);
+      handleError(err, "Login Failed");
     }
   }
 
@@ -82,6 +80,7 @@ export function LoginPage() {
       <CardContent>
         <div className="grid gap-4">
           <Form {...form}>
+            {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <div className="grid gap-2">
                 <FormField

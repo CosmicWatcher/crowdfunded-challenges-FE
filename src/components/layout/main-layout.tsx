@@ -14,7 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ModeToggle } from "@/components/theme/toggle";
 import { SitePages } from "@/configs/routes";
-import { isUserAuthenticated, supabase } from "@/utils/supabase";
+import { getUserSession, logout } from "@/lib/supabase";
+import { handleError } from "@/lib/error";
+import { notifySuccess } from "@/lib/notification";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -128,19 +130,24 @@ function AccountDropdown() {
 
   useEffect(() => {
     async function checkAuth() {
-      const is = await isUserAuthenticated();
-      if (is) setAuthenticated(true);
-      else setAuthenticated(false);
+      try {
+        const session = await getUserSession();
+        if (!session) setAuthenticated(false);
+        else setAuthenticated(true);
+      } catch (err) {
+        handleError(err);
+      }
     }
-    checkAuth().catch((err) => console.error(err));
+    void checkAuth();
   }, []);
 
   async function handleLogout() {
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
+    try {
+      await logout();
+      notifySuccess("Successfully Logged Out");
       setLocation(SitePages.HOME);
-    } else {
-      console.error(error.message);
+    } catch (err) {
+      handleError(err, "Logout Failed");
     }
   }
 
@@ -151,6 +158,7 @@ function AccountDropdown() {
       <DropdownMenuItem>Settings</DropdownMenuItem>
       <DropdownMenuItem>Support</DropdownMenuItem>
       <DropdownMenuSeparator />
+      {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
       <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
     </>
   ) : (

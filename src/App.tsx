@@ -1,17 +1,32 @@
 import { Route, Switch } from "wouter";
 import { DollarSign } from "lucide-react";
 import { ErrorBoundary } from "react-error-boundary";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import { TaskPage } from "@/pages/TaskPage";
 import { SignupPage } from "@/pages/signup";
 import { LoginPage } from "@/pages/login";
-import { AppLayout } from "@/components/layout/main";
+import { AppLayout } from "@/components/layout/main-layout";
 import { ThemeProvider } from "@/components/theme/provider";
 import { SitePages } from "@/configs/routes";
 import { MainErrorFallback } from "@/components/error/main";
 
 export default function App() {
   return (
-    <ErrorBoundary fallback={<MainErrorFallback />}>
+    <ErrorBoundary FallbackComponent={MainErrorFallback}>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable="touch"
+        pauseOnHover
+        theme="colored"
+      />
       <ThemeProvider storageKey="vite-ui-theme">
         <AppLayout>
           <Switch>
