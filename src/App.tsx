@@ -16,7 +16,7 @@ export default function App() {
   return (
     <ErrorBoundary FallbackComponent={MainErrorFallback}>
       <ToastContainer
-        position="top-center"
+        position="bottom-center"
         autoClose={5000}
         hideProgressBar={false}
         newestOnTop={false}
@@ -44,8 +44,14 @@ export default function App() {
             <Route path={SitePages.LOGIN}>
               <LoginPage />
             </Route>
-            <Route path={SitePages.TASK}>
+            <Route path={SitePages.TASKS_COMMUNITY}>
               <TaskPage />
+            </Route>
+            <Route path={SitePages.TASKS_PERSONAL}>
+              <TaskPage />
+            </Route>
+            <Route path={SitePages.USERS}>
+              <h1>USERS PAGE</h1>
             </Route>
             <Route>
               <h1 className="fixed left-1/2 top-1/4">404, Not Found!</h1>

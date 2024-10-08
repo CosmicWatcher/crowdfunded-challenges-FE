@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { Fragment, ReactNode, useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { CircleUser, Menu, House, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { ModeToggle } from "@/components/theme/toggle";
 import { SitePages } from "@/configs/routes";
 import { getUserSession, logout } from "@/lib/supabase";
@@ -26,31 +31,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     <div className="flex min-h-screen w-full flex-col">
       <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
         <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
-          <Link
-            href={SitePages.HOME}
-            className="flex items-center gap-2 text-lg font-semibold md:text-base"
-          >
-            <House className="h-6 w-6" />
-            <span className="sr-only">This APP</span>
-          </Link>
-          <Link
-            href={SitePages.TASK}
-            className="text-foreground transition-colors hover:text-foreground"
-          >
-            Tasks
-          </Link>
-          <Link
-            href={SitePages.SIGNUP}
-            className="text-muted-foreground transition-colors hover:text-foreground"
-          >
-            SignUp
-          </Link>
-          <Link
-            href={SitePages.LOGIN}
-            className="text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Login
-          </Link>
+          <NavSection />
         </nav>
         <Sheet>
           <SheetTrigger asChild>
@@ -63,30 +44,9 @@ export function AppLayout({ children }: AppLayoutProps) {
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left">
+          <SheetContent side="left" className="w-1/2">
             <nav className="grid gap-6 text-lg font-medium">
-              <Link
-                href={SitePages.HOME}
-                className="flex items-center gap-2 text-lg font-semibold"
-              >
-                <House className="h-6 w-6" />
-                <span className="sr-only">This APP</span>
-              </Link>
-              <Link href={SitePages.TASK} className="hover:text-foreground">
-                Tasks
-              </Link>
-              <Link
-                href={SitePages.SIGNUP}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                SignUp
-              </Link>
-              <Link
-                href={SitePages.LOGIN}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                Login
-              </Link>
+              <NavSection isInSheet />
             </nav>
           </SheetContent>
         </Sheet>
@@ -119,6 +79,56 @@ export function AppLayout({ children }: AppLayoutProps) {
         {children}
       </main>
     </div>
+  );
+}
+
+interface NavSectionProps {
+  isInSheet?: boolean;
+}
+function NavSection({ isInSheet = false }: NavSectionProps) {
+  const [location, _setLocation] = useLocation();
+  const [SheetCloseWrapper, shetCloseWrapperProps] = isInSheet
+    ? [SheetClose, { asChild: true }]
+    : [Fragment, {}]; // delegate SheetClose behavior to its child if isInSheet == true, otherwise use <>
+
+  const primary = `flex items-center gap-2 text-xl font-semibold ${isInSheet ? "" : "md:text-base"}`;
+  const secondary = `hover:text-foreground text-lg ${isInSheet ? "" : "transition-colors"}`;
+
+  return (
+    <>
+      <SheetCloseWrapper {...shetCloseWrapperProps}>
+        <Link href={SitePages.HOME} className={primary}>
+          <House
+            className={`h-6 w-6 hover:stroke-[3px] ${location === SitePages.HOME.toString() ? "stroke-[3px]" : "stroke-[1.5px]"}`}
+          />
+          <span className="sr-only">This APP</span>
+        </Link>
+      </SheetCloseWrapper>
+      <SheetCloseWrapper {...shetCloseWrapperProps}>
+        <Link
+          href={SitePages.TASKS_COMMUNITY}
+          className={`${secondary} ${location === SitePages.TASKS_COMMUNITY.toString() ? "text-foreground" : "text-muted-foreground"}`}
+        >
+          Asks
+        </Link>
+      </SheetCloseWrapper>
+      <SheetCloseWrapper {...shetCloseWrapperProps}>
+        <Link
+          href={SitePages.TASKS_PERSONAL}
+          className={`${secondary} ${location === SitePages.TASKS_PERSONAL.toString() ? "text-foreground" : "text-muted-foreground"}`}
+        >
+          Tasks
+        </Link>
+      </SheetCloseWrapper>
+      <SheetCloseWrapper {...shetCloseWrapperProps}>
+        <Link
+          href={SitePages.USERS}
+          className={`${secondary} ${location === SitePages.USERS.toString() ? "text-foreground" : "text-muted-foreground"}`}
+        >
+          Users
+        </Link>
+      </SheetCloseWrapper>
+    </>
   );
 }
 
