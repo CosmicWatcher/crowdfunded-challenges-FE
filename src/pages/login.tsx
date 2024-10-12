@@ -20,7 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { getUserSession, login } from "@/lib/supabase";
-import { SitePages } from "@/configs/routes";
+import { SITE_PAGES } from "@/configs/routes";
 import { useEffect, useState } from "react";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
@@ -36,7 +36,7 @@ export function LoginPage() {
       try {
         const session = await getUserSession();
         if (!session) setAuthenticated(false);
-        else setLocation(SitePages.HOME);
+        else setLocation(SITE_PAGES.HOME);
       } catch (err) {
         handleError(err);
       }
@@ -63,7 +63,7 @@ export function LoginPage() {
     try {
       await login(values.email, values.password);
       notifySuccess("Successfully Logged In");
-      setLocation(SitePages.HOME);
+      setLocation(SITE_PAGES.HOME);
     } catch (err) {
       handleError(err, "Login Failed");
     }
@@ -136,7 +136,7 @@ export function LoginPage() {
         </div>
         <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}
-          <Link href={SitePages.SIGNUP} className="underline">
+          <Link href={SITE_PAGES.SIGNUP} className="underline">
             Sign up
           </Link>
         </div>

@@ -18,7 +18,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ModeToggle } from "@/components/theme/toggle";
-import { SitePages } from "@/configs/routes";
+import { SITE_PAGES } from "@/configs/routes";
 import { getUserSession, logout } from "@/lib/supabase";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
@@ -97,35 +97,19 @@ function NavSection({ isInSheet = false }: NavSectionProps) {
   return (
     <>
       <SheetCloseWrapper {...shetCloseWrapperProps}>
-        <Link href={SitePages.HOME} className={primary}>
+        <Link href={SITE_PAGES.HOME} className={primary}>
           <House
-            className={`h-6 w-6 hover:stroke-[3px] ${location === SitePages.HOME.toString() ? "stroke-[3px]" : "stroke-[1.5px]"}`}
+            className={`h-6 w-6 hover:stroke-[3px] ${location === SITE_PAGES.HOME.toString() ? "stroke-[3px]" : "stroke-[1.5px]"}`}
           />
           <span className="sr-only">This APP</span>
         </Link>
       </SheetCloseWrapper>
       <SheetCloseWrapper {...shetCloseWrapperProps}>
         <Link
-          href={SitePages.TASKS_COMMUNITY}
-          className={`${secondary} ${location === SitePages.TASKS_COMMUNITY.toString() ? "text-foreground" : "text-muted-foreground"}`}
-        >
-          Asks
-        </Link>
-      </SheetCloseWrapper>
-      <SheetCloseWrapper {...shetCloseWrapperProps}>
-        <Link
-          href={SitePages.TASKS_PERSONAL}
-          className={`${secondary} ${location === SitePages.TASKS_PERSONAL.toString() ? "text-foreground" : "text-muted-foreground"}`}
+          href={SITE_PAGES.TASKS}
+          className={`${secondary} ${location === SITE_PAGES.TASKS.toString() ? "text-foreground" : "text-muted-foreground"}`}
         >
           Tasks
-        </Link>
-      </SheetCloseWrapper>
-      <SheetCloseWrapper {...shetCloseWrapperProps}>
-        <Link
-          href={SitePages.USERS}
-          className={`${secondary} ${location === SitePages.USERS.toString() ? "text-foreground" : "text-muted-foreground"}`}
-        >
-          Users
         </Link>
       </SheetCloseWrapper>
     </>
@@ -155,7 +139,7 @@ function AccountDropdown() {
     try {
       await logout();
       notifySuccess("Successfully Logged Out");
-      setLocation(SitePages.HOME);
+      setLocation(SITE_PAGES.HOME);
     } catch (err) {
       handleError(err, "Logout Failed");
     }
@@ -174,7 +158,7 @@ function AccountDropdown() {
   ) : (
     <>
       <DropdownMenuItem>
-        <Link href={SitePages.LOGIN}>Login</Link>
+        <Link href={SITE_PAGES.LOGIN}>Login</Link>
       </DropdownMenuItem>
     </>
   );

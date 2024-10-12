@@ -9,7 +9,7 @@ import { SignupPage } from "@/pages/signup";
 import { LoginPage } from "@/pages/login";
 import { AppLayout } from "@/components/layout/main-layout";
 import { ThemeProvider } from "@/components/theme/provider";
-import { SitePages } from "@/configs/routes";
+import { SITE_PAGES } from "@/configs/routes";
 import { MainErrorFallback } from "@/components/error/main";
 
 export default function App() {
@@ -30,7 +30,7 @@ export default function App() {
       <ThemeProvider storageKey="vite-ui-theme">
         <AppLayout>
           <Switch>
-            <Route path={SitePages.HOME}>
+            <Route path={SITE_PAGES.HOME}>
               <DollarSign className="animate-ping fixed left-1/3 top-1/3 size-32" />
               <DollarSign className="animate-ping fixed left-1/4 top-1/4 size-16" />
               <DollarSign className="animate-ping fixed right-1/4 top-2/3 size-20" />
@@ -38,13 +38,13 @@ export default function App() {
               <DollarSign className="animate-ping fixed left-1/2 top-2/3 size-4" />
               <DollarSign className="animate-ping fixed left-2/3 top-1/3 size-8" />
             </Route>
-            <Route path={SitePages.SIGNUP}>
+            <Route path={SITE_PAGES.SIGNUP}>
               <SignupPage />
             </Route>
-            <Route path={SitePages.LOGIN}>
+            <Route path={SITE_PAGES.LOGIN}>
               <LoginPage />
             </Route>
-            <Route path={SitePages.TASKS_COMMUNITY}>
+            <Route path={SITE_PAGES.TASKS}>
               <TaskPage />
             </Route>
             <Route path={SitePages.TASKS_PERSONAL}>

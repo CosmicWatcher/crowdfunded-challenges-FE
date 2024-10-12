@@ -1,7 +1,7 @@
 import { AlertCircle, Frown } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { SitePages } from "@/configs/routes";
+import { SITE_PAGES } from "@/configs/routes";
 import { Button } from "@/components/ui/button";
 
 export function MainErrorFallback() {
@@ -14,7 +14,7 @@ export function MainErrorFallback() {
       </AlertDescription>
       <br></br>
       <AlertDescription>
-        <Button onClick={() => window.location.assign(SitePages.HOME)}>
+        <Button onClick={() => window.location.assign(SITE_PAGES.HOME)}>
           Go Back Home!
         </Button>
       </AlertDescription>
