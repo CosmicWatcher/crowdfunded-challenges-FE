@@ -11,6 +11,7 @@ import { AppLayout } from "@/components/layout/main-layout";
 import { ThemeProvider } from "@/components/theme/provider";
 import { SITE_PAGES } from "@/configs/routes";
 import { MainErrorFallback } from "@/components/error/main";
+import TaskCreationPage from "@/pages/task-creation";
 
 export default function App() {
   return (
@@ -47,11 +48,8 @@ export default function App() {
             <Route path={SITE_PAGES.TASKS}>
               <TaskPage />
             </Route>
-            <Route path={SitePages.TASKS_PERSONAL}>
-              <TaskPage />
-            </Route>
-            <Route path={SitePages.USERS}>
-              <h1>USERS PAGE</h1>
+            <Route path={SITE_PAGES.CREATE_TASK}>
+              <TaskCreationPage />
             </Route>
             <Route>
               <h1 className="fixed left-1/2 top-1/4">404, Not Found!</h1>

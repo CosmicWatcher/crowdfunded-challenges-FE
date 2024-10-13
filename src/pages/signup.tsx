@@ -69,10 +69,10 @@ export function SignupPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       await signup(values.email, values.password);
-      notifySuccess("Account Created");
+      notifySuccess("Account successfully created");
       setLocation(SITE_PAGES.HOME);
     } catch (err) {
-      handleError(err, "Signup Failed");
+      handleError(err, "Signup failed");
     }
   }
 

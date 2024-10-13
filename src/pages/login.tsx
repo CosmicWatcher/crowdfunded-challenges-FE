@@ -62,10 +62,10 @@ export function LoginPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       await login(values.email, values.password);
-      notifySuccess("Successfully Logged In");
+      notifySuccess("Successfully logged in");
       setLocation(SITE_PAGES.HOME);
     } catch (err) {
-      handleError(err, "Login Failed");
+      handleError(err, "Login failed");
     }
   }
 
