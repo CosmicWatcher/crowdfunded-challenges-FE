@@ -9,4 +9,5 @@ export const FORM_LIMITS = {
     DESCRIPTION: { MAX: 20000 },
     MAX_WINNERS: { MIN: 1, MAX: 10 },
   },
+  TASK_SUBMISSION: { DESCRIPTION: { MAX: 10000 } },
 } as const;

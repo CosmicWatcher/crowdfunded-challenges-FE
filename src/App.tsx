@@ -4,14 +4,14 @@ import { ErrorBoundary } from "react-error-boundary";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { TaskPage } from "@/pages/TaskPage";
 import { SignupPage } from "@/pages/signup";
 import { LoginPage } from "@/pages/login";
+import TaskViewPage from "@/pages/task-view";
+import TaskCreationPage from "@/pages/task-creation";
 import { AppLayout } from "@/components/layout/main-layout";
 import { ThemeProvider } from "@/components/theme/provider";
 import { SITE_PAGES } from "@/configs/routes";
 import { MainErrorFallback } from "@/components/error/main";
-import TaskCreationPage from "@/pages/task-creation";
 
 export default function App() {
   return (
@@ -46,7 +46,7 @@ export default function App() {
               <LoginPage />
             </Route>
             <Route path={SITE_PAGES.TASKS}>
-              <TaskPage />
+              <TaskViewPage />
             </Route>
             <Route path={SITE_PAGES.CREATE_TASK}>
               <TaskCreationPage />
