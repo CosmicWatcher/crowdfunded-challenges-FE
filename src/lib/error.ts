@@ -7,5 +7,5 @@ export function handleError(error: unknown, prefix = "Error") {
   if (error instanceof Error) errorContent = error.message;
   else errorContent = String(error);
 
-  toast.error(`${prefix}: ${errorContent}`);
+  toast.error(`${prefix}: ${errorContent}`, { autoClose: 20000 });
 }

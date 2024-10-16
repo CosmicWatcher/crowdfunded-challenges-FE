@@ -5,3 +5,7 @@ export const SITE_PAGES = {
   TASKS: "/tasks",
   CREATE_TASK: "/tasks/create",
 } as const;
+
+export const API_ROUTES = {
+  TASKS: { CREATE: "/tasks/create" },
+};

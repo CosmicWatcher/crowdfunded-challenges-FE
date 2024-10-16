@@ -18,7 +18,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { FORM_LIMITS, TASK_TYPES } from "@/configs/constants";
-import { createTaskSubmission, getUserSession } from "@/lib/supabase";
+import { getUserSession } from "@/lib/supabase";
+import { createTaskSubmission } from "@/lib/api";
 import { notifySuccess } from "@/lib/notification";
 import { handleError } from "@/lib/error";
 import { z } from "zod";
@@ -34,7 +35,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Time from "@/components/ui/time";
-import { type } from "os";
 
 interface Submission {
   id: number;
@@ -288,7 +288,7 @@ interface SubmissionsListProps {
 
 function SubmissionsList({ submissions }: SubmissionsListProps) {
   return (
-    <Card className="max-w-3xl mx-auto">
+    <Card className="max-w-3xl mx-auto bg-secondary">
       <CardHeader className="text-center">
         <CardTitle>Submissions</CardTitle>
       </CardHeader>

@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useLocation } from "wouter";
-import { createTask, getUserSession } from "@/lib/supabase";
+import { getUserSession } from "@/lib/supabase";
+import { createTask } from "@/lib/api";
 import { SITE_PAGES } from "@/configs/routes";
 import { handleError } from "@/lib/error";
 import { z } from "zod";
@@ -22,6 +23,22 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+
+const taskCreationFormSchema = z.object({
+  title: z
+    .string()
+    .min(FORM_LIMITS.TASK_CREATION.TITLE.MIN, {
+      message: `Title must be at least ${FORM_LIMITS.TASK_CREATION.TITLE.MIN} characters`,
+    })
+    .max(FORM_LIMITS.TASK_CREATION.TITLE.MAX, {
+      message: `Title must be less than ${FORM_LIMITS.TASK_CREATION.TITLE.MAX} characters`,
+    }),
+  description: z.string().max(FORM_LIMITS.TASK_CREATION.DESCRIPTION.MAX, {
+    message: `Description must be less than ${FORM_LIMITS.TASK_CREATION.DESCRIPTION.MAX} characters`,
+  }),
+  maxWinners: z.number(),
+});
+export type TaskCreationForm = z.infer<typeof taskCreationFormSchema>;
 
 export default function TaskCreationPage() {
   const [taskType, setTaskType] = useState(TASK_TYPES.COMMUNITY);
@@ -54,23 +71,8 @@ export default function TaskCreationPage() {
     };
   }, [setLocation]);
 
-  const formSchema = z.object({
-    title: z
-      .string()
-      .min(FORM_LIMITS.TASK_CREATION.TITLE.MIN, {
-        message: `Title must be at least ${FORM_LIMITS.TASK_CREATION.TITLE.MIN} characters`,
-      })
-      .max(FORM_LIMITS.TASK_CREATION.TITLE.MAX, {
-        message: `Title must be less than ${FORM_LIMITS.TASK_CREATION.TITLE.MAX} characters`,
-      }),
-    description: z.string().max(FORM_LIMITS.TASK_CREATION.DESCRIPTION.MAX, {
-      message: `Description must be less than ${FORM_LIMITS.TASK_CREATION.DESCRIPTION.MAX} characters`,
-    }),
-    maxWinners: z.number(),
-  });
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<TaskCreationForm>({
+    resolver: zodResolver(taskCreationFormSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -78,7 +80,7 @@ export default function TaskCreationPage() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: TaskCreationForm) {
     try {
       await createTask(values, taskType);
       notifySuccess("Task successfully created");
