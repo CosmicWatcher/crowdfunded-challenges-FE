@@ -3,6 +3,7 @@ export const SITE_PAGES = {
   SIGNUP: "/auth/signup",
   LOGIN: "/auth/login",
   TASKS: "/tasks",
+  VIEW_TASK: "/tasks/:id",
   CREATE_TASK: "/tasks/create",
 } as const;
 

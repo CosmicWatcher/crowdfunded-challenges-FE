@@ -12,6 +12,7 @@ import { LoginPage } from "@/pages/login";
 import { SignupPage } from "@/pages/signup";
 import TaskCreationPage from "@/pages/task-creation";
 import TaskViewPage from "@/pages/task-view";
+import TasksPage from "@/pages/tasks";
 
 export default function App() {
   return (
@@ -46,6 +47,9 @@ export default function App() {
               <LoginPage />
             </Route>
             <Route path={SITE_PAGES.TASKS}>
+              <TasksPage />
+            </Route>
+            <Route path={SITE_PAGES.VIEW_TASK}>
               <TaskViewPage />
             </Route>
             <Route path={SITE_PAGES.CREATE_TASK}>
