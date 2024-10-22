@@ -1,11 +1,19 @@
-import { useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CalendarIcon,
-  TrophyIcon,
   CoinsIcon,
-  WalletIcon,
+  TrophyIcon,
   Vote,
+  WalletIcon,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { Link } from "wouter";
+import { z } from "zod";
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -13,20 +21,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { FORM_LIMITS, TASK_TYPES } from "@/configs/constants";
-import { getUserSession } from "@/lib/supabase";
-import { createTaskSubmission } from "@/lib/api";
-import { notifySuccess } from "@/lib/notification";
-import { handleError } from "@/lib/error";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { SITE_PAGES } from "@/configs/routes";
-import { Link } from "wouter";
 import {
   Form,
   FormControl,
@@ -34,7 +28,15 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
 import Time from "@/components/ui/time";
+import { FORM_LIMITS, TASK_TYPES } from "@/configs/constants";
+import { SITE_PAGES } from "@/configs/routes";
+import { createTaskSubmission } from "@/lib/api";
+import { handleError } from "@/lib/error";
+import { notifySuccess } from "@/lib/notification";
+import { getUserSession } from "@/lib/supabase";
+import { Task } from "@/types/task.types";
 
 interface Submission {
   id: number;
@@ -86,19 +88,7 @@ export default function TaskViewPage() {
   );
 }
 
-interface Task {
-  title: string;
-  description: string;
-  taskType: TASK_TYPES;
-  status: string;
-  username: string;
-  maxWinners: number;
-  fundsRaised: number;
-  depositAddress: string;
-  creationDate: Date;
-}
-
-export function TaskDisplay({ task }: { task: Task | undefined }) {
+function TaskDisplay({ task }: { task: Task | undefined }) {
   if (!task) {
     return (
       <Card className="max-w-3xl mx-auto">

@@ -1,6 +1,8 @@
+import { CircleUser, House, Menu, Search } from "lucide-react";
 import { Fragment, ReactNode, useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { CircleUser, Menu, House, Search } from "lucide-react";
+
+import { ModeToggle } from "@/components/theme/toggle";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,11 +19,10 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ModeToggle } from "@/components/theme/toggle";
 import { SITE_PAGES } from "@/configs/routes";
-import { getUserSession, logout } from "@/lib/supabase";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
+import { getUserSession, logout } from "@/lib/supabase";
 
 interface AppLayoutProps {
   children: ReactNode;

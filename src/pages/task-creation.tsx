@@ -1,20 +1,11 @@
-import { useState, useEffect, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { useLocation } from "wouter";
-import { getUserSession } from "@/lib/supabase";
-import { createTask } from "@/lib/api";
-import { SITE_PAGES } from "@/configs/routes";
-import { handleError } from "@/lib/error";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { notifyInfo, notifySuccess } from "@/lib/notification";
-import { FORM_LIMITS, TASK_TYPES } from "@/configs/constants";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useLocation } from "wouter";
+import { z } from "zod";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -23,6 +14,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Textarea } from "@/components/ui/textarea";
+import { FORM_LIMITS, TASK_TYPES } from "@/configs/constants";
+import { SITE_PAGES } from "@/configs/routes";
+import { createTask } from "@/lib/api";
+import { handleError } from "@/lib/error";
+import { notifyInfo, notifySuccess } from "@/lib/notification";
+import { getUserSession } from "@/lib/supabase";
 
 const taskCreationFormSchema = z.object({
   title: z

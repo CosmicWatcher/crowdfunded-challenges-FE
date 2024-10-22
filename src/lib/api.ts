@@ -33,3 +33,10 @@ export async function createTask(vals: TaskCreationForm, type: TASK_TYPES) {
 export async function createTaskSubmission(vals, id) {
   console.log(vals, id);
 }
+
+// export async function testSecurity() {
+// (async () => {
+//   const { data, error } = await supabase.from("post").select();
+//   console.log(error, data);
+// })();
+// }

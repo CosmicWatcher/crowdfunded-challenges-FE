@@ -1,17 +1,17 @@
-import { Route, Switch } from "wouter";
 import { DollarSign } from "lucide-react";
 import { ErrorBoundary } from "react-error-boundary";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Route, Switch } from "wouter";
 
-import { SignupPage } from "@/pages/signup";
-import { LoginPage } from "@/pages/login";
-import TaskViewPage from "@/pages/task-view";
-import TaskCreationPage from "@/pages/task-creation";
+import { MainErrorFallback } from "@/components/error/main-error";
 import { AppLayout } from "@/components/layout/main-layout";
 import { ThemeProvider } from "@/components/theme/provider";
 import { SITE_PAGES } from "@/configs/routes";
-import { MainErrorFallback } from "@/components/error/main";
+import { LoginPage } from "@/pages/login";
+import { SignupPage } from "@/pages/signup";
+import TaskCreationPage from "@/pages/task-creation";
+import TaskViewPage from "@/pages/task-view";
 
 export default function App() {
   return (

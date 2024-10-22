@@ -1,7 +1,9 @@
-import { Link, useLocation } from "wouter";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { Link, useLocation } from "wouter";
 import { z } from "zod";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
@@ -19,11 +20,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { SITE_PAGES } from "@/configs/routes";
-import { useEffect, useState } from "react";
-import { getUserSession, signup } from "@/lib/supabase";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
+import { getUserSession, signup } from "@/lib/supabase";
 
 export function SignupPage() {
   const [_location, setLocation] = useLocation();
