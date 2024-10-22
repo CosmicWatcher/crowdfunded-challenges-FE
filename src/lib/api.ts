@@ -22,6 +22,7 @@ export async function createTask(vals: TaskCreationForm, type: TASK_TYPES) {
         Authorization: `Bearer ${session.access_token}`,
       },
     });
+    if (res.status >= 500) throw new Error("Server Error!");
     const resJson = (await res.json()) as ApiResponse;
     if (!resJson.success) throw new Error(resJson.message);
   } else {
