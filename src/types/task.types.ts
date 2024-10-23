@@ -1,10 +1,11 @@
-import { TASK_TYPES } from "@/configs/constants";
+export type TASK_KIND = "community" | "personal";
+export type TASK_STATUS = "active" | "successful" | "failed" | "deleted";
 
 export interface Task {
   title: string;
   description: string;
-  taskType: TASK_TYPES;
-  status: string;
+  taskKind: TASK_KIND;
+  status: TASK_STATUS;
   username: string;
   maxWinners: number;
   fundsRaised: number;

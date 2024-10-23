@@ -1,17 +1,49 @@
-import { TASK_TYPES } from "@/configs/constants";
 import { SERVER_URL } from "@/configs/env";
 import { API_ROUTES } from "@/configs/routes";
 import { getUserSession } from "@/lib/supabase";
 import { TaskCreationForm } from "@/pages/task-creation";
+import { TASK_KIND, TASK_STATUS } from "@/types/task.types";
 
 interface ApiResponse {
   success: boolean;
   message: string;
-  responseObject: object | null;
+  responseObject: ResponseObject | null;
   statusCode: number;
 }
 
-export async function createTask(vals: TaskCreationForm, type: TASK_TYPES) {
+interface ResponseObject {
+  data: UserResponse | TaskResponse;
+  pagination?: ResponsePagination;
+}
+
+interface ResponsePagination {
+  total_records: number;
+  total_pages: number;
+  current_page: number;
+  prev_page: number | null;
+  next_page: number | null;
+}
+
+interface UserResponse {
+  id: string;
+  username: string | null;
+}
+
+interface TaskResponse {
+  id: string;
+  createdBy: UserResponse | null;
+  title: string | null;
+  details: string | null;
+  kind: TASK_KIND;
+  maxWinners: number;
+  status: TASK_STATUS;
+  depositAddress: string | null;
+  createdAt: string;
+  editedAt: string | null;
+  endedAt: string | null;
+}
+
+export async function createTask(vals: TaskCreationForm, type: TASK_KIND) {
   const session = await getUserSession();
   if (session) {
     const res = await fetch(`${SERVER_URL}${API_ROUTES.TASKS.CREATE}`, {
@@ -30,7 +62,14 @@ export async function createTask(vals: TaskCreationForm, type: TASK_TYPES) {
   }
 }
 
-export async function createTaskSubmission(vals, id) {
+export async function createTaskSubmission(
+  vals: { description: string },
+  id: string,
+) {
+  await fetch(`${SERVER_URL}`, {
+    method: "POST",
+    body: JSON.stringify(vals),
+  });
   console.log(vals, id);
 }
 

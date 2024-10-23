@@ -1,8 +1,3 @@
-export enum TASK_TYPES {
-  COMMUNITY = "community",
-  PERSONAL = "personal",
-}
-
 export const FORM_LIMITS = {
   TASK_CREATION: {
     TITLE: { MIN: 3, MAX: 200 },

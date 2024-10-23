@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import Time from "@/components/ui/time";
-import { FORM_LIMITS, TASK_TYPES } from "@/configs/constants";
+import { FORM_LIMITS } from "@/configs/constants";
 import { SITE_PAGES } from "@/configs/routes";
 import { createTaskSubmission } from "@/lib/api";
 import { handleError } from "@/lib/error";
@@ -65,13 +65,13 @@ export default function TaskViewPage() {
     },
   ]);
 
-  const task = {
+  const task: Task = {
     title:
       "Complete a Web3 Task where we need someone to come in and do a thing. if this is you contact us and we will get in touch becuse that is what we do in this business yes sir we do that indeed",
     description:
       "We need someone to develop a smart contract for our new DeFi project. if this sounds good to you make sure to let us know.If you just glance of at these two folder structures you may notice a ton of similarities, but there is one major difference which is the features folder. This features folder is a more elegant way of grouping similar code together and best of all it does not suffer from the same problems as the pages folder from the intermediate folder structure since your features will almost never have mass amounts of overlap between them. Since so many of the folders in this structure are repeats from the intermediate structure, I will only be covering the folders that have changed between these two structures.\n\nhere are the details:\nphone number 800-888-1234\nemail:example@ex.com",
-    taskType: TASK_TYPES.COMMUNITY,
-    status: "Open",
+    taskKind: "community",
+    status: "active",
     username: "crypto_enthusiast",
     maxWinners: 3,
     fundsRaised: 5000,
@@ -103,7 +103,7 @@ function TaskDisplay({ task }: { task: Task | undefined }) {
     <Card className="max-w-3xl mx-auto relative">
       <div className="absolute top-4 right-4">
         <Badge variant="outline" className="bg-blue-500">
-          {task.taskType}
+          {task.taskKind}
         </Badge>
       </div>
       <CardHeader>

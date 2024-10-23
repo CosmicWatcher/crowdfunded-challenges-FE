@@ -18,12 +18,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import { FORM_LIMITS, TASK_TYPES } from "@/configs/constants";
+import { FORM_LIMITS } from "@/configs/constants";
 import { SITE_PAGES } from "@/configs/routes";
 import { createTask } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { notifyInfo, notifySuccess } from "@/lib/notification";
 import { getUserSession } from "@/lib/supabase";
+import { TASK_KIND } from "@/types/task.types";
 
 const taskCreationFormSchema = z.object({
   title: z
@@ -42,7 +43,7 @@ const taskCreationFormSchema = z.object({
 export type TaskCreationForm = z.infer<typeof taskCreationFormSchema>;
 
 export default function TaskCreationPage() {
-  const [taskType, setTaskType] = useState(TASK_TYPES.COMMUNITY);
+  const [taskType, setTaskType] = useState<TASK_KIND>("community");
   const [_location, setLocation] = useLocation();
   const [isAuthenticated, setAuthenticated] = useState<undefined | boolean>(
     undefined,
@@ -91,16 +92,14 @@ export default function TaskCreationPage() {
     }
   }
 
-  const handleTaskTypeChange = (newTaskType: TASK_TYPES) => {
+  const handleTaskTypeChange = (newTaskType: TASK_KIND) => {
     setTaskType(newTaskType);
   };
 
   useEffect(() => {
     if (taskTypeRef.current) {
       taskTypeRef.current.style.transform =
-        taskType === TASK_TYPES.COMMUNITY
-          ? "translateX(0)"
-          : "translateX(100%)";
+        taskType === "community" ? "translateX(0)" : "translateX(100%)";
     }
   }, [taskType]);
 
@@ -125,33 +124,29 @@ export default function TaskCreationPage() {
                   <div
                     ref={taskTypeRef}
                     className={`absolute top-1 left-1 w-[calc(50%-4px)] h-8 rounded-full transition-all duration-300 ease-in-out ${
-                      taskType === TASK_TYPES.COMMUNITY
-                        ? "bg-blue-500"
-                        : "bg-green-500"
+                      taskType === "community" ? "bg-blue-500" : "bg-green-500"
                     }`}
                   ></div>
                   <div className="absolute inset-0 flex">
                     <button
                       type="button"
-                      onClick={() => handleTaskTypeChange(TASK_TYPES.COMMUNITY)}
+                      onClick={() => handleTaskTypeChange("community")}
                       className={`flex-1 z-10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-l-full ${
-                        taskType === TASK_TYPES.COMMUNITY
+                        taskType === "community"
                           ? "text-white"
                           : "text-gray-700"
                       }`}
-                      aria-pressed={taskType === TASK_TYPES.COMMUNITY}
+                      aria-pressed={taskType === "community"}
                     >
                       Community
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleTaskTypeChange(TASK_TYPES.PERSONAL)}
+                      onClick={() => handleTaskTypeChange("personal")}
                       className={`flex-1 z-10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 rounded-r-full ${
-                        taskType === TASK_TYPES.PERSONAL
-                          ? "text-white"
-                          : "text-gray-700"
+                        taskType === "personal" ? "text-white" : "text-gray-700"
                       }`}
-                      aria-pressed={taskType === TASK_TYPES.PERSONAL}
+                      aria-pressed={taskType === "personal"}
                     >
                       Personal
                     </button>
