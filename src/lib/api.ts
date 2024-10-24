@@ -2,45 +2,14 @@ import { SERVER_URL } from "@/configs/env";
 import { API_ROUTES } from "@/configs/routes";
 import { getUserSession } from "@/lib/supabase";
 import { TaskCreationForm } from "@/pages/task-creation";
-import { TASK_KIND, TASK_STATUS } from "@/types/task.types";
+import { ResponseObject, TaskResponse } from "@/types/api.types";
+import { TASK_KIND } from "@/types/task.types";
 
-interface ApiResponse {
+interface ApiResponse<T = null> {
   success: boolean;
   message: string;
-  responseObject: ResponseObject | null;
+  responseObject: T extends null ? null : ResponseObject<T>;
   statusCode: number;
-}
-
-interface ResponseObject {
-  data: UserResponse | TaskResponse;
-  pagination?: ResponsePagination;
-}
-
-interface ResponsePagination {
-  total_records: number;
-  total_pages: number;
-  current_page: number;
-  prev_page: number | null;
-  next_page: number | null;
-}
-
-interface UserResponse {
-  id: string;
-  username: string | null;
-}
-
-interface TaskResponse {
-  id: string;
-  createdBy: UserResponse | null;
-  title: string | null;
-  details: string | null;
-  kind: TASK_KIND;
-  maxWinners: number;
-  status: TASK_STATUS;
-  depositAddress: string | null;
-  createdAt: string;
-  editedAt: string | null;
-  endedAt: string | null;
 }
 
 export async function createTask(vals: TaskCreationForm, type: TASK_KIND) {
@@ -55,11 +24,55 @@ export async function createTask(vals: TaskCreationForm, type: TASK_KIND) {
       },
     });
     if (res.status >= 500) throw new Error("Server Error!");
+
     const resJson = (await res.json()) as ApiResponse;
     if (!resJson.success) throw new Error(resJson.message);
   } else {
     throw new Error("User authentication failed!");
   }
+}
+export async function getTaskList(page = 1) {
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+  });
+
+  const res = await fetch(
+    `${SERVER_URL}${API_ROUTES.TASKS.GET_LIST}?${queryParams}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  if (res.status >= 500) throw new Error("Server Error!");
+
+  const resJson = (await res.json()) as ApiResponse<TaskResponse[]>;
+  if (!resJson.success) throw new Error(resJson.message);
+  if (!resJson.responseObject) throw new Error("No response object!");
+
+  return resJson.responseObject;
+}
+
+export async function getTaskById(id: string) {
+  const res = await fetch(
+    `${SERVER_URL}${API_ROUTES.TASKS.GET_BY_ID.replace(":id", id)}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  if (res.status >= 500) throw new Error("Server Error!");
+
+  const resJson = (await res.json()) as ApiResponse<TaskResponse>;
+  if (!resJson.success) throw new Error(resJson.message);
+  if (!resJson.responseObject) throw new Error("No response object!");
+
+  return resJson.responseObject.data;
 }
 
 export async function createTaskSubmission(

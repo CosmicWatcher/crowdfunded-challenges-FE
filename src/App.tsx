@@ -49,11 +49,11 @@ export default function App() {
             <Route path={SITE_PAGES.TASKS}>
               <TasksPage />
             </Route>
-            <Route path={SITE_PAGES.VIEW_TASK}>
-              <TaskViewPage />
-            </Route>
             <Route path={SITE_PAGES.CREATE_TASK}>
               <TaskCreationPage />
+            </Route>
+            <Route path={SITE_PAGES.VIEW_TASK}>
+              <TaskViewPage />
             </Route>
             <Route>
               <h1 className="fixed left-1/2 top-1/4">404, Not Found!</h1>

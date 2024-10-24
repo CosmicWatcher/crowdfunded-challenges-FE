@@ -50,6 +50,10 @@ export default {
           4: "hsl(var(--chart-4))",
           5: "hsl(var(--chart-5))",
         },
+        task: {
+          community: "hsl(var(--task-community))",
+          personal: "hsl(var(--task-personal))",
+        },
       },
     },
   },

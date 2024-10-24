@@ -1,16 +1,20 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CalendarIcon,
+  ClipboardIcon,
   CoinsIcon,
+  Copy,
+  ScrollText,
   TrophyIcon,
   Vote,
   WalletIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "wouter";
+import { Link, useParams } from "wouter";
 import { z } from "zod";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,15 +32,23 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { Loading } from "@/components/ui/loading";
 import { Textarea } from "@/components/ui/textarea";
 import Time from "@/components/ui/time";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { FORM_LIMITS } from "@/configs/constants";
 import { SITE_PAGES } from "@/configs/routes";
-import { createTaskSubmission } from "@/lib/api";
+import { createTaskSubmission, getTaskById } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
 import { getUserSession } from "@/lib/supabase";
-import { Task } from "@/types/task.types";
+import { TaskResponse } from "@/types/api.types";
+import { getTaskKindColor } from "@/utils/colors";
 
 interface Submission {
   id: number;
@@ -46,6 +58,10 @@ interface Submission {
 }
 
 export default function TaskViewPage() {
+  const [task, setTask] = useState<TaskResponse>();
+  const [loading, setLoading] = useState(true);
+  const params = useParams();
+  const taskID = params.id;
   const [submissions, setSubmissions] = useState<Submission[]>([
     {
       id: 1,
@@ -65,19 +81,47 @@ export default function TaskViewPage() {
     },
   ]);
 
-  const task: Task = {
-    title:
-      "Complete a Web3 Task where we need someone to come in and do a thing. if this is you contact us and we will get in touch becuse that is what we do in this business yes sir we do that indeed",
-    description:
-      "We need someone to develop a smart contract for our new DeFi project. if this sounds good to you make sure to let us know.If you just glance of at these two folder structures you may notice a ton of similarities, but there is one major difference which is the features folder. This features folder is a more elegant way of grouping similar code together and best of all it does not suffer from the same problems as the pages folder from the intermediate folder structure since your features will almost never have mass amounts of overlap between them. Since so many of the folders in this structure are repeats from the intermediate structure, I will only be covering the folders that have changed between these two structures.\n\nhere are the details:\nphone number 800-888-1234\nemail:example@ex.com",
-    taskKind: "community",
-    status: "active",
-    username: "crypto_enthusiast",
-    maxWinners: 3,
-    fundsRaised: 5000,
-    depositAddress: "0x1234...5678",
-    creationDate: new Date("2023-05-15T09:00:00Z"),
-  };
+  useEffect(() => {
+    let ignore = false;
+
+    async function fetchTask() {
+      setLoading(true);
+      console.log("fetching task");
+      try {
+        if (taskID !== undefined) {
+          const response = await getTaskById(taskID);
+          if (!ignore && response) {
+            setTask(response);
+          }
+        }
+      } catch (err) {
+        handleError(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    void fetchTask();
+
+    return () => {
+      ignore = true;
+    };
+  }, [taskID]);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (!task) {
+    return (
+      <Alert className="max-w-lg mx-auto">
+        <ScrollText className="h-4 w-4" />
+        <AlertTitle>Task not found</AlertTitle>
+        <AlertDescription>
+          Please check the task ID and try again.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div className="min-h-screen space-y-4">
@@ -88,43 +132,36 @@ export default function TaskViewPage() {
   );
 }
 
-function TaskDisplay({ task }: { task: Task | undefined }) {
-  if (!task) {
-    return (
-      <Card className="max-w-3xl mx-auto">
-        <CardContent>
-          <p>No task data available.</p>
-        </CardContent>
-      </Card>
-    );
-  }
+function TaskDisplay({ task }: { task: TaskResponse }) {
+  const username = task.createdBy?.username ?? "anonymous";
+  const kindColor = getTaskKindColor(task.kind);
 
   return (
     <Card className="max-w-3xl mx-auto relative">
       <div className="absolute top-4 right-4">
-        <Badge variant="outline" className="bg-blue-500">
-          {task.taskKind}
+        <Badge variant="outline" className={kindColor}>
+          {task.kind}
         </Badge>
       </div>
       <CardHeader>
         <div className="space-y-2">
           <div className="flex items-center text-sm">
             <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-            <Time timestamp={task.creationDate} />
+            <Time timestamp={new Date(task.createdAt)} />
           </div>
           <div className="flex items-center text-sm space-x-2">
             <Avatar>
               <AvatarFallback>
-                {`${task.username[0].toUpperCase()}${task.username[1].toUpperCase()}`}
+                {`${username[0].toUpperCase()}${username[1].toUpperCase()}`}
               </AvatarFallback>
             </Avatar>
-            <span>{task.username}</span>
+            <span>{username}</span>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <CardTitle className="text-2xl font-bold">{task.title}</CardTitle>
-        <p>{task.description}</p>
+        <p>{task.details}</p>
 
         {/* <div className="flex items-center">
           <CheckCircleIcon className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -138,7 +175,14 @@ function TaskDisplay({ task }: { task: Task | undefined }) {
         <div className="flex items-center justify-center">
           <WalletIcon className="mr-2 h-4 w-4 text-muted-foreground" />
           <span className="font-semibold text-sm">Address:</span>
-          <span className="ml-2 font-mono text-sm">{task.depositAddress}</span>
+          <span className="ml-2 font-mono text-sm">
+            {task.depositAddress
+              ? `${task.depositAddress.slice(0, 5)}...${task.depositAddress.slice(-5)}`
+              : "no wallet found"}
+          </span>
+          {task.depositAddress && (
+            <CopyAddressButton address={task.depositAddress} />
+          )}
         </div>
         <Badge variant="secondary" className="flex items-center justify-center">
           <CoinsIcon className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -154,6 +198,39 @@ function TaskDisplay({ task }: { task: Task | undefined }) {
         </div>
       </div>
     </Card>
+  );
+}
+
+function CopyAddressButton({ address }: { address: string }) {
+  const [clipboardCopyTooltip, setClipboardCopyTooltip] =
+    useState("Copy to Clipboard");
+
+  function clickHandler() {
+    navigator.clipboard
+      .writeText(address)
+      .then(() => setClipboardCopyTooltip("Copied"))
+      .catch(() => setClipboardCopyTooltip("Failed to Copy"))
+      .finally(() => {
+        setTimeout(() => {
+          setClipboardCopyTooltip("Copy to Clipboard");
+        }, 5000);
+      });
+  }
+
+  return (
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger>
+          <Copy
+            className="h-4 w-4 ml-1 text-muted-foreground"
+            onClick={clickHandler}
+          />
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{clipboardCopyTooltip}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 

@@ -1,54 +1,134 @@
-import { CalendarIcon, CheckCircleIcon } from "lucide-react";
+import {
+  ArrowBigDownDash,
+  CalendarIcon,
+  CheckCircleIcon,
+  LoaderCircle,
+  ScrollText,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Loading } from "@/components/ui/loading";
 import Time from "@/components/ui/time";
-import { Task } from "@/types/task.types";
+import { getTaskList } from "@/lib/api";
+import { handleError } from "@/lib/error";
+import { ResponseObject, TaskResponse } from "@/types/api.types";
+import { getTaskKindColor } from "@/utils/colors";
 
 export default function TasksPage() {
-  const task: Task = {
-    title:
-      "Complete a Web3 Task where we need someone to come in and do a thing. if this is you contact us and we will get in touch becuse that is what we do in this business yes sir we do that indeed",
-    description:
-      "We need someone to develop a smart contract for our new DeFi project. if this sounds good to you make sure to let us know.If you just glance of at these two folder structures you may notice a ton of similarities, but there is one major difference which is the features folder. This features folder is a more elegant way of grouping similar code together and best of all it does not suffer from the same problems as the pages folder from the intermediate folder structure since your features will almost never have mass amounts of overlap between them. Since so many of the folders in this structure are repeats from the intermediate structure, I will only be covering the folders that have changed between these two structures.\n\nhere are the details:\nphone number 800-888-1234\nemail:example@ex.com",
-    taskKind: "community",
-    status: "active",
-    username: "crypto_enthusiast",
-    maxWinners: 3,
-    fundsRaised: 5000,
-    depositAddress: "0x1234...5678",
-    creationDate: new Date("2023-05-15T09:00:00Z"),
-  };
+  const [tasks, setTasks] = useState<ResponseObject<TaskResponse[]>>({
+    data: [],
+    pagination: {
+      total_records: 0,
+      total_pages: 0,
+      current_page: 0,
+      prev_page: null,
+      next_page: null,
+    },
+  });
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
 
-  return <TaskCard task={task} />;
+  function handleNextPageClick() {
+    if (tasks.pagination?.next_page && tasks.pagination.next_page !== page) {
+      setPage(tasks.pagination.next_page);
+    }
+  }
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function fetchTasks(pageNum: number) {
+      setLoading(true);
+      try {
+        const response = await getTaskList(pageNum);
+        if (!ignore && response.data) {
+          setTasks((prevTasks) => {
+            return {
+              data: [...prevTasks.data, ...response.data],
+              pagination: response.pagination,
+            };
+          });
+        }
+      } catch (err) {
+        handleError(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    void fetchTasks(page);
+
+    return () => {
+      ignore = true;
+    };
+  }, [page]);
+
+  if (loading && tasks.data.length === 0) {
+    return <Loading />;
+  }
+
+  if (tasks.data.length === 0) {
+    return (
+      <Alert className="max-w-lg mx-auto">
+        <ScrollText className="h-4 w-4" />
+        <AlertTitle>No tasks available.</AlertTitle>
+        <AlertDescription>Please check back later.</AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {tasks.data.map((task) => (
+        <TaskCard key={task.id} task={task} />
+      ))}
+      {loading && <Loading />}
+      {!loading && tasks.pagination?.next_page && (
+        <ArrowBigDownDash
+          className="size-10 mx-auto cursor-pointer animate-bounce"
+          onClick={handleNextPageClick}
+        />
+      )}
+    </div>
+  );
 }
 
-function TaskCard({ task }: { task: Task }) {
+function TaskCard({ task }: { task: TaskResponse }) {
+  const [_location, setLocation] = useLocation();
+  const username = task.createdBy?.username ?? "anonymous";
+  const kindColor = getTaskKindColor(task.kind);
+
   return (
-    <Card className="max-w-3xl mx-auto relative">
+    <Card
+      className="max-w-3xl mx-auto relative cursor-pointer"
+      onClick={() => setLocation(`/tasks/${task.id}`)}
+    >
       <div className=" px-6 py-4 md:flex grid gap-2 justify-center md:justify-between items-center text-sm">
-        <div className="flex items-center justify-center space-x-1">
+        <div className="flex items-center justify-center space-x-2">
           <Avatar>
             <AvatarFallback>
-              {`${task.username[0].toUpperCase()}${task.username[1].toUpperCase()}`}
+              {`${username[0].toUpperCase()}${username[1].toUpperCase()}`}
             </AvatarFallback>
           </Avatar>
-          <span>{task.username}</span>
+          <span>{username}</span>
         </div>
         <div className="flex items-center justify-center">
           <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-          <Time timestamp={task.creationDate} />
+          <Time timestamp={new Date(task.createdAt)} />
         </div>
         <div className="flex items-center justify-center">
-          <Badge variant="outline" className="bg-blue-500">
-            {task.taskKind}
+          <Badge variant="outline" className={kindColor}>
+            {task.kind}
           </Badge>
         </div>
       </div>
       <CardContent className="space-y-4">
         <CardTitle className="text-2xl font-bold">{task.title}</CardTitle>
-        <p className="line-clamp-2">{task.description}</p>
+        <p className="line-clamp-2">{task.details}</p>
 
         <div className="flex items-center">
           <CheckCircleIcon className="mr-1 h-4 w-4 text-muted-foreground" />

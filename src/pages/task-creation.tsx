@@ -25,6 +25,7 @@ import { handleError } from "@/lib/error";
 import { notifyInfo, notifySuccess } from "@/lib/notification";
 import { getUserSession } from "@/lib/supabase";
 import { TASK_KIND } from "@/types/task.types";
+import { getTaskKindColor } from "@/utils/colors";
 
 const taskCreationFormSchema = z.object({
   title: z
@@ -43,12 +44,12 @@ const taskCreationFormSchema = z.object({
 export type TaskCreationForm = z.infer<typeof taskCreationFormSchema>;
 
 export default function TaskCreationPage() {
-  const [taskType, setTaskType] = useState<TASK_KIND>("community");
+  const [taskKind, setTaskKind] = useState<TASK_KIND>("community");
   const [_location, setLocation] = useLocation();
   const [isAuthenticated, setAuthenticated] = useState<undefined | boolean>(
     undefined,
   );
-  const taskTypeRef = useRef<HTMLDivElement>(null);
+  const taskKindRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let ignore = false;
@@ -84,7 +85,7 @@ export default function TaskCreationPage() {
 
   async function onSubmit(values: TaskCreationForm) {
     try {
-      await createTask(values, taskType);
+      await createTask(values, taskKind);
       notifySuccess("Task successfully created");
       setLocation(SITE_PAGES.TASKS);
     } catch (err) {
@@ -92,16 +93,22 @@ export default function TaskCreationPage() {
     }
   }
 
-  const handleTaskTypeChange = (newTaskType: TASK_KIND) => {
-    setTaskType(newTaskType);
+  const handleTaskKindChange = (newTaskKind: TASK_KIND) => {
+    setTaskKind(newTaskKind);
   };
 
   useEffect(() => {
-    if (taskTypeRef.current) {
-      taskTypeRef.current.style.transform =
-        taskType === "community" ? "translateX(0)" : "translateX(100%)";
+    if (taskKindRef.current) {
+      taskKindRef.current.style.transform =
+        taskKind === "community" ? "translateX(0)" : "translateX(100%)";
     }
-  }, [taskType]);
+  }, [taskKind]);
+
+  const kindColor = getTaskKindColor(taskKind);
+  const communityTextColor =
+    taskKind === "community" ? "text-foreground" : "text-muted-foreground";
+  const personalTextColor =
+    taskKind === "personal" ? "text-foreground" : "text-muted-foreground";
 
   return isAuthenticated === undefined ? null : (
     <div className="container mx-auto p-4">
@@ -115,38 +122,32 @@ export default function TaskCreationPage() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label
-                  htmlFor="taskType-toggle"
+                  htmlFor="taskKind-toggle"
                   className="block text-center mb-2"
                 >
                   Choose the Task Type
                 </Label>
                 <div className="relative w-64 h-10 mx-auto bg-gray-200 rounded-full">
                   <div
-                    ref={taskTypeRef}
+                    ref={taskKindRef}
                     className={`absolute top-1 left-1 w-[calc(50%-4px)] h-8 rounded-full transition-all duration-300 ease-in-out ${
-                      taskType === "community" ? "bg-blue-500" : "bg-green-500"
+                      kindColor
                     }`}
                   ></div>
                   <div className="absolute inset-0 flex">
                     <button
                       type="button"
-                      onClick={() => handleTaskTypeChange("community")}
-                      className={`flex-1 z-10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-l-full ${
-                        taskType === "community"
-                          ? "text-white"
-                          : "text-gray-700"
-                      }`}
-                      aria-pressed={taskType === "community"}
+                      onClick={() => handleTaskKindChange("community")}
+                      className={`flex-1 z-10 rounded-l-full ${communityTextColor}`}
+                      aria-pressed={taskKind === "community"}
                     >
                       Community
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleTaskTypeChange("personal")}
-                      className={`flex-1 z-10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 rounded-r-full ${
-                        taskType === "personal" ? "text-white" : "text-gray-700"
-                      }`}
-                      aria-pressed={taskType === "personal"}
+                      onClick={() => handleTaskKindChange("personal")}
+                      className={`flex-1 z-10 rounded-r-full ${personalTextColor}`}
+                      aria-pressed={taskKind === "personal"}
                     >
                       Personal
                     </button>

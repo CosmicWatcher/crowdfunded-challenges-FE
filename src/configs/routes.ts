@@ -8,5 +8,9 @@ export const SITE_PAGES = {
 } as const;
 
 export const API_ROUTES = {
-  TASKS: { CREATE: "/tasks/create" },
+  TASKS: {
+    CREATE: "/tasks/create",
+    GET_LIST: "/tasks",
+    GET_BY_ID: "/tasks/:id",
+  },
 };
