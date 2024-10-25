@@ -116,7 +116,7 @@ function TaskCard({ task }: { task: TaskResponse }) {
 
   return (
     <Card
-      className="max-w-3xl mx-auto relative cursor-pointer"
+      className="max-w-7xl mx-auto relative cursor-pointer"
       onClick={() => setLocation(`/tasks/${task.id}`)}
     >
       <div className=" px-6 py-4 md:flex grid gap-2 justify-center md:justify-between items-center text-sm">

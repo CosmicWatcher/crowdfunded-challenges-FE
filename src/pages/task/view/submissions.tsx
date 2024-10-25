@@ -128,7 +128,7 @@ function SubmissionForm({
   }
 
   return (
-    <Card className="max-w-3xl mx-auto">
+    <Card className="max-w-7xl mx-auto">
       <CardHeader>
         <CardTitle>Submit Your Work</CardTitle>
       </CardHeader>
@@ -268,7 +268,7 @@ function SubmissionsList({
   }
 
   return (
-    <Card className="max-w-3xl mx-auto bg-secondary">
+    <Card className="max-w-7xl mx-auto bg-secondary">
       <CardHeader className="text-center">
         <CardTitle>Submissions</CardTitle>
       </CardHeader>

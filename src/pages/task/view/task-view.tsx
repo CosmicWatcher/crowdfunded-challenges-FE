@@ -87,7 +87,7 @@ function TaskDisplay({ task }: { task: TaskResponse }) {
   const kindColor = getTaskKindColor(task.kind);
 
   return (
-    <Card className="max-w-3xl mx-auto relative">
+    <Card className="max-w-7xl mx-auto relative">
       <div className="absolute top-4 right-4">
         <Badge variant="outline" className={kindColor}>
           {task.kind}

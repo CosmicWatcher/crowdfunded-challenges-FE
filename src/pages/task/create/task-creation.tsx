@@ -96,113 +96,111 @@ export default function TaskCreationPage() {
     taskKind === "personal" ? "text-foreground" : "text-muted-foreground";
 
   return isAuthenticated === undefined ? null : (
-    <div className="container mx-auto p-4">
-      <Card className="w-full max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Create New Task</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="taskKind-toggle"
-                  className="block text-center mb-2"
-                >
-                  Choose the Task Type
-                </Label>
-                <div className="relative w-64 h-10 mx-auto bg-gray-200 rounded-full">
-                  <div
-                    ref={taskKindRef}
-                    className={`absolute top-1 left-1 w-[calc(50%-4px)] h-8 rounded-full transition-all duration-300 ease-in-out ${
-                      kindColor
-                    }`}
-                  ></div>
-                  <div className="absolute inset-0 flex">
-                    <button
-                      type="button"
-                      onClick={() => handleTaskKindChange("community")}
-                      className={`flex-1 z-10 rounded-l-full ${communityTextColor}`}
-                      aria-pressed={taskKind === "community"}
-                    >
-                      Community
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTaskKindChange("personal")}
-                      className={`flex-1 z-10 rounded-r-full ${personalTextColor}`}
-                      aria-pressed={taskKind === "personal"}
-                    >
-                      Personal
-                    </button>
-                  </div>
+    <Card className="w-full max-w-7xl mx-auto my-auto">
+      <CardHeader>
+        <CardTitle>Create New Task</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label
+                htmlFor="taskKind-toggle"
+                className="block text-center mb-2"
+              >
+                Choose the Task Type
+              </Label>
+              <div className="relative w-64 h-10 mx-auto bg-gray-200 rounded-full">
+                <div
+                  ref={taskKindRef}
+                  className={`absolute top-1 left-1 w-[calc(50%-4px)] h-8 rounded-full transition-all duration-300 ease-in-out ${
+                    kindColor
+                  }`}
+                ></div>
+                <div className="absolute inset-0 flex">
+                  <button
+                    type="button"
+                    onClick={() => handleTaskKindChange("community")}
+                    className={`flex-1 z-10 rounded-l-full ${communityTextColor}`}
+                    aria-pressed={taskKind === "community"}
+                  >
+                    Community
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleTaskKindChange("personal")}
+                    className={`flex-1 z-10 rounded-r-full ${personalTextColor}`}
+                    aria-pressed={taskKind === "personal"}
+                  >
+                    Personal
+                  </button>
                 </div>
               </div>
-              <div className="space-y-2">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter a title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="space-y-2">
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Enter task details and the criteria that the submissions must meet"
-                          className="min-h-[150px]"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="space-y-2">
-                <FormField
-                  control={form.control}
-                  name="maxWinners"
-                  render={({ field: { value, onChange } }) => (
-                    <FormItem>
-                      <FormLabel>Maximum Number of Winners: {value}</FormLabel>
-                      <FormControl>
-                        <Slider
-                          min={FORM_LIMITS.TASK_CREATION.MAX_WINNERS.MIN}
-                          max={FORM_LIMITS.TASK_CREATION.MAX_WINNERS.MAX}
-                          step={1}
-                          defaultValue={[value]}
-                          onValueChange={(vals) => onChange(vals[0])}
-                          className="w-full"
-                          // {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                Submit
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+            </div>
+            <div className="space-y-2">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter a title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="space-y-2">
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter task details and the criteria that the submissions must meet"
+                        className="min-h-60"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="space-y-2">
+              <FormField
+                control={form.control}
+                name="maxWinners"
+                render={({ field: { value, onChange } }) => (
+                  <FormItem>
+                    <FormLabel>Maximum Number of Winners: {value}</FormLabel>
+                    <FormControl>
+                      <Slider
+                        min={FORM_LIMITS.TASK_CREATION.MAX_WINNERS.MIN}
+                        max={FORM_LIMITS.TASK_CREATION.MAX_WINNERS.MAX}
+                        step={1}
+                        defaultValue={[value]}
+                        onValueChange={(vals) => onChange(vals[0])}
+                        className="w-full"
+                        // {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              Submit
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }
