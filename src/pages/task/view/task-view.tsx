@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/tooltip";
 import { getTaskById } from "@/lib/api";
 import { handleError } from "@/lib/error";
-import SubmissionSection from "@/pages/task/view/submissions";
+import SolutionSection from "@/pages/task/view/solutions";
 import { TaskResponse } from "@/types/api.types";
 import { getTaskKindColor } from "@/utils/colors";
 
@@ -77,7 +77,7 @@ export default function TaskViewPage() {
   return (
     <div className="min-h-screen space-y-4">
       <TaskDisplay task={task} />
-      <SubmissionSection taskId={task.id} />
+      <SolutionSection taskId={task.id} />
     </div>
   );
 }
@@ -145,6 +145,17 @@ function TaskDisplay({ task }: { task: TaskResponse }) {
           <TrophyIcon className="mr-2 h-4 w-4 text-muted-foreground" />
           <span className="font-semibold text-sm">Max Winners:</span>
           <span className="ml-2 text-sm">{task.maxWinners}</span>
+        </div>
+      </div>
+      <div className="border flex justify-center">
+        <div className="bg-secondary-foreground w-1/4 p-2 m-4 rounded-xl shadow-md">
+          <h3 className="text-sm font-medium text-secondary mb-1">
+            Total Votes Received
+          </h3>
+          <p className="text-3xl font-bold text-primary">
+            {/* {totalVotesReceived} */}
+            190
+          </p>
         </div>
       </div>
     </Card>

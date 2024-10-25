@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "wouter";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -162,7 +161,7 @@ export default function TaskCreationPage() {
                     <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Enter task details and the criteria that the submissions must meet"
+                        placeholder="Enter task details and the criteria that the solutions must meet"
                         className="min-h-60"
                         {...field}
                       />

@@ -3,7 +3,7 @@ import { API_ROUTES } from "@/configs/routes";
 import { getUserSession } from "@/lib/supabase";
 import {
   ResponseObject,
-  SubmissionResponse,
+  SolutionResponse,
   TaskResponse,
 } from "@/types/api.types";
 import { TaskCreationForm } from "@/types/task.types";
@@ -87,13 +87,13 @@ export async function getTaskById(
   return resObj;
 }
 
-export async function createSubmission(
+export async function createSolution(
   vals: { description: string },
   taskId: TaskResponse["id"],
-): Promise<ResponseObject<SubmissionResponse> | null> {
+): Promise<ResponseObject<SolutionResponse> | null> {
   const session = await getUserSession();
   if (session) {
-    const res = await fetch(`${SERVER_URL}${API_ROUTES.SUBMISSIONS.CREATE}`, {
+    const res = await fetch(`${SERVER_URL}${API_ROUTES.SOLUTIONS.CREATE}`, {
       method: "POST",
       body: JSON.stringify(Object.assign(vals, { taskId })),
       headers: {
@@ -101,23 +101,23 @@ export async function createSubmission(
         Authorization: `Bearer ${session.access_token}`,
       },
     });
-    const resObj = await handleApiErrors<SubmissionResponse>(res);
+    const resObj = await handleApiErrors<SolutionResponse>(res);
     return resObj;
   } else {
     throw new Error("User authentication failed!");
   }
 }
 
-export async function getSubmissionList(
+export async function getSolutionList(
   taskId: TaskResponse["id"],
   page = 1,
-): Promise<ResponseObject<SubmissionResponse[]>> {
+): Promise<ResponseObject<SolutionResponse[]>> {
   const queryParams = new URLSearchParams({
     page: page.toString(),
   });
 
   const res = await fetch(
-    `${SERVER_URL}${API_ROUTES.SUBMISSIONS.GET_LIST.replace(
+    `${SERVER_URL}${API_ROUTES.SOLUTIONS.GET_LIST.replace(
       ":taskId",
       taskId,
     )}?${queryParams}`,
@@ -129,7 +129,7 @@ export async function getSubmissionList(
     },
   );
 
-  const resObj = await handleApiErrors<SubmissionResponse[]>(res);
+  const resObj = await handleApiErrors<SolutionResponse[]>(res);
   if (!resObj) throw new Error("No response object!");
   return resObj;
 }

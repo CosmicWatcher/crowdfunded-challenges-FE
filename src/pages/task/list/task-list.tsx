@@ -77,7 +77,7 @@ export default function TaskListPage() {
     return (
       <Alert className="max-w-lg mx-auto">
         <OctagonX className="size-5" />
-        <AlertTitle>Error fetching submissions!</AlertTitle>
+        <AlertTitle>Error fetching solutions!</AlertTitle>
         <AlertDescription>Please check back later.</AlertDescription>
       </Alert>
     );

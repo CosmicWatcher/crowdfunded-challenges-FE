@@ -17,13 +17,13 @@ export const taskCreationFormSchema = z.object({
   maxWinners: z.number(),
 });
 
-export const submissionFormSchema = z.object({
+export const solutionFormSchema = z.object({
   description: z
     .string()
-    .min(FORM_LIMITS.TASK_SUBMISSION.DESCRIPTION.MIN, {
-      message: `Description must at least ${FORM_LIMITS.TASK_SUBMISSION.DESCRIPTION.MIN} characters`,
+    .min(FORM_LIMITS.TASK_SOLUTION.DESCRIPTION.MIN, {
+      message: `Description must at least ${FORM_LIMITS.TASK_SOLUTION.DESCRIPTION.MIN} characters`,
     })
-    .max(FORM_LIMITS.TASK_SUBMISSION.DESCRIPTION.MAX, {
-      message: `Description must be less than ${FORM_LIMITS.TASK_SUBMISSION.DESCRIPTION.MAX} characters`,
+    .max(FORM_LIMITS.TASK_SOLUTION.DESCRIPTION.MAX, {
+      message: `Description must be less than ${FORM_LIMITS.TASK_SOLUTION.DESCRIPTION.MAX} characters`,
     }),
 });

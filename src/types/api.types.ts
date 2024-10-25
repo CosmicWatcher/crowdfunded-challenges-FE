@@ -33,7 +33,7 @@ export interface TaskResponse {
   endedAt: string | null;
 }
 
-export interface SubmissionResponse {
+export interface SolutionResponse {
   id: string;
   taskId: string | null;
   createdBy: UserResponse | null;

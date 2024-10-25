@@ -27,39 +27,37 @@ import { Loading } from "@/components/ui/loading";
 import { Textarea } from "@/components/ui/textarea";
 import Time from "@/components/ui/time";
 import { SITE_PAGES } from "@/configs/routes";
-import { submissionFormSchema } from "@/configs/schema";
-import { createSubmission, getSubmissionList } from "@/lib/api";
+import { solutionFormSchema } from "@/configs/schema";
+import { createSolution, getSolutionList } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
 import { getUserSession } from "@/lib/supabase";
 import {
   ResponseObject,
-  SubmissionResponse,
+  SolutionResponse,
   TaskResponse,
 } from "@/types/api.types";
 
-export default function SubmissionSection({
+export default function SolutionSection({
   taskId,
 }: {
   taskId: TaskResponse["id"];
 }) {
-  const [newSubmission, setNewSubmission] = useState<SubmissionResponse | null>(
-    null,
-  );
+  const [newSolution, setNewSolution] = useState<SolutionResponse | null>(null);
   return (
     <>
-      <SubmissionForm taskId={taskId} setNewSubmission={setNewSubmission} />
-      <SubmissionsList taskId={taskId} newSubmission={newSubmission} />
+      <SolutionForm taskId={taskId} setNewSolution={setNewSolution} />
+      <SolutionsList taskId={taskId} newSolution={newSolution} />
     </>
   );
 }
 
-function SubmissionForm({
+function SolutionForm({
   taskId,
-  setNewSubmission,
+  setNewSolution,
 }: {
   taskId: TaskResponse["id"];
-  setNewSubmission: Dispatch<SetStateAction<SubmissionResponse | null>>;
+  setNewSolution: Dispatch<SetStateAction<SolutionResponse | null>>;
 }) {
   const [isAuthenticated, setAuthenticated] = useState<undefined | boolean>(
     undefined,
@@ -86,18 +84,18 @@ function SubmissionForm({
     };
   }, []);
 
-  const form = useForm<z.infer<typeof submissionFormSchema>>({
-    resolver: zodResolver(submissionFormSchema),
+  const form = useForm<z.infer<typeof solutionFormSchema>>({
+    resolver: zodResolver(solutionFormSchema),
     defaultValues: {
       description: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof submissionFormSchema>) {
+  async function onSubmit(values: z.infer<typeof solutionFormSchema>) {
     try {
-      const res = await createSubmission(values, taskId);
+      const res = await createSolution(values, taskId);
       notifySuccess("Work successfully submitted");
-      if (res) setNewSubmission(res.data);
+      if (res) setNewSolution(res.data);
     } catch (err) {
       handleError(err, "Submission failed");
       form.setError("root.serverError", { type: "500" });
@@ -144,7 +142,7 @@ function SubmissionForm({
                   <FormItem>
                     <FormControl>
                       <Textarea
-                        placeholder="Describe your submission here..."
+                        placeholder="Describe your solution here..."
                         className="min-h-[150px]"
                         {...field}
                       />
@@ -164,15 +162,15 @@ function SubmissionForm({
   );
 }
 
-function SubmissionsList({
+function SolutionsList({
   taskId,
-  newSubmission,
+  newSolution,
 }: {
   taskId: TaskResponse["id"];
-  newSubmission: SubmissionResponse | null;
+  newSolution: SolutionResponse | null;
 }) {
-  const [submissions, setSubmissions] = useState<
-    ResponseObject<SubmissionResponse[]>
+  const [solutions, setSolutions] = useState<
+    ResponseObject<SolutionResponse[]>
   >({
     data: [],
     pagination: {
@@ -189,42 +187,42 @@ function SubmissionsList({
 
   function handleNextPageClick() {
     if (
-      submissions.pagination?.next_page &&
-      submissions.pagination.next_page !== page
+      solutions.pagination?.next_page &&
+      solutions.pagination.next_page !== page
     ) {
-      setPage(submissions.pagination.next_page);
+      setPage(solutions.pagination.next_page);
     }
   }
 
   useEffect(() => {
-    if (newSubmission) {
-      setSubmissions((prevSubmissions) => {
+    if (newSolution) {
+      setSolutions((prevSolutions) => {
         return {
-          data: [newSubmission, ...prevSubmissions.data],
-          pagination: prevSubmissions.pagination,
+          data: [newSolution, ...prevSolutions.data],
+          pagination: prevSolutions.pagination,
         };
       });
     }
-  }, [taskId, newSubmission]);
+  }, [taskId, newSolution]);
 
-  // Fetch submissions based on page number
+  // Fetch solutions based on page number
   useEffect(() => {
     let ignore = false;
 
-    async function fetchSubmissions(pageNum: number) {
+    async function fetchSolutions(pageNum: number) {
       setLoading(true);
       try {
-        const response = await getSubmissionList(taskId, pageNum);
+        const response = await getSolutionList(taskId, pageNum);
         if (!ignore && response.data) {
           console.log(response.pagination);
-          setSubmissions((prevSubmissions) => {
-            // Remove duplicates from prevSubmissions
-            const filteredPrevSubmissions = prevSubmissions.data.filter(
+          setSolutions((prevSolutions) => {
+            // Remove duplicates from prevSolutions
+            const filteredPrevSolutions = prevSolutions.data.filter(
               (prevSub) =>
                 !response.data.some((newSub) => newSub.id === prevSub.id),
             );
             return {
-              data: [...filteredPrevSubmissions, ...response.data],
+              data: [...filteredPrevSolutions, ...response.data],
               pagination: response.pagination,
             };
           });
@@ -236,14 +234,14 @@ function SubmissionsList({
         setLoading(false);
       }
     }
-    void fetchSubmissions(page);
+    void fetchSolutions(page);
 
     return () => {
       ignore = true;
     };
   }, [page, taskId]);
 
-  if (loading && submissions.data.length === 0) {
+  if (loading && solutions.data.length === 0) {
     return <Loading />;
   }
 
@@ -251,17 +249,17 @@ function SubmissionsList({
     return (
       <Alert className="max-w-lg mx-auto">
         <OctagonX className="size-5" />
-        <AlertTitle>Error fetching submissions!</AlertTitle>
+        <AlertTitle>Error fetching solutions!</AlertTitle>
         <AlertDescription>Please check back later.</AlertDescription>
       </Alert>
     );
   }
 
-  if (submissions.data.length === 0) {
+  if (solutions.data.length === 0) {
     return (
       <Alert className="max-w-lg mx-auto">
         <CircleSlash className="size-5" />
-        <AlertTitle>No submissions available.</AlertTitle>
+        <AlertTitle>No solutions available.</AlertTitle>
         <AlertDescription>Please check back later.</AlertDescription>
       </Alert>
     );
@@ -270,15 +268,26 @@ function SubmissionsList({
   return (
     <Card className="max-w-7xl mx-auto bg-secondary">
       <CardHeader className="text-center">
-        <CardTitle>Submissions</CardTitle>
+        <CardTitle className="text-4xl font-bold">Solutions</CardTitle>
       </CardHeader>
+      <div className="flex justify-center">
+        <div className="bg-secondary-foreground w-1/4 p-2 m-4 rounded-xl shadow-md">
+          <h3 className="text-sm font-medium text-secondary mb-1">
+            Your Total Available Votes
+          </h3>
+          <p className="text-3xl font-bold text-primary">
+            {/* {totalVotesAvailable} */}
+            810
+          </p>
+        </div>
+      </div>
       <CardContent className="px-3">
         <div className="space-y-8">
-          {submissions.data.map((submission) => (
-            <Submission key={submission.id} submission={submission} />
+          {solutions.data.map((solution) => (
+            <Solution key={solution.id} solution={solution} />
           ))}
           {loading && <Loading />}
-          {!loading && submissions.pagination?.next_page && (
+          {!loading && solutions.pagination?.next_page && (
             <ArrowBigDownDash
               className="size-10 mx-auto cursor-pointer animate-bounce"
               onClick={handleNextPageClick}
@@ -290,8 +299,8 @@ function SubmissionsList({
   );
 }
 
-function Submission({ submission }: { submission: SubmissionResponse }) {
-  const username = submission.createdBy?.username ?? "anonymous";
+function Solution({ solution }: { solution: SolutionResponse }) {
+  const username = solution.createdBy?.username ?? "anonymous";
 
   return (
     <Card>
@@ -299,7 +308,7 @@ function Submission({ submission }: { submission: SubmissionResponse }) {
         <div className="space-y-2">
           <div className="flex items-center text-sm">
             <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-            <Time timestamp={new Date(submission.createdAt)} />
+            <Time timestamp={new Date(solution.createdAt)} />
           </div>
           <div className="flex items-center text-sm space-x-2">
             <Avatar>
@@ -312,11 +321,11 @@ function Submission({ submission }: { submission: SubmissionResponse }) {
         </div>
       </CardHeader>
       <CardContent>
-        <p>{submission.details}</p>
+        <p>{solution.details}</p>
       </CardContent>
       <div className="rounded-3xl ring-secondary ring-4 ring-offset-primary ring-offset-1 m-2 md:flex grid justify-center md:justify-around items-center">
         <Badge variant="secondary" className="text-center my-4 p-4">
-          {`Votes: ${submission.voteCount}`}
+          {`Votes: ${solution.voteCount}`}
         </Badge>
         <Button>
           <Vote />

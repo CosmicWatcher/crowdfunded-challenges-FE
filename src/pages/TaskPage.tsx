@@ -9,7 +9,7 @@ export function TaskPage() {
     <div className="App">
       <div className="flex flex-col justify-center">
         <Task />
-        <SubmissionList />
+        <SolutionList />
       </div>
     </div>
   );
@@ -43,10 +43,10 @@ interface CreateIntentResponse extends ApiResponse {
     clientSecret: string;
   };
 }
-function SubmissionList() {
+function SolutionList() {
   const codeElement = useRef(null);
   // const codeBtnCreated = useRef(false);
-  const [submissionId, setSubmissionId] = useState(0);
+  const [solutionId, setSolutionId] = useState(0);
 
   useEffect(() => {
     let ignore = false; // good practice according to https://react.dev/learn/synchronizing-with-effects#fetching-data
@@ -95,17 +95,17 @@ function SubmissionList() {
 
   function handleVote(id: number) {
     // if (!codeBtnCreated.current) createCodeButton();
-    setSubmissionId(id);
+    setSolutionId(id);
   }
 
   function cancelVote() {
-    setSubmissionId(0);
+    setSolutionId(0);
   }
 
   return (
     <>
       <div
-        className={`${submissionId === 0 ? "hidden" : ""} relative z-10`}
+        className={`${solutionId === 0 ? "hidden" : ""} relative z-10`}
         aria-labelledby="modal-title"
         role="dialog"
         aria-modal="true"
@@ -124,7 +124,7 @@ function SubmissionList() {
                     className="text-base text-center font-semibold leading-6 text-gray-900"
                     id="modal-title"
                   >
-                    Vote for id={submissionId}
+                    Vote for id={solutionId}
                   </h3>
                   <div className="m-2">
                     <div ref={codeElement} />
@@ -144,18 +144,18 @@ function SubmissionList() {
         </div>
       </div>
 
-      <Submission id={1} voteHandler={handleVote} />
-      <Submission id={2} voteHandler={handleVote} />
-      <Submission id={3} voteHandler={handleVote} />
+      <Solution id={1} voteHandler={handleVote} />
+      <Solution id={2} voteHandler={handleVote} />
+      <Solution id={3} voteHandler={handleVote} />
     </>
   );
 }
 
-interface SubmissionProps {
+interface SolutionProps {
   id: number;
   voteHandler: (id: number) => void;
 }
-function Submission({ id, voteHandler }: SubmissionProps) {
+function Solution({ id, voteHandler }: SolutionProps) {
   return (
     <div className="flex justify-center">
       <div className="m-1 h-auto max-h-[90%] w-10/12 md:w-[55rem] overflow-y-auto rounded-3xl bg-indigo-600 p-4 shadow-2xl flex-initial">
@@ -167,9 +167,9 @@ function Submission({ id, voteHandler }: SubmissionProps) {
             <p className="text-nowrap">Vote</p>
           </button>
           <p className="pl-2 pr-2 pt-0 pb-0 text-sm font-medium  text-slate-100">
-            This is where the submission details are displayed submission
-            details are displayed submission details are displayed submission
-            details are displayed
+            This is where the solution details are displayed solution details
+            are displayed solution details are displayed solution details are
+            displayed
           </p>
         </div>
       </div>
