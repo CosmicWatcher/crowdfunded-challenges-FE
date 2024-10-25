@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/components/theme/provider";
 import { SITE_PAGES } from "@/configs/routes";
 import { LoginPage } from "@/pages/auth/login";
 import { SignupPage } from "@/pages/auth/signup";
+import SolutionList from "@/pages/solution-list";
 import { TaskCreationPage, TaskListPage, TaskViewPage } from "@/pages/task";
 
 export default function App() {
@@ -52,6 +53,9 @@ export default function App() {
             </Route>
             <Route path={SITE_PAGES.VIEW_TASK}>
               <TaskViewPage />
+            </Route>
+            <Route path={"/tst"}>
+              <SolutionList />
             </Route>
             <Route>
               <h1 className="fixed left-1/2 top-1/4">404, Not Found!</h1>
