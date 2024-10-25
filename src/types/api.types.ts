@@ -1,4 +1,4 @@
-import { TASK_KIND, TASK_STATUS } from "@/types/task.types";
+import { TaskKind, TaskStatus } from "@/types/task.types";
 
 export interface ResponseObject<T> {
   data: T;
@@ -23,12 +23,24 @@ export interface TaskResponse {
   createdBy: UserResponse | null;
   title: string | null;
   details: string | null;
-  kind: TASK_KIND;
+  kind: TaskKind;
   maxWinners: number;
-  status: TASK_STATUS;
+  status: TaskStatus;
   depositAddress: string | null;
   fundsRaised: number;
   createdAt: string;
   editedAt: string | null;
   endedAt: string | null;
+}
+
+export interface SubmissionResponse {
+  id: string;
+  taskId: string | null;
+  createdBy: UserResponse | null;
+  details: string | null;
+  voteCount: number;
+  isWinner: boolean;
+  createdAt: string;
+  editedAt: string | null;
+  deletedAt: string | null;
 }

@@ -20,31 +20,16 @@ import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { FORM_LIMITS } from "@/configs/constants";
 import { SITE_PAGES } from "@/configs/routes";
+import { taskCreationFormSchema } from "@/configs/schema";
 import { createTask } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { notifyInfo, notifySuccess } from "@/lib/notification";
 import { getUserSession } from "@/lib/supabase";
-import { TASK_KIND } from "@/types/task.types";
+import { TaskCreationForm, TaskKind } from "@/types/task.types";
 import { getTaskKindColor } from "@/utils/colors";
 
-const taskCreationFormSchema = z.object({
-  title: z
-    .string()
-    .min(FORM_LIMITS.TASK_CREATION.TITLE.MIN, {
-      message: `Title must be at least ${FORM_LIMITS.TASK_CREATION.TITLE.MIN} characters`,
-    })
-    .max(FORM_LIMITS.TASK_CREATION.TITLE.MAX, {
-      message: `Title must be less than ${FORM_LIMITS.TASK_CREATION.TITLE.MAX} characters`,
-    }),
-  description: z.string().max(FORM_LIMITS.TASK_CREATION.DESCRIPTION.MAX, {
-    message: `Description must be less than ${FORM_LIMITS.TASK_CREATION.DESCRIPTION.MAX} characters`,
-  }),
-  maxWinners: z.number(),
-});
-export type TaskCreationForm = z.infer<typeof taskCreationFormSchema>;
-
 export default function TaskCreationPage() {
-  const [taskKind, setTaskKind] = useState<TASK_KIND>("community");
+  const [taskKind, setTaskKind] = useState<TaskKind>("community");
   const [_location, setLocation] = useLocation();
   const [isAuthenticated, setAuthenticated] = useState<undefined | boolean>(
     undefined,
@@ -93,7 +78,7 @@ export default function TaskCreationPage() {
     }
   }
 
-  const handleTaskKindChange = (newTaskKind: TASK_KIND) => {
+  const handleTaskKindChange = (newTaskKind: TaskKind) => {
     setTaskKind(newTaskKind);
   };
 

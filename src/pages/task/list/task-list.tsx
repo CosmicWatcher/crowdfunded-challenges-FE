@@ -2,8 +2,8 @@ import {
   ArrowBigDownDash,
   CalendarIcon,
   CheckCircleIcon,
-  LoaderCircle,
-  ScrollText,
+  CircleSlash,
+  OctagonX,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
@@ -19,7 +19,7 @@ import { handleError } from "@/lib/error";
 import { ResponseObject, TaskResponse } from "@/types/api.types";
 import { getTaskKindColor } from "@/utils/colors";
 
-export default function TasksPage() {
+export default function TaskListPage() {
   const [tasks, setTasks] = useState<ResponseObject<TaskResponse[]>>({
     data: [],
     pagination: {
@@ -32,6 +32,7 @@ export default function TasksPage() {
   });
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [isError, setIsError] = useState(false);
 
   function handleNextPageClick() {
     if (tasks.pagination?.next_page && tasks.pagination.next_page !== page) {
@@ -56,6 +57,7 @@ export default function TasksPage() {
         }
       } catch (err) {
         handleError(err);
+        setIsError(true);
       } finally {
         setLoading(false);
       }
@@ -71,11 +73,21 @@ export default function TasksPage() {
     return <Loading />;
   }
 
+  if (isError) {
+    return (
+      <Alert className="max-w-lg mx-auto">
+        <OctagonX className="size-5" />
+        <AlertTitle>Error fetching submissions!</AlertTitle>
+        <AlertDescription>Please check back later.</AlertDescription>
+      </Alert>
+    );
+  }
+
   if (tasks.data.length === 0) {
     return (
       <Alert className="max-w-lg mx-auto">
-        <ScrollText className="h-4 w-4" />
-        <AlertTitle>No tasks available.</AlertTitle>
+        <CircleSlash className="size-5" />
+        <AlertTitle>No tasks available!</AlertTitle>
         <AlertDescription>Please check back later.</AlertDescription>
       </Alert>
     );

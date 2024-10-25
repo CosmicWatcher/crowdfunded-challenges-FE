@@ -1,5 +1,5 @@
-import { TASK_KIND } from "@/types/task.types";
+import { TaskKind } from "@/types/task.types";
 
-export function getTaskKindColor(kind: TASK_KIND) {
+export function getTaskKindColor(kind: TaskKind) {
   return kind === "community" ? "bg-task-community" : "bg-task-personal";
 }

@@ -1,2 +1,8 @@
-export type TASK_KIND = "community" | "personal";
-export type TASK_STATUS = "active" | "successful" | "failed" | "deleted";
+import { z } from "zod";
+
+import { taskCreationFormSchema } from "@/configs/schema";
+
+export type TaskKind = "community" | "personal";
+export type TaskStatus = "active" | "successful" | "failed" | "deleted";
+
+export type TaskCreationForm = z.infer<typeof taskCreationFormSchema>;

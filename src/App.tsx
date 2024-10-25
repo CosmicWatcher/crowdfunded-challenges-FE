@@ -8,17 +8,15 @@ import { MainErrorFallback } from "@/components/error/main-error";
 import { AppLayout } from "@/components/layout/main-layout";
 import { ThemeProvider } from "@/components/theme/provider";
 import { SITE_PAGES } from "@/configs/routes";
-import { LoginPage } from "@/pages/login";
-import { SignupPage } from "@/pages/signup";
-import TaskCreationPage from "@/pages/task-creation";
-import TaskViewPage from "@/pages/task-view";
-import TasksPage from "@/pages/tasks";
+import { LoginPage } from "@/pages/auth/login";
+import { SignupPage } from "@/pages/auth/signup";
+import { TaskCreationPage, TaskListPage, TaskViewPage } from "@/pages/task";
 
 export default function App() {
   return (
     <ErrorBoundary FallbackComponent={MainErrorFallback}>
       <ToastContainer
-        position="bottom-center"
+        position="bottom-right"
         autoClose={5000}
         hideProgressBar={false}
         newestOnTop={false}
@@ -47,7 +45,7 @@ export default function App() {
               <LoginPage />
             </Route>
             <Route path={SITE_PAGES.TASKS}>
-              <TasksPage />
+              <TaskListPage />
             </Route>
             <Route path={SITE_PAGES.CREATE_TASK}>
               <TaskCreationPage />

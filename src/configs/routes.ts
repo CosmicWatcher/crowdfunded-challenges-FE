@@ -13,4 +13,8 @@ export const API_ROUTES = {
     GET_LIST: "/tasks",
     GET_BY_ID: "/tasks/:id",
   },
-};
+  SUBMISSIONS: {
+    CREATE: "/submissions/create",
+    GET_LIST: "/submissions/:taskId",
+  },
+} as const;
