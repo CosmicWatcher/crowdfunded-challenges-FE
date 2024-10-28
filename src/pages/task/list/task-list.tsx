@@ -2,18 +2,21 @@ import {
   ArrowBigDownDash,
   CalendarIcon,
   CheckCircleIcon,
+  CirclePlus,
   CircleSlash,
   OctagonX,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
 import Time from "@/components/ui/time";
+import { SITE_PAGES } from "@/configs/routes";
 import { getTaskList } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { ResponseObject, TaskResponse } from "@/types/api.types";
@@ -95,6 +98,12 @@ export default function TaskListPage() {
 
   return (
     <div className="space-y-4">
+      <Link href={SITE_PAGES.CREATE_TASK}>
+        <Button className="w-full py-8">
+          <CirclePlus className="size-9 mr-2 my-4" />
+          <p className="text-xl font-bold">Create Task</p>
+        </Button>
+      </Link>
       {tasks.data.map((task) => (
         <TaskCard key={task.id} task={task} />
       ))}
