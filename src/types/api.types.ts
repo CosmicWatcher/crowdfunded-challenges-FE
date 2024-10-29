@@ -38,9 +38,15 @@ export interface SolutionResponse {
   taskId: string | null;
   createdBy: UserResponse | null;
   details: string | null;
-  voteCount: number;
+  voteDetails: SolutionVoteDetailsResponse;
   isWinner: boolean;
   createdAt: string;
   editedAt: string | null;
   deletedAt: string | null;
+}
+
+export interface SolutionVoteDetailsResponse {
+  totalVotes: number;
+  totalVotesByUser: number | null;
+  userVotingRights: number | null;
 }

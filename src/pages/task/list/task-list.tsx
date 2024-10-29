@@ -80,7 +80,7 @@ export default function TaskListPage() {
     return (
       <Alert className="max-w-lg mx-auto">
         <OctagonX className="size-5" />
-        <AlertTitle>Error fetching solutions!</AlertTitle>
+        <AlertTitle>Error fetching tasks!</AlertTitle>
         <AlertDescription>Please check back later.</AlertDescription>
       </Alert>
     );

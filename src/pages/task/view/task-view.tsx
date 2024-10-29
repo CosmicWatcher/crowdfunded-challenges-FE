@@ -23,8 +23,9 @@ import {
 } from "@/components/ui/tooltip";
 import { getTaskById } from "@/lib/api";
 import { handleError } from "@/lib/error";
-import SolutionSection from "@/pages/task/view/solutions";
-import { TaskResponse } from "@/types/api.types";
+import SolutionCreator from "@/pages/task/view/components/solution-create";
+import SolutionsList from "@/pages/task/view/components/solution-view";
+import { SolutionResponse, TaskResponse } from "@/types/api.types";
 import { getTaskKindColor } from "@/utils/colors";
 
 export default function TaskViewPage() {
@@ -147,17 +148,6 @@ function TaskDisplay({ task }: { task: TaskResponse }) {
           <span className="ml-2 text-sm">{task.maxWinners}</span>
         </div>
       </div>
-      <div className="border flex justify-center">
-        <div className="bg-secondary-foreground w-1/4 p-2 m-4 rounded-xl shadow-md">
-          <h3 className="text-sm font-medium text-secondary mb-1">
-            Total Votes Received
-          </h3>
-          <p className="text-3xl font-bold text-primary">
-            {/* {totalVotesReceived} */}
-            190
-          </p>
-        </div>
-      </div>
     </Card>
   );
 }
@@ -192,5 +182,15 @@ function CopyAddressButton({ address }: { address: string }) {
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
+  );
+}
+
+function SolutionSection({ taskId }: { taskId: TaskResponse["id"] }) {
+  const [newSolution, setNewSolution] = useState<SolutionResponse | null>(null);
+  return (
+    <>
+      <SolutionCreator taskId={taskId} setNewSolution={setNewSolution} />
+      <SolutionsList taskId={taskId} newSolution={newSolution} />
+    </>
   );
 }

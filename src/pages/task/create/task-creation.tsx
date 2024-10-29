@@ -95,7 +95,7 @@ export default function TaskCreationPage() {
     taskKind === "personal" ? "text-foreground" : "text-muted-foreground";
 
   return isAuthenticated === undefined ? null : (
-    <Card className="w-full max-w-7xl mx-auto my-auto">
+    <Card className="w-full max-w-7xl mx-auto my-0">
       <CardHeader>
         <CardTitle>Create New Task</CardTitle>
       </CardHeader>
@@ -162,7 +162,7 @@ export default function TaskCreationPage() {
                     <FormControl>
                       <Textarea
                         placeholder="Enter task details and the criteria that the solutions must meet"
-                        className="min-h-60"
+                        className="min-h-48"
                         {...field}
                       />
                     </FormControl>

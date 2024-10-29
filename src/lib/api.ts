@@ -4,6 +4,7 @@ import { getUserSession } from "@/lib/supabase";
 import {
   ResponseObject,
   SolutionResponse,
+  SolutionVoteDetailsResponse,
   TaskResponse,
 } from "@/types/api.types";
 import { TaskCreationForm } from "@/types/task.types";
@@ -16,9 +17,32 @@ interface ApiResponse<T = null> {
   statusCode: number;
 }
 
-async function handleApiErrors<T = null>(
-  res: Response,
+async function apiCall<T = null>(
+  method: "GET" | "POST",
+  endpoint: string,
+  authRequired = false,
+  body?: object,
 ): Promise<ApiResponse<T>["responseObject"]> {
+  const session = await getUserSession();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (authRequired) {
+    if (!session) throw new Error("User authentication failed!");
+    headers.Authorization = `Bearer ${session.access_token}`;
+  } else if (session) headers.Authorization = `Bearer ${session.access_token}`;
+
+  let res: Response;
+  try {
+    res = await fetch(`${SERVER_URL}${endpoint}`, {
+      method,
+      body: body ? JSON.stringify(body) : undefined,
+      headers,
+    });
+  } catch (err) {
+    throw new Error(`API call failed: ${String(err)}`);
+  }
   if (res.status >= 500) throw new Error("Server Error!");
 
   const resJson = (await res.json()) as ApiResponse<T>;
@@ -31,20 +55,9 @@ export async function createTask(
   vals: TaskCreationForm,
   type: TaskKind,
 ): Promise<void> {
-  const session = await getUserSession();
-  if (session) {
-    const res = await fetch(`${SERVER_URL}${API_ROUTES.TASKS.CREATE}`, {
-      method: "POST",
-      body: JSON.stringify(Object.assign(vals, { kind: type })),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.access_token}`,
-      },
-    });
-    await handleApiErrors(res);
-  } else {
-    throw new Error("User authentication failed!");
-  }
+  const endpoint = API_ROUTES.TASKS.CREATE;
+  const body = Object.assign(vals, { kind: type });
+  await apiCall("POST", endpoint, true, body);
 }
 
 export async function getTaskList(
@@ -53,18 +66,9 @@ export async function getTaskList(
   const queryParams = new URLSearchParams({
     page: page.toString(),
   });
+  const endpoint = `${API_ROUTES.TASKS.GET_LIST}?${queryParams}`;
+  const resObj = await apiCall<TaskResponse[]>("GET", endpoint);
 
-  const res = await fetch(
-    `${SERVER_URL}${API_ROUTES.TASKS.GET_LIST}?${queryParams}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
-
-  const resObj = await handleApiErrors<TaskResponse[]>(res);
   if (!resObj) throw new Error("No response object!");
   return resObj;
 }
@@ -72,17 +76,9 @@ export async function getTaskList(
 export async function getTaskById(
   id: TaskResponse["id"],
 ): Promise<ResponseObject<TaskResponse>> {
-  const res = await fetch(
-    `${SERVER_URL}${API_ROUTES.TASKS.GET_BY_ID.replace(":id", id)}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
+  const endpoint = API_ROUTES.TASKS.GET_BY_ID.replace(":id", id);
+  const resObj = await apiCall<TaskResponse>("GET", endpoint);
 
-  const resObj = await handleApiErrors<TaskResponse>(res);
   if (!resObj) throw new Error("No response object!");
   return resObj;
 }
@@ -91,21 +87,9 @@ export async function createSolution(
   vals: { description: string },
   taskId: TaskResponse["id"],
 ): Promise<ResponseObject<SolutionResponse> | null> {
-  const session = await getUserSession();
-  if (session) {
-    const res = await fetch(`${SERVER_URL}${API_ROUTES.SOLUTIONS.CREATE}`, {
-      method: "POST",
-      body: JSON.stringify(Object.assign(vals, { taskId })),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.access_token}`,
-      },
-    });
-    const resObj = await handleApiErrors<SolutionResponse>(res);
-    return resObj;
-  } else {
-    throw new Error("User authentication failed!");
-  }
+  const endpoint = API_ROUTES.SOLUTIONS.CREATE;
+  const body = Object.assign(vals, { taskId });
+  return await apiCall<SolutionResponse>("POST", endpoint, true, body);
 }
 
 export async function getSolutionList(
@@ -115,21 +99,42 @@ export async function getSolutionList(
   const queryParams = new URLSearchParams({
     page: page.toString(),
   });
+  const endpoint = API_ROUTES.SOLUTIONS.GET_LIST.replace(":taskId", taskId);
+  const resObj = await apiCall<SolutionResponse[]>("GET", endpoint);
 
-  const res = await fetch(
-    `${SERVER_URL}${API_ROUTES.SOLUTIONS.GET_LIST.replace(
-      ":taskId",
-      taskId,
-    )}?${queryParams}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
+  if (!resObj) throw new Error("No response object!");
+  return resObj;
+}
+
+export async function getSolutionVoteDetails(
+  solutionId: SolutionResponse["id"],
+): Promise<ResponseObject<SolutionVoteDetailsResponse>> {
+  const endpoint = API_ROUTES.SOLUTION_VOTES.GET_DETAILS.replace(
+    ":solutionId",
+    solutionId,
+  );
+  const resObj = await apiCall<SolutionVoteDetailsResponse>(
+    "GET",
+    endpoint,
+    true,
   );
 
-  const resObj = await handleApiErrors<SolutionResponse[]>(res);
+  if (!resObj) throw new Error("No response object!");
+  return resObj;
+}
+
+export async function voteForSolution(
+  solutionId: SolutionResponse["id"],
+  amount: number,
+): Promise<ResponseObject<SolutionVoteDetailsResponse>> {
+  const endpoint = API_ROUTES.SOLUTION_VOTES.RECORD;
+  const resObj = await apiCall<SolutionVoteDetailsResponse>(
+    "POST",
+    endpoint,
+    true,
+    { solutionId, amount },
+  );
+
   if (!resObj) throw new Error("No response object!");
   return resObj;
 }

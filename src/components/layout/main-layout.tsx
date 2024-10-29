@@ -76,7 +76,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           </DropdownMenu>
         </div>
       </header>
-      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+      <main className="flex flex-1 flex-col gap-4 p-4 px-1 md:gap-8 md:p-8">
         {children}
       </main>
     </div>
@@ -110,7 +110,15 @@ function NavSection({ isInSheet = false }: NavSectionProps) {
           href={SITE_PAGES.TASKS}
           className={`${secondary} ${location === SITE_PAGES.TASKS.toString() ? "text-foreground" : "text-muted-foreground"}`}
         >
-          Tasks
+          View
+        </Link>
+      </SheetCloseWrapper>
+      <SheetCloseWrapper {...shetCloseWrapperProps}>
+        <Link
+          href={SITE_PAGES.CREATE_TASK}
+          className={`${secondary} ${location === SITE_PAGES.TASKS.toString() ? "text-foreground" : "text-muted-foreground"}`}
+        >
+          Create
         </Link>
       </SheetCloseWrapper>
     </>

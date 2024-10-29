@@ -17,4 +17,8 @@ export const API_ROUTES = {
     CREATE: "/solutions/create",
     GET_LIST: "/solutions/:taskId",
   },
+  SOLUTION_VOTES: {
+    GET_DETAILS: "/solution-votes/details/:solutionId",
+    RECORD: "/solution-votes/record",
+  },
 } as const;
