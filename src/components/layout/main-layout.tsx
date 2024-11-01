@@ -127,9 +127,7 @@ function NavSection({ isInSheet = false }: NavSectionProps) {
 
 function AccountDropdown() {
   const [_location, setLocation] = useLocation();
-  const [isAuthenticated, setAuthenticated] = useState<undefined | boolean>(
-    undefined,
-  );
+  const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
     async function checkAuth() {
@@ -161,8 +159,9 @@ function AccountDropdown() {
       <DropdownMenuItem>Settings</DropdownMenuItem>
       <DropdownMenuItem>Support</DropdownMenuItem>
       <DropdownMenuSeparator />
-      {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-      <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+      <DropdownMenuItem onClick={() => void handleLogout()}>
+        Logout
+      </DropdownMenuItem>
     </>
   ) : (
     <>

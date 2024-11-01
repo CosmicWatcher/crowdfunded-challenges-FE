@@ -99,7 +99,7 @@ export async function getSolutionList(
   const queryParams = new URLSearchParams({
     page: page.toString(),
   });
-  const endpoint = API_ROUTES.SOLUTIONS.GET_LIST.replace(":taskId", taskId);
+  const endpoint = `${API_ROUTES.SOLUTIONS.GET_LIST.replace(":taskId", taskId)}?${queryParams}`;
   const resObj = await apiCall<SolutionResponse[]>("GET", endpoint);
 
   if (!resObj) throw new Error("No response object!");
@@ -136,6 +136,19 @@ export async function voteForSolution(
   );
 
   if (!resObj) throw new Error("No response object!");
+  return resObj;
+}
+
+export async function fundTask(
+  taskId: TaskResponse["id"],
+  amount: number,
+): Promise<ResponseObject<TaskResponse> | null> {
+  const endpoint = "/task-funds/post";
+  const resObj = await apiCall<TaskResponse>("POST", endpoint, true, {
+    taskId,
+    amount,
+  });
+
   return resObj;
 }
 

@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
+import NotFoundAlert from "@/components/ui/not-found";
 import Time from "@/components/ui/time";
 import { SITE_PAGES } from "@/configs/routes";
 import { getTaskList } from "@/lib/api";
@@ -88,11 +89,10 @@ export default function TaskListPage() {
 
   if (tasks.data.length === 0) {
     return (
-      <Alert className="max-w-lg mx-auto">
-        <CircleSlash className="size-5" />
-        <AlertTitle>No tasks available!</AlertTitle>
-        <AlertDescription>Please check back later.</AlertDescription>
-      </Alert>
+      <NotFoundAlert
+        title="No tasks available!"
+        description="Please check back later."
+      />
     );
   }
 

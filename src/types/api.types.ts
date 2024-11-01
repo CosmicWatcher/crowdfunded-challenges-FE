@@ -27,7 +27,7 @@ export interface TaskResponse {
   maxWinners: number;
   status: TaskStatus;
   depositAddress: string | null;
-  fundsRaised: number;
+  fundsRaised: TaskFundDetailsResponse;
   createdAt: string;
   editedAt: string | null;
   endedAt: string | null;
@@ -49,4 +49,9 @@ export interface SolutionVoteDetailsResponse {
   totalVotes: number;
   totalVotesByUser: number | null;
   userVotingRights: number | null;
+}
+
+export interface TaskFundDetailsResponse {
+  totalFunds: number;
+  totalFundsByUser: number | null;
 }

@@ -19,7 +19,6 @@ import { SITE_PAGES } from "@/configs/routes";
 import { solutionFormSchema } from "@/configs/schema";
 import { createSolution } from "@/lib/api";
 import { handleError } from "@/lib/error";
-import { notifySuccess } from "@/lib/notification";
 import { getUserSession } from "@/lib/supabase";
 import { SolutionResponse, TaskResponse } from "@/types/api.types";
 
@@ -30,9 +29,7 @@ export default function SolutionCreator({
   taskId: TaskResponse["id"];
   setNewSolution: Dispatch<SetStateAction<SolutionResponse | null>>;
 }) {
-  const [isAuthenticated, setAuthenticated] = useState<undefined | boolean>(
-    undefined,
-  );
+  const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
     let ignore = false;

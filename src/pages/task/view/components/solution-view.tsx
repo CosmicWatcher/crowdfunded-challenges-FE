@@ -1,9 +1,4 @@
-import {
-  ArrowBigDownDash,
-  CalendarIcon,
-  CircleSlash,
-  OctagonX,
-} from "lucide-react";
+import { ArrowBigDownDash, CalendarIcon, OctagonX } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Link } from "wouter";
@@ -14,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
+import NotFoundAlert from "@/components/ui/not-found";
 import Time from "@/components/ui/time";
 import { SITE_PAGES } from "@/configs/routes";
 import {
@@ -125,11 +121,10 @@ export default function SolutionsList({
 
   if (solutions.data.length === 0) {
     return (
-      <Alert className="max-w-lg mx-auto">
-        <CircleSlash className="size-5" />
-        <AlertTitle>No solutions available.</AlertTitle>
-        <AlertDescription>Please check back later.</AlertDescription>
-      </Alert>
+      <NotFoundAlert
+        title="No solutions available."
+        description="Please check back later."
+      />
     );
   }
 

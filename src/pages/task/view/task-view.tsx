@@ -1,7 +1,6 @@
 import {
   CalendarIcon,
   CircleSlash,
-  CoinsIcon,
   Copy,
   TrophyIcon,
   WalletIcon,
@@ -14,6 +13,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
+import NotFoundAlert from "@/components/ui/not-found";
 import Time from "@/components/ui/time";
 import {
   Tooltip,
@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/tooltip";
 import { getTaskById } from "@/lib/api";
 import { handleError } from "@/lib/error";
+import FundingPopup from "@/pages/task/view/components/funding";
 import SolutionCreator from "@/pages/task/view/components/solution-create";
 import SolutionsList from "@/pages/task/view/components/solution-view";
 import { SolutionResponse, TaskResponse } from "@/types/api.types";
@@ -65,13 +66,10 @@ export default function TaskViewPage() {
 
   if (!task) {
     return (
-      <Alert className="max-w-lg mx-auto">
-        <CircleSlash className="size-5" />
-        <AlertTitle>Task not found!</AlertTitle>
-        <AlertDescription>
-          Please check the task ID and try again.
-        </AlertDescription>
-      </Alert>
+      <NotFoundAlert
+        title="Task not found!"
+        description="Please check the task ID and try again."
+      />
     );
   }
 
@@ -135,13 +133,11 @@ function TaskDisplay({ task }: { task: TaskResponse }) {
             <CopyAddressButton address={task.depositAddress} />
           )}
         </div>
-        <Badge variant="secondary" className="flex items-center justify-center">
-          <CoinsIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-          <span className="font-semibold text-lg">Funds:</span>
-          <span className="ml-2 text-lg">
-            {`${task.fundsRaised.toLocaleString()} kin`}
-          </span>
-        </Badge>
+        <FundingPopup
+          taskId={task.id}
+          fundsRaisedInit={task.fundsRaised}
+          depositAddress={task.depositAddress}
+        />
         <div className="flex items-center justify-center">
           <TrophyIcon className="mr-2 h-4 w-4 text-muted-foreground" />
           <span className="font-semibold text-sm">Max Winners:</span>
@@ -155,26 +151,32 @@ function TaskDisplay({ task }: { task: TaskResponse }) {
 function CopyAddressButton({ address }: { address: string }) {
   const [clipboardCopyTooltip, setClipboardCopyTooltip] =
     useState("Copy to Clipboard");
+  const [open, setOpen] = useState(false);
 
   function clickHandler() {
     navigator.clipboard
       .writeText(address)
-      .then(() => setClipboardCopyTooltip("Copied"))
-      .catch(() => setClipboardCopyTooltip("Failed to Copy"))
-      .finally(() => {
+      .then(() => {
+        setOpen(true);
+        setClipboardCopyTooltip("Copied");
         setTimeout(() => {
-          setClipboardCopyTooltip("Copy to Clipboard");
-        }, 5000);
-      });
+          setOpen(false);
+          setTimeout(() => {
+            setClipboardCopyTooltip("Copy to Clipboard");
+          }, 3000);
+        }, 1000);
+      })
+      .catch(() => setClipboardCopyTooltip("Failed to Copy"));
   }
 
   return (
     <TooltipProvider delayDuration={0}>
-      <Tooltip>
+      <Tooltip open={open} onOpenChange={setOpen}>
         <TooltipTrigger>
           <Copy
             className="h-4 w-4 ml-1 text-muted-foreground"
             onClick={clickHandler}
+            onTouchStart={clickHandler}
           />
         </TooltipTrigger>
         <TooltipContent>
