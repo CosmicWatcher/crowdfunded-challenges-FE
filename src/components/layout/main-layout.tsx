@@ -3,6 +3,7 @@ import { Fragment, ReactNode, useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 
 import { ModeToggle } from "@/components/theme/toggle";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -63,17 +64,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             </div>
           </form>
           <ModeToggle />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="rounded-full">
-                <CircleUser className="h-5 w-5" />
-                <span className="sr-only">Toggle user menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <AccountDropdown />
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <AccountDropdown />
         </div>
       </header>
       <main className="flex flex-1 flex-col gap-4 p-4 px-1 md:gap-8 md:p-8">
@@ -128,13 +119,17 @@ function NavSection({ isInSheet = false }: NavSectionProps) {
 function AccountDropdown() {
   const [_location, setLocation] = useLocation();
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
+  const [username, setUsername] = useState<string>("anonymous");
 
   useEffect(() => {
     async function checkAuth() {
       try {
         const session = await getUserSession();
         if (!session) setAuthenticated(false);
-        else setAuthenticated(true);
+        else {
+          setUsername(session.user.email ?? "anonymous");
+          setAuthenticated(true);
+        }
       } catch (err) {
         handleError(err);
       }
@@ -152,7 +147,7 @@ function AccountDropdown() {
     }
   }
 
-  return isAuthenticated ? (
+  const content = isAuthenticated ? (
     <>
       <DropdownMenuLabel>My Account</DropdownMenuLabel>
       <DropdownMenuSeparator />
@@ -169,5 +164,25 @@ function AccountDropdown() {
         <Link href={SITE_PAGES.LOGIN}>Login</Link>
       </DropdownMenuItem>
     </>
+  );
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="secondary" size="icon" className="rounded-full">
+          {isAuthenticated ? (
+            <Avatar>
+              <AvatarFallback>
+                {`${username[0].toUpperCase()}${username[1].toUpperCase()}`}
+              </AvatarFallback>
+            </Avatar>
+          ) : (
+            <CircleUser className="h-5 w-5" />
+          )}
+          <span className="sr-only">Toggle user menu</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">{content}</DropdownMenuContent>
+    </DropdownMenu>
   );
 }
