@@ -1,5 +1,5 @@
 import { ArrowBigDownDash, CalendarIcon, OctagonX } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Link } from "wouter";
 
@@ -12,11 +12,7 @@ import { Loading } from "@/components/ui/loading";
 import NotFoundAlert from "@/components/ui/not-found";
 import Time from "@/components/ui/time";
 import { SITE_PAGES } from "@/configs/routes";
-import {
-  getSolutionList,
-  getSolutionVoteDetails,
-  voteForSolution,
-} from "@/lib/api";
+import { getSolutionList, voteForSolution } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { getUserSession } from "@/lib/supabase";
 import VotingPopup from "@/pages/task/view/components/voting";
@@ -25,14 +21,19 @@ import {
   SolutionResponse,
   SolutionVoteDetailsResponse,
   TaskResponse,
+  UserVotingRights,
 } from "@/types/api.types";
 
 export default function SolutionsList({
   taskId,
   newSolution,
+  userVotingRights,
+  setUserVotingRights,
 }: {
   taskId: TaskResponse["id"];
   newSolution: SolutionResponse | null;
+  userVotingRights: UserVotingRights;
+  setUserVotingRights: Dispatch<SetStateAction<UserVotingRights>>;
 }) {
   const [solutions, setSolutions] = useState<
     ResponseObject<SolutionResponse[]>
@@ -154,9 +155,17 @@ export default function SolutionsList({
         </div> */}
         <CardContent className="px-1.5">
           <div className="space-y-8">
-            {solutions.data.map((solution) => (
-              <SolutionCard key={solution.id} solution={solution} />
-            ))}
+            {solutions.data.map((solution) => {
+              if (userVotingRights)
+                solution.voteDetails.userVotingRights = userVotingRights;
+              return (
+                <SolutionCard
+                  key={solution.id}
+                  solution={solution}
+                  setUserVotingRights={setUserVotingRights}
+                />
+              );
+            })}
             {loading && <Loading />}
             {!loading && solutions.pagination?.next_page && (
               <ArrowBigDownDash
@@ -171,14 +180,25 @@ export default function SolutionsList({
   );
 }
 
-function SolutionCard({ solution }: { solution: SolutionResponse }) {
+function SolutionCard({
+  solution,
+  setUserVotingRights,
+}: {
+  solution: SolutionResponse;
+  setUserVotingRights: Dispatch<SetStateAction<UserVotingRights>>;
+}) {
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
-  const [voteDetails, setVoteDetails] = useState<
-    ResponseObject<SolutionVoteDetailsResponse>
-  >({
-    data: solution.voteDetails,
-  });
+  const [voteDetails, setVoteDetails] = useState<SolutionVoteDetailsResponse>(
+    solution.voteDetails,
+  );
   const username = solution.createdBy?.username ?? "anonymous";
+
+  // useEffect(() => {
+  //   console.log("first", count.current, voteDetails);
+  // }, [voteDetails]);
+  // useEffect(() => {
+  //   setVoteDetails(solution.voteDetails);
+  // }, [setVoteDetails, solution.voteDetails]);
 
   useEffect(() => {
     async function checkAuth() {
@@ -194,7 +214,7 @@ function SolutionCard({ solution }: { solution: SolutionResponse }) {
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated && voteDetails.data.userVotingRights === null) {
+    if (isAuthenticated && voteDetails.userVotingRights === null) {
       handleError(
         new Error(
           "Failed to fetch your vote data! Please try reloading the page.",
@@ -203,27 +223,23 @@ function SolutionCard({ solution }: { solution: SolutionResponse }) {
         false,
       );
     }
-  }, [isAuthenticated, voteDetails.data.userVotingRights]);
+  }, [isAuthenticated, voteDetails.userVotingRights]);
 
   // useEffect(() => {
-  //   let ignore = false;
-
-  //   async function fetchVoteDetails() {
+  //   async function updateVoteDetails() {
   //     try {
   //       const response = await getSolutionVoteDetails(solution.id);
-  //       if (!ignore) {
-  //         setVoteDetails(response);
-  //       }
+  //       setVoteDetails(response.data);
   //     } catch (err) {
-  //       handleError(err);
+  //       console.error("Failed to update vote details", err);
   //     }
   //   }
-  //   void fetchVoteDetails();
 
-  //   return () => {
-  //     ignore = true;
-  //   };
-  // }, [solution.id]);
+  //   if (isAuthenticated) {
+  //     const id = setInterval(() => void updateVoteDetails(), 5000);
+  //     return () => clearInterval(id);
+  //   }
+  // }, [solution.id, isAuthenticated, setVoteDetails]);
 
   async function handleVoteConfirm(amount: number) {
     try {
@@ -231,7 +247,10 @@ function SolutionCard({ solution }: { solution: SolutionResponse }) {
         pending: "Voting for solution...",
         success: "Vote successfully recorded",
       });
-      setVoteDetails(res);
+      console.log(res.data);
+      setVoteDetails(res.data);
+      if (res.data.userVotingRights)
+        setUserVotingRights(res.data.userVotingRights);
     } catch (err) {
       handleError(err, "Voting failed!");
     }
@@ -261,22 +280,22 @@ function SolutionCard({ solution }: { solution: SolutionResponse }) {
       <div className="flex justify-center items-center mb-4">
         <div className="flex flex-col">
           <Badge variant="secondary" className="text-center p-4 m-2 mr-4">
-            {`Total votes: ${voteDetails.data.totalVotes}`}
+            {`Total votes: ${voteDetails.totalVotes}`}
           </Badge>
           {isAuthenticated && (
             <Badge variant="secondary" className="text-center p-4 m-2 mr-4">
-              {`Your votes: ${voteDetails.data.totalVotesByUser ?? "?"}`}
+              {`Your votes: ${voteDetails.totalVotesByUser ?? "?"}`}
             </Badge>
           )}
         </div>
         <div className="m-2 ml-4">
           {isAuthenticated ? (
             <VotingPopup
-              totalVotesAvailable={voteDetails.data.userVotingRights ?? -1}
+              totalVotesAvailable={voteDetails.userVotingRights ?? -1}
               onVoteConfirm={(amount) => void handleVoteConfirm(amount)}
               enabled={
-                voteDetails.data.userVotingRights !== null &&
-                voteDetails.data.userVotingRights > 0
+                voteDetails.userVotingRights !== null &&
+                voteDetails.userVotingRights > 0
               }
             />
           ) : (

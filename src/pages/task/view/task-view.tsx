@@ -1,14 +1,7 @@
-import {
-  CalendarIcon,
-  CircleSlash,
-  Copy,
-  TrophyIcon,
-  WalletIcon,
-} from "lucide-react";
-import { useEffect, useState } from "react";
+import { CalendarIcon, Copy, TrophyIcon, WalletIcon } from "lucide-react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "wouter";
 
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,12 +19,18 @@ import { handleError } from "@/lib/error";
 import FundingPopup from "@/pages/task/view/components/funding";
 import SolutionCreator from "@/pages/task/view/components/solution-create";
 import SolutionsList from "@/pages/task/view/components/solution-view";
-import { SolutionResponse, TaskResponse } from "@/types/api.types";
+import {
+  SolutionResponse,
+  TaskResponse,
+  UserVotingRights,
+} from "@/types/api.types";
 import { getTaskKindColor } from "@/utils/colors";
 
 export default function TaskViewPage() {
   const [task, setTask] = useState<TaskResponse>();
   const [loading, setLoading] = useState(true);
+  const [userVotingRights, setUserVotingRights] =
+    useState<UserVotingRights>(null);
   const params = useParams();
   const taskId = params.id;
 
@@ -75,15 +74,35 @@ export default function TaskViewPage() {
 
   return (
     <div className="min-h-screen space-y-4">
-      <TaskDisplay task={task} />
-      <SolutionSection taskId={task.id} />
+      <TaskDisplay
+        task={task}
+        userVotingRights={userVotingRights}
+        setUserVotingRights={setUserVotingRights}
+      />
+      <SolutionSection
+        taskId={task.id}
+        userVotingRights={userVotingRights}
+        setUserVotingRights={setUserVotingRights}
+      />
     </div>
   );
 }
 
-function TaskDisplay({ task }: { task: TaskResponse }) {
+function TaskDisplay({
+  task,
+  userVotingRights,
+  setUserVotingRights,
+}: {
+  task: TaskResponse;
+  userVotingRights: UserVotingRights;
+  setUserVotingRights: Dispatch<SetStateAction<UserVotingRights>>;
+}) {
   const username = task.createdBy?.username ?? "anonymous";
   const kindColor = getTaskKindColor(task.kind);
+
+  useEffect(() => {
+    if (userVotingRights) task.fundsRaised.userVotingRights = userVotingRights;
+  }, [task.fundsRaised, userVotingRights]);
 
   return (
     <Card className="max-w-7xl mx-auto relative">
@@ -137,11 +156,22 @@ function TaskDisplay({ task }: { task: TaskResponse }) {
           taskId={task.id}
           fundsRaisedInit={task.fundsRaised}
           depositAddress={task.depositAddress}
+          setUserVotingRights={setUserVotingRights}
         />
         <div className="flex items-center justify-center">
           <TrophyIcon className="mr-2 h-4 w-4 text-muted-foreground" />
           <span className="font-semibold text-sm">Max Winners:</span>
           <span className="ml-2 text-sm">{task.maxWinners}</span>
+        </div>
+      </div>
+      <div className="flex justify-between">
+        <div className="bg-secondary-foreground max-w-1/2 p-2 m-4 rounded-xl shadow-md">
+          <h3 className="text-sm font-medium text-secondary mb-1">
+            Your Available Votes
+          </h3>
+          <p className="text-3xl font-bold text-primary">
+            {userVotingRights ?? 0}
+          </p>
         </div>
       </div>
     </Card>
@@ -187,12 +217,25 @@ function CopyAddressButton({ address }: { address: string }) {
   );
 }
 
-function SolutionSection({ taskId }: { taskId: TaskResponse["id"] }) {
+function SolutionSection({
+  taskId,
+  userVotingRights,
+  setUserVotingRights,
+}: {
+  taskId: TaskResponse["id"];
+  userVotingRights: UserVotingRights;
+  setUserVotingRights: Dispatch<SetStateAction<UserVotingRights>>;
+}) {
   const [newSolution, setNewSolution] = useState<SolutionResponse | null>(null);
   return (
     <>
       <SolutionCreator taskId={taskId} setNewSolution={setNewSolution} />
-      <SolutionsList taskId={taskId} newSolution={newSolution} />
+      <SolutionsList
+        taskId={taskId}
+        newSolution={newSolution}
+        userVotingRights={userVotingRights}
+        setUserVotingRights={setUserVotingRights}
+      />
     </>
   );
 }

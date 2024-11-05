@@ -1,5 +1,5 @@
 import { CoinsIcon } from "lucide-react";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { toast } from "react-toastify";
 
 import { Badge } from "@/components/ui/badge";
@@ -13,16 +13,22 @@ import {
 } from "@/components/ui/popover";
 import { fundTask } from "@/lib/api";
 import { handleError } from "@/lib/error";
-import { TaskFundDetailsResponse, TaskResponse } from "@/types/api.types";
+import {
+  TaskFundDetailsResponse,
+  TaskResponse,
+  UserVotingRights,
+} from "@/types/api.types";
 
 export default function FundingPopup({
   taskId,
   fundsRaisedInit,
   depositAddress,
+  setUserVotingRights,
 }: {
   taskId: TaskResponse["id"];
   fundsRaisedInit: TaskFundDetailsResponse;
   depositAddress: TaskResponse["depositAddress"];
+  setUserVotingRights: Dispatch<SetStateAction<UserVotingRights>>;
 }) {
   const [fundsRaised, setFundsRaised] = useState(fundsRaisedInit);
   const [open, setOpen] = useState(false);
@@ -35,7 +41,10 @@ export default function FundingPopup({
         pending: "Funding task...",
         success: "Funding successful",
       });
-      if (res) setFundsRaised(res.data.fundsRaised);
+      if (res) {
+        setUserVotingRights(res.data.fundsRaised.userVotingRights);
+        setFundsRaised(res.data.fundsRaised);
+      }
     } catch (err) {
       handleError(err, "Funding failed!");
     }
