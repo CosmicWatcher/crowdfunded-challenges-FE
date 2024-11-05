@@ -135,12 +135,13 @@ function AccountDropdown() {
       }
     }
     void checkAuth();
-  }, []);
+  });
 
   async function handleLogout() {
     try {
       await logout();
       notifySuccess("Successfully Logged Out");
+      setAuthenticated(false);
       setLocation(SITE_PAGES.HOME);
     } catch (err) {
       handleError(err, "Logout Failed");
