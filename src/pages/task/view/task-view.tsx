@@ -1,5 +1,6 @@
 import { CalendarIcon, Copy, TrophyIcon, WalletIcon } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { useParams } from "wouter";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -14,23 +15,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { getTaskById } from "@/lib/api";
+import { fundTask, getTaskById } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import FundingPopup from "@/pages/task/view/components/funding";
 import SolutionCreator from "@/pages/task/view/components/solution-create";
 import SolutionsList from "@/pages/task/view/components/solution-view";
-import {
-  SolutionResponse,
-  TaskResponse,
-  UserVotingRights,
-} from "@/types/api.types";
+import { SolutionResponse, TaskResponse } from "@/types/api.types";
 import { getTaskKindColor } from "@/utils/colors";
 
 export default function TaskViewPage() {
   const [task, setTask] = useState<TaskResponse>();
   const [loading, setLoading] = useState(true);
-  const [userVotingRights, setUserVotingRights] =
-    useState<UserVotingRights>(null);
+  const [userVotingRights, setUserVotingRights] = useState<number | null>(null);
   const params = useParams();
   const taskId = params.id;
 
@@ -43,6 +39,9 @@ export default function TaskViewPage() {
         if (taskId !== undefined) {
           const response = await getTaskById(taskId);
           if (!ignore && response.data) {
+            setUserVotingRights(
+              response.data.metrics.user?.votingRights ?? null,
+            );
             setTask(response.data);
           }
         }
@@ -59,6 +58,26 @@ export default function TaskViewPage() {
     };
   }, [taskId]);
 
+  function handleFundConfirm(amount: number) {
+    async function func() {
+      try {
+        if (task) {
+          const res = await toast.promise(fundTask(task.id, amount), {
+            pending: "Funding task...",
+            success: "Funding successful",
+          });
+          if (res) {
+            setUserVotingRights(res.data.metrics.user?.votingRights ?? null);
+            setTask(res.data);
+          }
+        }
+      } catch (err) {
+        handleError(err, "Funding failed!");
+      }
+    }
+    void func();
+  }
+
   if (loading) {
     return <Loading />;
   }
@@ -74,11 +93,7 @@ export default function TaskViewPage() {
 
   return (
     <div className="min-h-screen space-y-4">
-      <TaskDisplay
-        task={task}
-        userVotingRights={userVotingRights}
-        setUserVotingRights={setUserVotingRights}
-      />
+      <TaskDisplay task={task} handleFundConfirm={handleFundConfirm} />
       <SolutionSection
         taskId={task.id}
         userVotingRights={userVotingRights}
@@ -90,19 +105,13 @@ export default function TaskViewPage() {
 
 function TaskDisplay({
   task,
-  userVotingRights,
-  setUserVotingRights,
+  handleFundConfirm,
 }: {
   task: TaskResponse;
-  userVotingRights: UserVotingRights;
-  setUserVotingRights: Dispatch<SetStateAction<UserVotingRights>>;
+  handleFundConfirm: (amount: number) => void;
 }) {
   const username = task.createdBy?.username ?? "anonymous";
   const kindColor = getTaskKindColor(task.kind);
-
-  useEffect(() => {
-    if (userVotingRights) task.fundsRaised.userVotingRights = userVotingRights;
-  }, [task.fundsRaised, userVotingRights]);
 
   return (
     <Card className="max-w-7xl mx-auto relative">
@@ -153,10 +162,9 @@ function TaskDisplay({
           )}
         </div>
         <FundingPopup
-          taskId={task.id}
-          fundsRaisedInit={task.fundsRaised}
+          totalFunds={task.metrics.overall.totalFunds}
           depositAddress={task.depositAddress}
-          setUserVotingRights={setUserVotingRights}
+          handleFundConfirm={handleFundConfirm}
         />
         <div className="flex items-center justify-center">
           <TrophyIcon className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -164,17 +172,23 @@ function TaskDisplay({
           <span className="ml-2 text-sm">{task.maxWinners}</span>
         </div>
       </div>
-      <div className="flex justify-between">
-        <div className="bg-secondary-foreground max-w-1/2 p-2 m-4 rounded-xl shadow-md">
-          <h3 className="text-sm font-medium text-secondary mb-1">
-            Your Available Votes
-          </h3>
-          <p className="text-3xl font-bold text-primary">
-            {userVotingRights ?? 0}
-          </p>
-        </div>
-      </div>
+      <TaskMetrics metrics={task.metrics} />
     </Card>
+  );
+}
+
+function TaskMetrics({ metrics }: { metrics: TaskResponse["metrics"] }) {
+  return (
+    <div className="flex justify-between">
+      <div className="bg-secondary-foreground max-w-1/2 p-2 m-4 rounded-xl shadow-md">
+        <h3 className="text-sm font-medium text-secondary mb-1">
+          Your Available Votes
+        </h3>
+        <p className="text-3xl font-bold text-primary">
+          {metrics.user?.votingRights ?? 0}
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -223,8 +237,8 @@ function SolutionSection({
   setUserVotingRights,
 }: {
   taskId: TaskResponse["id"];
-  userVotingRights: UserVotingRights;
-  setUserVotingRights: Dispatch<SetStateAction<UserVotingRights>>;
+  userVotingRights: number | null;
+  setUserVotingRights: Dispatch<SetStateAction<number | null>>;
 }) {
   const [newSolution, setNewSolution] = useState<SolutionResponse | null>(null);
   return (

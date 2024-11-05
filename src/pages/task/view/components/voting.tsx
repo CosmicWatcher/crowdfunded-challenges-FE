@@ -12,11 +12,11 @@ import {
 import { Slider } from "@/components/ui/slider";
 
 export default function VotingPopup({
-  totalVotesAvailable,
+  userVotingRights,
   onVoteConfirm,
   enabled,
 }: {
-  totalVotesAvailable: number;
+  userVotingRights: number;
   onVoteConfirm: (voteAmount: number) => void;
   enabled: boolean;
 }) {
@@ -28,26 +28,26 @@ export default function VotingPopup({
     (value: number[]) => {
       const percentage = Math.round(value[0]);
       setVotePercentage(percentage);
-      setVoteAmount(Math.floor(totalVotesAvailable * (percentage / 100)));
+      setVoteAmount(Math.floor(userVotingRights * (percentage / 100)));
     },
-    [totalVotesAvailable],
+    [userVotingRights],
   );
 
   const handleVoteAmountChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const amount = Math.min(Number(e.target.value), totalVotesAvailable);
+      const amount = Math.min(Number(e.target.value), userVotingRights);
       setVoteAmount(amount);
-      setVotePercentage(Math.round((amount / totalVotesAvailable) * 100));
+      setVotePercentage(Math.round((amount / userVotingRights) * 100));
     },
-    [totalVotesAvailable],
+    [userVotingRights],
   );
 
   const setQuickChoice = useCallback(
     (percentage: number) => {
       setVotePercentage(percentage);
-      setVoteAmount(Math.floor(totalVotesAvailable * (percentage / 100)));
+      setVoteAmount(Math.floor(userVotingRights * (percentage / 100)));
     },
-    [totalVotesAvailable],
+    [userVotingRights],
   );
 
   const handleConfirm = useCallback(() => {
@@ -81,7 +81,7 @@ export default function VotingPopup({
                 <span className="text-sm font-medium">
                   Your available votes for this task:
                 </span>
-                <span className="text-lg font-bold">{totalVotesAvailable}</span>
+                <span className="text-lg font-bold">{userVotingRights}</span>
               </div>
               <div>
                 <label
@@ -96,7 +96,7 @@ export default function VotingPopup({
                     type="number"
                     value={voteAmount}
                     onChange={handleVoteAmountChange}
-                    max={totalVotesAvailable}
+                    max={userVotingRights}
                     min={0}
                     className="w-32"
                   />

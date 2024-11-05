@@ -27,10 +27,17 @@ export interface TaskResponse {
   maxWinners: number;
   status: TaskStatus;
   depositAddress: string | null;
-  fundsRaised: TaskFundDetailsResponse;
   createdAt: string;
   editedAt: string | null;
   endedAt: string | null;
+  metrics: {
+    overall: { totalFunds: number; totalVotes: number };
+    user: {
+      totalFunds: number;
+      totalVotes: number;
+      votingRights: number;
+    } | null;
+  };
 }
 
 export interface SolutionResponse {
@@ -49,9 +56,4 @@ export interface SolutionVoteDetailsResponse {
   totalVotes: number;
   totalVotesByUser: number | null;
   userVotingRights: number | null;
-}
-
-export interface TaskFundDetailsResponse {
-  totalFunds: number;
-  totalFundsByUser: number | null;
 }

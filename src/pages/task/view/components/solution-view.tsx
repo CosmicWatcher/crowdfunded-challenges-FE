@@ -21,7 +21,6 @@ import {
   SolutionResponse,
   SolutionVoteDetailsResponse,
   TaskResponse,
-  UserVotingRights,
 } from "@/types/api.types";
 
 export default function SolutionsList({
@@ -32,8 +31,8 @@ export default function SolutionsList({
 }: {
   taskId: TaskResponse["id"];
   newSolution: SolutionResponse | null;
-  userVotingRights: UserVotingRights;
-  setUserVotingRights: Dispatch<SetStateAction<UserVotingRights>>;
+  userVotingRights: number | null;
+  setUserVotingRights: Dispatch<SetStateAction<number | null>>;
 }) {
   const [solutions, setSolutions] = useState<
     ResponseObject<SolutionResponse[]>
@@ -185,7 +184,7 @@ function SolutionCard({
   setUserVotingRights,
 }: {
   solution: SolutionResponse;
-  setUserVotingRights: Dispatch<SetStateAction<UserVotingRights>>;
+  setUserVotingRights: Dispatch<SetStateAction<number | null>>;
 }) {
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
   const [voteDetails, setVoteDetails] = useState<SolutionVoteDetailsResponse>(
@@ -291,7 +290,7 @@ function SolutionCard({
         <div className="m-2 ml-4">
           {isAuthenticated ? (
             <VotingPopup
-              totalVotesAvailable={voteDetails.userVotingRights ?? -1}
+              userVotingRights={voteDetails.userVotingRights ?? -1}
               onVoteConfirm={(amount) => void handleVoteConfirm(amount)}
               enabled={
                 voteDetails.userVotingRights !== null &&
