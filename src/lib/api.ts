@@ -4,7 +4,7 @@ import { getUserSession } from "@/lib/supabase";
 import {
   ResponseObject,
   SolutionResponse,
-  SolutionVoteDetailsResponse,
+  SolutionVoteMetrics,
   TaskResponse,
 } from "@/types/api.types";
 import { TaskCreationForm } from "@/types/task.types";
@@ -106,34 +106,32 @@ export async function getSolutionList(
   return resObj;
 }
 
-export async function getSolutionVoteDetails(
-  solutionId: SolutionResponse["id"],
-): Promise<ResponseObject<SolutionVoteDetailsResponse>> {
-  const endpoint = API_ROUTES.SOLUTION_VOTES.GET_DETAILS.replace(
-    ":solutionId",
-    solutionId,
-  );
-  const resObj = await apiCall<SolutionVoteDetailsResponse>(
-    "GET",
-    endpoint,
-    true,
-  );
+// export async function getSolutionVoteDetails(
+//   solutionId: SolutionResponse["id"],
+// ): Promise<ResponseObject<SolutionResponse["userVoteMetrics"]>> {
+//   const endpoint = API_ROUTES.SOLUTION_VOTES.GET_DETAILS.replace(
+//     ":solutionId",
+//     solutionId,
+//   );
+//   const resObj = await apiCall<SolutionResponse["userVoteMetrics"]>(
+//     "GET",
+//     endpoint,
+//     true,
+//   );
 
-  if (!resObj) throw new Error("No response object!");
-  return resObj;
-}
+//   if (!resObj) throw new Error("No response object!");
+//   return resObj;
+// }
 
 export async function voteForSolution(
   solutionId: SolutionResponse["id"],
   amount: number,
-): Promise<ResponseObject<SolutionVoteDetailsResponse>> {
+): Promise<ResponseObject<SolutionVoteMetrics>> {
   const endpoint = API_ROUTES.SOLUTION_VOTES.RECORD;
-  const resObj = await apiCall<SolutionVoteDetailsResponse>(
-    "POST",
-    endpoint,
-    true,
-    { solutionId, amount },
-  );
+  const resObj = await apiCall<SolutionVoteMetrics>("POST", endpoint, true, {
+    solutionId,
+    amount,
+  });
 
   if (!resObj) throw new Error("No response object!");
   return resObj;

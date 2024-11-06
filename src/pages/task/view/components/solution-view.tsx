@@ -115,7 +115,7 @@ export default function SolutionsList({
           return {
             data: prevSolutions.data.map((solution) => {
               if (solution.id === solutionId) {
-                return { ...solution, voteDetails: res.data };
+                return { ...solution, userVoteMetrics: res.data };
               } else {
                 return solution;
               }
@@ -123,7 +123,7 @@ export default function SolutionsList({
             pagination: prevSolutions.pagination,
           };
         });
-        updateUserVotingRights(res.data.userVotingRights);
+        updateUserVotingRights(res.data.votingRights);
         updateVoteCounts(amount);
       } catch (err) {
         handleError(err, "Voting failed!");
@@ -171,7 +171,9 @@ export default function SolutionsList({
                   title={solution.title}
                   details={solution.details}
                   userVotingRights={userVotingRights}
-                  totalVotesByUser={solution.voteDetails.totalVotesByUser}
+                  totalVotesByUser={
+                    solution.userVoteMetrics?.totalVotes ?? null
+                  }
                   handleVoteConfirm={handleVoteConfirm}
                 />
               );

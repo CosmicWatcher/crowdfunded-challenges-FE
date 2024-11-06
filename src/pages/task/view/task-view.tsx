@@ -275,7 +275,7 @@ function UserMetrics({
   return (
     <>
       <div className="flex justify-center">
-        <div className="bg-gradient-to-b from-teal-200 to-emerald-600 from-30% p-2 m-4 mb-0 w-1/2 rounded-xl shadow-md flex flex-col justify-center items-center">
+        <div className="bg-gradient-to-b from-teal-200 to-emerald-600 from-30% p-2 m-4 mb-0 w-1/2 rounded-full shadow-md flex flex-col justify-center items-center">
           <h3 className="text-xs font-bold text-slate-800">
             Your Fund Contribution
           </h3>
@@ -284,13 +284,13 @@ function UserMetrics({
       </div>
       <div className="sticky top-16 z-10 bg-background">
         <div className="flex justify-evenly">
-          <div className="bg-gradient-to-b from-teal-200 to-emerald-600 from-30% p-2 m-4 rounded-xl shadow-md flex flex-col justify-center items-center">
+          <div className="bg-gradient-to-b from-teal-200 to-emerald-600 from-30% p-2 px-4 m-4 rounded-full shadow-md flex flex-col justify-center items-center">
             <h3 className="text-xs font-bold text-slate-800">
               Your Available Votes
             </h3>
             <p className="text-lg font-bold text-primary">{votingRights}</p>
           </div>
-          <div className="bg-gradient-to-b from-teal-200 to-emerald-600 from-30% p-2 m-4 rounded-xl shadow-md flex flex-col justify-center items-center">
+          <div className="bg-gradient-to-b from-teal-200 to-emerald-600 from-30% p-2 px-4 m-4 rounded-full shadow-md flex flex-col justify-center items-center">
             <h3 className="text-xs font-bold text-slate-800">
               Your Votes Cast
             </h3>
