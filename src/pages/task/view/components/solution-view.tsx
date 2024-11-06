@@ -1,5 +1,5 @@
 import { ArrowBigDownDash, CalendarIcon, OctagonX } from "lucide-react";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Link } from "wouter";
 
@@ -19,20 +19,22 @@ import VotingPopup from "@/pages/task/view/components/voting";
 import {
   ResponseObject,
   SolutionResponse,
-  SolutionVoteDetailsResponse,
   TaskResponse,
+  UserResponse,
 } from "@/types/api.types";
 
 export default function SolutionsList({
   taskId,
   newSolution,
   userVotingRights,
-  setUserVotingRights,
+  updateUserVotingRights,
+  updateVoteCounts,
 }: {
   taskId: TaskResponse["id"];
   newSolution: SolutionResponse | null;
   userVotingRights: number | null;
-  setUserVotingRights: Dispatch<SetStateAction<number | null>>;
+  updateUserVotingRights: (newRights: number | null) => void;
+  updateVoteCounts: (newVotes: number) => void;
 }) {
   const [solutions, setSolutions] = useState<
     ResponseObject<SolutionResponse[]>
@@ -73,7 +75,6 @@ export default function SolutionsList({
   // Fetch solutions based on page number
   useEffect(() => {
     let ignore = false;
-
     async function fetchSolutions(pageNum: number) {
       setLoading(true);
       try {
@@ -99,16 +100,42 @@ export default function SolutionsList({
       }
     }
     void fetchSolutions(page);
-
     return () => {
       ignore = true;
     };
   }, [page, taskId]);
 
+  function handleVoteConfirm(solutionId: string, amount: number) {
+    async function vote() {
+      try {
+        const res = await toast.promise(voteForSolution(solutionId, amount), {
+          pending: "Voting for solution...",
+          success: "Vote successfully recorded",
+        });
+        setSolutions((prevSolutions) => {
+          return {
+            data: prevSolutions.data.map((solution) => {
+              if (solution.id === solutionId) {
+                return { ...solution, voteDetails: res.data };
+              } else {
+                return solution;
+              }
+            }),
+            pagination: prevSolutions.pagination,
+          };
+        });
+        updateUserVotingRights(res.data.userVotingRights);
+        updateVoteCounts(amount);
+      } catch (err) {
+        handleError(err, "Voting failed!");
+      }
+    }
+    void vote();
+  }
+
   if (loading && solutions.data.length === 0) {
     return <Loading />;
   }
-
   if (isError) {
     return (
       <Alert className="max-w-lg mx-auto">
@@ -118,7 +145,6 @@ export default function SolutionsList({
       </Alert>
     );
   }
-
   if (solutions.data.length === 0) {
     return (
       <NotFoundAlert
@@ -155,13 +181,16 @@ export default function SolutionsList({
         <CardContent className="px-1.5">
           <div className="space-y-8">
             {solutions.data.map((solution) => {
-              if (userVotingRights)
-                solution.voteDetails.userVotingRights = userVotingRights;
               return (
                 <SolutionCard
                   key={solution.id}
-                  solution={solution}
-                  setUserVotingRights={setUserVotingRights}
+                  solutionId={solution.id}
+                  createdBy={solution.createdBy}
+                  createdAt={solution.createdAt}
+                  details={solution.details}
+                  userVotingRights={userVotingRights}
+                  totalVotesByUser={solution.voteDetails.totalVotesByUser}
+                  handleVoteConfirm={handleVoteConfirm}
                 />
               );
             })}
@@ -180,24 +209,24 @@ export default function SolutionsList({
 }
 
 function SolutionCard({
-  solution,
-  setUserVotingRights,
+  solutionId,
+  createdBy,
+  createdAt,
+  details,
+  userVotingRights,
+  totalVotesByUser,
+  handleVoteConfirm,
 }: {
-  solution: SolutionResponse;
-  setUserVotingRights: Dispatch<SetStateAction<number | null>>;
+  solutionId: string;
+  createdBy: UserResponse | null;
+  createdAt: string;
+  details: string | null;
+  userVotingRights: number | null;
+  totalVotesByUser: number | null;
+  handleVoteConfirm: (id: string, amount: number) => void;
 }) {
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
-  const [voteDetails, setVoteDetails] = useState<SolutionVoteDetailsResponse>(
-    solution.voteDetails,
-  );
-  const username = solution.createdBy?.username ?? "anonymous";
-
-  // useEffect(() => {
-  //   console.log("first", count.current, voteDetails);
-  // }, [voteDetails]);
-  // useEffect(() => {
-  //   setVoteDetails(solution.voteDetails);
-  // }, [setVoteDetails, solution.voteDetails]);
+  const username = createdBy?.username ?? "anonymous";
 
   useEffect(() => {
     async function checkAuth() {
@@ -210,10 +239,10 @@ function SolutionCard({
       }
     }
     void checkAuth();
-  }, []);
+  });
 
   useEffect(() => {
-    if (isAuthenticated && voteDetails.userVotingRights === null) {
+    if (isAuthenticated && userVotingRights === null) {
       handleError(
         new Error(
           "Failed to fetch your vote data! Please try reloading the page.",
@@ -222,7 +251,7 @@ function SolutionCard({
         false,
       );
     }
-  }, [isAuthenticated, voteDetails.userVotingRights]);
+  }, [isAuthenticated, userVotingRights]);
 
   // useEffect(() => {
   //   async function updateVoteDetails() {
@@ -240,28 +269,13 @@ function SolutionCard({
   //   }
   // }, [solution.id, isAuthenticated, setVoteDetails]);
 
-  async function handleVoteConfirm(amount: number) {
-    try {
-      const res = await toast.promise(voteForSolution(solution.id, amount), {
-        pending: "Voting for solution...",
-        success: "Vote successfully recorded",
-      });
-      console.log(res.data);
-      setVoteDetails(res.data);
-      if (res.data.userVotingRights)
-        setUserVotingRights(res.data.userVotingRights);
-    } catch (err) {
-      handleError(err, "Voting failed!");
-    }
-  }
-
   return (
     <Card>
       <CardHeader>
         <div className="space-y-2">
           <div className="flex items-center text-sm">
             <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-            <Time timestamp={new Date(solution.createdAt)} />
+            <Time timestamp={new Date(createdAt)} />
           </div>
           <div className="flex items-center text-sm space-x-2">
             <Avatar>
@@ -274,28 +288,25 @@ function SolutionCard({
         </div>
       </CardHeader>
       <CardContent>
-        <p className="flex-grow break-words">{solution.details}</p>
+        <p className="flex-grow break-words">{details}</p>
       </CardContent>
       <div className="flex justify-center items-center mb-4">
         <div className="flex flex-col">
-          <Badge variant="secondary" className="text-center p-4 m-2 mr-4">
-            {`Total votes: ${voteDetails.totalVotes}`}
-          </Badge>
           {isAuthenticated && (
-            <Badge variant="secondary" className="text-center p-4 m-2 mr-4">
-              {`Your votes: ${voteDetails.totalVotesByUser ?? "?"}`}
+            <Badge
+              variant="secondary"
+              className="text-center text-slate-800 p-4 m-2 mr-4 bg-teal-300"
+            >
+              {`Your Votes: ${totalVotesByUser ?? "?"}`}
             </Badge>
           )}
         </div>
         <div className="m-2 ml-4">
           {isAuthenticated ? (
             <VotingPopup
-              userVotingRights={voteDetails.userVotingRights ?? -1}
-              onVoteConfirm={(amount) => void handleVoteConfirm(amount)}
-              enabled={
-                voteDetails.userVotingRights !== null &&
-                voteDetails.userVotingRights > 0
-              }
+              userVotingRights={userVotingRights ?? -1}
+              onVoteConfirm={(amount) => handleVoteConfirm(solutionId, amount)}
+              enabled={userVotingRights !== null && userVotingRights > 0}
             />
           ) : (
             <Button variant="default">
