@@ -12,8 +12,10 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { SITE_PAGES } from "@/configs/routes";
 import { solutionFormSchema } from "@/configs/schema";
@@ -55,6 +57,7 @@ export default function SolutionCreator({
   const form = useForm<z.infer<typeof solutionFormSchema>>({
     resolver: zodResolver(solutionFormSchema),
     defaultValues: {
+      title: "",
       description: "",
     },
   });
@@ -104,6 +107,21 @@ export default function SolutionCreator({
         <Form {...form}>
           {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter a title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <div className="space-y-2">
               <FormField
                 control={form.control}

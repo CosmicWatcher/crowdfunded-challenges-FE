@@ -44,6 +44,7 @@ export interface SolutionResponse {
   id: string;
   taskId: string | null;
   createdBy: UserResponse | null;
+  title: string | null;
   details: string | null;
   voteDetails: SolutionVoteDetailsResponse;
   isWinner: boolean;

@@ -5,7 +5,6 @@ import { Link } from "wouter";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
@@ -160,24 +159,6 @@ export default function SolutionsList({
         <CardHeader className="text-center">
           <CardTitle className="text-4xl font-bold">Solutions</CardTitle>
         </CardHeader>
-        {/* <div className="flex justify-between">
-          <div className="bg-secondary-foreground max-w-1/2 p-2 m-4 rounded-xl shadow-md">
-            <h3 className="text-sm font-medium text-secondary mb-1">
-              Your Available Votes
-            </h3>
-            <p className="text-3xl font-bold text-primary">
-               {voting.totalVotesAvailable}
-            </p>
-          </div>
-          <div className="bg-secondary-foreground max-w-1/2 p-2 m-4 rounded-xl shadow-md">
-            <h3 className="text-sm font-medium text-secondary mb-1">
-              Total Votes Received
-            </h3>
-            <p className="text-3xl font-bold text-primary">
-              {voting.totalVotesReceived}
-            </p>
-          </div>
-        </div> */}
         <CardContent className="px-1.5">
           <div className="space-y-8">
             {solutions.data.map((solution) => {
@@ -187,6 +168,7 @@ export default function SolutionsList({
                   solutionId={solution.id}
                   createdBy={solution.createdBy}
                   createdAt={solution.createdAt}
+                  title={solution.title}
                   details={solution.details}
                   userVotingRights={userVotingRights}
                   totalVotesByUser={solution.voteDetails.totalVotesByUser}
@@ -212,6 +194,7 @@ function SolutionCard({
   solutionId,
   createdBy,
   createdAt,
+  title,
   details,
   userVotingRights,
   totalVotesByUser,
@@ -220,6 +203,7 @@ function SolutionCard({
   solutionId: string;
   createdBy: UserResponse | null;
   createdAt: string;
+  title: string | null;
   details: string | null;
   userVotingRights: number | null;
   totalVotesByUser: number | null;
@@ -253,22 +237,6 @@ function SolutionCard({
     }
   }, [isAuthenticated, userVotingRights]);
 
-  // useEffect(() => {
-  //   async function updateVoteDetails() {
-  //     try {
-  //       const response = await getSolutionVoteDetails(solution.id);
-  //       setVoteDetails(response.data);
-  //     } catch (err) {
-  //       console.error("Failed to update vote details", err);
-  //     }
-  //   }
-
-  //   if (isAuthenticated) {
-  //     const id = setInterval(() => void updateVoteDetails(), 5000);
-  //     return () => clearInterval(id);
-  //   }
-  // }, [solution.id, isAuthenticated, setVoteDetails]);
-
   return (
     <Card>
       <CardHeader>
@@ -287,18 +255,19 @@ function SolutionCard({
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        <CardTitle className="text-2xl font-bold">{title}</CardTitle>
         <p className="flex-grow break-words">{details}</p>
       </CardContent>
       <div className="flex justify-center items-center mb-4">
         <div className="flex flex-col">
           {isAuthenticated && (
-            <Badge
-              variant="secondary"
-              className="text-center text-slate-800 p-4 m-2 mr-4 bg-teal-300"
-            >
-              {`Your Votes: ${totalVotesByUser ?? "?"}`}
-            </Badge>
+            <div className="text-center p-4 m-2 mr-4 bg-gradient-to-b from-sky-300 to-sky-600 from-40% rounded-full flex flex-col shadow-xl">
+              <h3 className="text-xs font-bold text-slate-800">Your Votes</h3>
+              <p className="text-md font-bold text-primary">
+                {totalVotesByUser}
+              </p>
+            </div>
           )}
         </div>
         <div className="m-2 ml-4">
@@ -315,23 +284,6 @@ function SolutionCard({
           )}
         </div>
       </div>
-
-      {/* <Dialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center">
-              <AlertCircle className="h-5 w-5 mr-2" />
-              Error
-            </DialogTitle>
-          </DialogHeader>
-          <DialogDescription>
-            You don&apos;t have enough votes to contribute to this solution.
-          </DialogDescription>
-          <Button className="mt-4" onClick={() => setErrorDialogOpen(false)}>
-            Close
-          </Button>
-        </DialogContent>
-      </Dialog> */}
     </Card>
   );
 }
