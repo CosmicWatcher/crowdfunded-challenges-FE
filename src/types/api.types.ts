@@ -57,3 +57,15 @@ export interface SolutionVoteMetrics {
   totalVotes: number;
   votingRights: number;
 }
+
+export interface SolutionVoteResponse {
+  topSolutions: {
+    createdBy: UserResponse | null;
+    title: string | null;
+    details: string | null;
+    voteCount: number;
+    createdAt: string;
+    editedAt: string | null;
+  }[];
+  userVoteMetrics: SolutionVoteMetrics;
+}

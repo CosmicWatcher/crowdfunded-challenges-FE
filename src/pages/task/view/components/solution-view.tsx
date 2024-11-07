@@ -7,8 +7,16 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Loading } from "@/components/ui/loading";
 import NotFoundAlert from "@/components/ui/not-found";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import Time from "@/components/ui/time";
 import { SITE_PAGES } from "@/configs/routes";
 import { getSolutionList, voteForSolution } from "@/lib/api";
@@ -18,6 +26,7 @@ import VotingPopup from "@/pages/task/view/components/voting";
 import {
   ResponseObject,
   SolutionResponse,
+  SolutionVoteResponse,
   TaskResponse,
   UserResponse,
 } from "@/types/api.types";
@@ -50,6 +59,10 @@ export default function SolutionsList({
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [isError, setIsError] = useState(false);
+  const [topSolutions, setTopSolutions] = useState<
+    SolutionVoteResponse["topSolutions"]
+  >([]);
+  const [openDialog, setOpenDialog] = useState(false);
 
   function handleNextPageClick() {
     if (
@@ -115,7 +128,10 @@ export default function SolutionsList({
           return {
             data: prevSolutions.data.map((solution) => {
               if (solution.id === solutionId) {
-                return { ...solution, userVoteMetrics: res.data };
+                return {
+                  ...solution,
+                  userVoteMetrics: res.data.userVoteMetrics,
+                };
               } else {
                 return solution;
               }
@@ -123,8 +139,10 @@ export default function SolutionsList({
             pagination: prevSolutions.pagination,
           };
         });
-        updateUserVotingRights(res.data.votingRights);
+        updateUserVotingRights(res.data.userVoteMetrics.votingRights);
         updateVoteCounts(amount);
+        setTopSolutions(res.data.topSolutions);
+        setOpenDialog(true);
       } catch (err) {
         handleError(err, "Voting failed!");
       }
@@ -188,6 +206,62 @@ export default function SolutionsList({
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent className="bg-secondary rounded-3xl max-w-3xl w-full h-fit max-h-[80vh] px-1 overflow-hidden flex flex-col">
+          <DialogHeader className="flex flex-col justify-center items-center">
+            <DialogTitle>Top Solutions</DialogTitle>
+            <DialogDescription>
+              Solutions ranked by total votes received
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="rounded-3xl p-2 bg-primary flex-grow overflow-y-auto">
+            <div className="grid gap-2">
+              {topSolutions.map((solution, idx) => {
+                const username = solution.createdBy?.username ?? "anonymous";
+                return (
+                  <div key={idx} className="flex justify-between">
+                    <Card className="px-3 py-2 space-y-1 w-full">
+                      <div className="flex justify-left gap-10">
+                        <div className="flex items-center text-sm space-x-2">
+                          <Avatar className="size-8">
+                            <AvatarFallback>
+                              {`${username[0].toUpperCase()}${username[1].toUpperCase()}`}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span>{username}</span>
+                        </div>
+                        <div className="flex items-center text-sm">
+                          <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                          <Time timestamp={new Date(solution.createdAt)} />
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold line-clamp-1 break-all">
+                          {solution.title}
+                        </h4>
+                        <p className="text-sm text-muted-foreground line-clamp-1 break-all">
+                          {solution.details}
+                        </p>
+                      </div>
+                    </Card>
+                    <div className="flex justify-evenly">
+                      <div className="bg-gradient-to-tr from-sky-400 to-red-300 p-1 m-1 rounded-full shadow-md flex flex-col justify-center items-center">
+                        <p className="text-lg font-bold text-primary">
+                          {solution.voteCount}
+                        </p>
+                        <h3 className="text-xs font-bold text-slate-800">
+                          Votes
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
@@ -258,7 +332,9 @@ function SolutionCard({
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <CardTitle className="text-2xl font-bold">{title}</CardTitle>
+        <CardTitle className="text-2xl font-bold break-words">
+          {title}
+        </CardTitle>
         <p className="flex-grow break-words">{details}</p>
       </CardContent>
       <div className="flex justify-center items-center mb-4">

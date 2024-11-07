@@ -3,7 +3,6 @@ import {
   CalendarIcon,
   CheckCircleIcon,
   CirclePlus,
-  CircleSlash,
   OctagonX,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -126,7 +125,7 @@ function TaskCard({ task }: { task: TaskResponse }) {
   return (
     <Card
       className="max-w-7xl mx-auto relative cursor-pointer"
-      onClick={() => setLocation(`/tasks/${task.id}`)}
+      onClick={() => setLocation(SITE_PAGES.VIEW_TASK.replace(":id", task.id))}
     >
       <div className=" px-6 py-4 md:flex grid gap-2 justify-center md:justify-between items-center text-sm">
         <div className="flex items-center justify-center space-x-2">

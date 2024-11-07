@@ -201,8 +201,10 @@ function TaskDisplay({
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <CardTitle className="text-2xl font-bold">{title}</CardTitle>
-          <p>{details}</p>
+          <CardTitle className="text-2xl font-bold break-words">
+            {title}
+          </CardTitle>
+          <p className="break-words">{details}</p>
 
           {/* <div className="flex items-center">
           <CheckCircleIcon className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -253,11 +255,11 @@ function TaskDisplay({
 function OverallMetrics({ totalVotes }: { totalVotes: number }) {
   return (
     <div className="flex justify-evenly">
-      <div className="bg-gradient-to-tr from-sky-400 to-red-300 p-2 m-4 rounded-2xl shadow-md flex flex-col justify-center items-center">
-        <h3 className="text-sm font-bold text-slate-800">
+      <div className="bg-gradient-to-tr from-sky-400 to-red-300 p-2 m-4 px-4 rounded-full shadow-md flex flex-col justify-center items-center">
+        <h3 className="text-xs font-bold text-slate-800">
           Total Solution Votes
         </h3>
-        <p className="text-xl font-bold text-primary">{totalVotes}</p>
+        <p className="text-lg font-bold text-primary">{totalVotes}</p>
       </div>
     </div>
   );

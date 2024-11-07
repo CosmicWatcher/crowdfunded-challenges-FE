@@ -4,7 +4,7 @@ import { getUserSession } from "@/lib/supabase";
 import {
   ResponseObject,
   SolutionResponse,
-  SolutionVoteMetrics,
+  SolutionVoteResponse,
   TaskResponse,
 } from "@/types/api.types";
 import { TaskCreationForm } from "@/types/task.types";
@@ -126,9 +126,9 @@ export async function getSolutionList(
 export async function voteForSolution(
   solutionId: SolutionResponse["id"],
   amount: number,
-): Promise<ResponseObject<SolutionVoteMetrics>> {
+): Promise<ResponseObject<SolutionVoteResponse>> {
   const endpoint = API_ROUTES.SOLUTION_VOTES.RECORD;
-  const resObj = await apiCall<SolutionVoteMetrics>("POST", endpoint, true, {
+  const resObj = await apiCall<SolutionVoteResponse>("POST", endpoint, true, {
     solutionId,
     amount,
   });
