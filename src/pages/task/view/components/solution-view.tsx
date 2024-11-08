@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Loading } from "@/components/ui/loading";
+import { OverallMetric, UserMetric } from "@/components/ui/metrics";
 import NotFoundAlert from "@/components/ui/not-found";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Time from "@/components/ui/time";
@@ -237,7 +238,7 @@ export default function SolutionsList({
                         </div>
                       </div>
                       <div>
-                        <h4 className="font-semibold line-clamp-1 break-all">
+                        <h4 className="font-semibold line-clamp-1 break-all mt-2 mb-1">
                           {solution.title}
                         </h4>
                         <p className="text-sm text-muted-foreground line-clamp-1 break-all">
@@ -246,14 +247,10 @@ export default function SolutionsList({
                       </div>
                     </Card>
                     <div className="flex justify-evenly">
-                      <div className="bg-gradient-to-tr from-sky-400 to-red-300 p-1 m-1 rounded-full shadow-md flex flex-col justify-center items-center">
-                        <p className="text-lg font-bold text-primary">
-                          {solution.voteCount}
-                        </p>
-                        <h3 className="text-xs font-bold text-slate-800">
-                          Votes
-                        </h3>
-                      </div>
+                      <OverallMetric
+                        metric={solution.voteCount.toString()}
+                        label="Votes"
+                      />
                     </div>
                   </div>
                 );
@@ -340,12 +337,16 @@ function SolutionCard({
       <div className="flex justify-center items-center mb-4">
         <div className="flex flex-col">
           {isAuthenticated && (
-            <div className="text-center p-4 m-2 mr-4 bg-gradient-to-b from-sky-300 to-sky-600 from-40% rounded-full flex flex-col shadow-xl">
-              <h3 className="text-xs font-bold text-slate-800">Your Votes</h3>
-              <p className="text-md font-bold text-primary">
-                {totalVotesByUser}
-              </p>
-            </div>
+            <UserMetric
+              metric={totalVotesByUser?.toString() ?? "0"}
+              label="Your Votes"
+            />
+            // <div className="text-center p-4 m-2 mr-4 bg-gradient-to-b from-sky-300 to-sky-600 from-40% rounded-full flex flex-col shadow-xl">
+            //   <h3 className="text-xs font-bold text-slate-800">Your Votes</h3>
+            //   <p className="text-md font-bold text-primary">
+            //     {totalVotesByUser}
+            //   </p>
+            // </div>
           )}
         </div>
         <div className="m-2 ml-4">

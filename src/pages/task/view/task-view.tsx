@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
+import { OverallMetric, UserMetric } from "@/components/ui/metrics";
 import NotFoundAlert from "@/components/ui/not-found";
 import Time from "@/components/ui/time";
 import {
@@ -215,7 +216,10 @@ function TaskDisplay({
         </div> */}
 
           <div className="flex justify-end">
-            <OverallMetrics totalVotes={totalVotes} />
+            <OverallMetric
+              metric={totalVotes.toString()}
+              label="Total Solution Votes"
+            />
           </div>
         </CardContent>
         <div className="border-4 px-6 py-4 md:flex grid gap-2 m-2 justify-center md:justify-between items-center">
@@ -242,64 +246,30 @@ function TaskDisplay({
         </div>
       </Card>
       {userVotingRights !== null && (
-        <UserMetrics
-          totalFunds={userTotalFunds}
-          totalVotes={userTotalVotes}
-          votingRights={userVotingRights}
-        />
+        <>
+          <div className="flex justify-center">
+            <UserMetric
+              metric={`${userTotalFunds.toString()} Kin`}
+              label="Your Fund Contribution"
+              className="border-4 ring-offset-2 ring-1 border-cyan-800 ring-offset-cyan-700 ring-cyan-600"
+            />
+          </div>
+          <div className="sticky top-16 z-10 bg-backgroundTransparent">
+            <div className="flex justify-evenly">
+              <UserMetric
+                metric={userVotingRights.toString()}
+                label="Your Available Votes"
+                className="border-4 ring-offset-2 ring-1 border-cyan-800 ring-offset-cyan-700 ring-cyan-600"
+              />
+              <UserMetric
+                metric={userTotalVotes.toString()}
+                label="Your Votes Cast"
+                className="border-4 ring-offset-2 ring-1 border-cyan-800 ring-offset-cyan-700 ring-cyan-600"
+              />
+            </div>
+          </div>
+        </>
       )}
-    </>
-  );
-}
-
-function OverallMetrics({ totalVotes }: { totalVotes: number }) {
-  return (
-    <div className="flex justify-evenly">
-      <div className="bg-gradient-to-tr from-sky-400 to-red-300 p-2 m-4 px-4 rounded-full shadow-md flex flex-col justify-center items-center">
-        <h3 className="text-xs font-bold text-slate-800">
-          Total Solution Votes
-        </h3>
-        <p className="text-lg font-bold text-primary">{totalVotes}</p>
-      </div>
-    </div>
-  );
-}
-
-function UserMetrics({
-  totalFunds,
-  totalVotes,
-  votingRights,
-}: {
-  totalFunds: number;
-  totalVotes: number;
-  votingRights: number;
-}) {
-  return (
-    <>
-      <div className="flex justify-center">
-        <div className="bg-gradient-to-b from-teal-200 to-emerald-600 from-30% p-2 m-4 mb-0 w-1/2 rounded-full shadow-md flex flex-col justify-center items-center">
-          <h3 className="text-xs font-bold text-slate-800">
-            Your Fund Contribution
-          </h3>
-          <p className="text-lg font-bold text-primary">{`${totalFunds.toLocaleString()} Kin`}</p>
-        </div>
-      </div>
-      <div className="sticky top-16 z-10 bg-background">
-        <div className="flex justify-evenly">
-          <div className="bg-gradient-to-b from-teal-200 to-emerald-600 from-30% p-2 px-4 m-4 rounded-full shadow-md flex flex-col justify-center items-center">
-            <h3 className="text-xs font-bold text-slate-800">
-              Your Available Votes
-            </h3>
-            <p className="text-lg font-bold text-primary">{votingRights}</p>
-          </div>
-          <div className="bg-gradient-to-b from-teal-200 to-emerald-600 from-30% p-2 px-4 m-4 rounded-full shadow-md flex flex-col justify-center items-center">
-            <h3 className="text-xs font-bold text-slate-800">
-              Your Votes Cast
-            </h3>
-            <p className="text-lg font-bold text-primary">{totalVotes}</p>
-          </div>
-        </div>
-      </div>
     </>
   );
 }

@@ -12,8 +12,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
+import { OverallMetric, UserMetric } from "@/components/ui/metrics";
 import NotFoundAlert from "@/components/ui/not-found";
 import Time from "@/components/ui/time";
 import { SITE_PAGES } from "@/configs/routes";
@@ -147,16 +148,46 @@ function TaskCard({ task }: { task: TaskResponse }) {
         </div>
       </div>
       <CardContent className="space-y-4">
-        <CardTitle className="text-2xl font-bold">{task.title}</CardTitle>
-        <p className="line-clamp-2">{task.details}</p>
+        <CardTitle className="text-2xl font-bold line-clamp-2 break-words">
+          {task.title}
+        </CardTitle>
+        <p className="line-clamp-2 break-words">{task.details}</p>
 
-        <div className="flex items-center">
+        {/* <div className="flex items-center">
           <CheckCircleIcon className="mr-1 h-4 w-4 text-muted-foreground" />
           <Badge variant="outline" className="ml-1">
             {task.status}
           </Badge>
-        </div>
+        </div> */}
       </CardContent>
+      <CardFooter className="flex flex-col items-center">
+        <div className="flex items-center">
+          <OverallMetric
+            metric={`${task.metrics.overall.totalFunds.toLocaleString()} Kin`}
+            label="Total Funds"
+          />
+          <OverallMetric
+            metric={task.metrics.overall.totalVotes.toString()}
+            label="Total Solution Votes"
+          />
+        </div>
+        {task.metrics?.user && (
+          <div className="flex items-center">
+            <UserMetric
+              metric={`${task.metrics.user.totalFunds.toLocaleString()} Kin`}
+              label="Your Fund Contribution"
+            />
+            <UserMetric
+              metric={task.metrics.user.totalVotes.toString()}
+              label="Your Votes Cast"
+            />
+            <UserMetric
+              metric={task.metrics.user.votingRights.toString()}
+              label="Your Available Votes"
+            />
+          </div>
+        )}
+      </CardFooter>
     </Card>
   );
 }
