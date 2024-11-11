@@ -333,7 +333,7 @@ function SolutionCard({
         <CardTitle className="text-2xl font-bold break-words">
           {title}
         </CardTitle>
-        <p className="flex-grow break-words">{details}</p>
+        <p className="flex-grow break-words whitespace-pre-wrap">{details}</p>
       </CardContent>
       <div className="flex justify-center items-center mb-4">
         <div className="flex flex-col">

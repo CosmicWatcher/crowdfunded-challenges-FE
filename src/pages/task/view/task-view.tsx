@@ -16,6 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { NO_USERNAME } from "@/configs/constants";
 import { fundTask, getTaskById } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import FundingPopup from "@/pages/task/view/components/funding";
@@ -28,7 +29,6 @@ import {
 } from "@/types/api.types";
 import { TaskKind } from "@/types/task.types";
 import { getTaskKindColor } from "@/utils/colors";
-import { NO_USERNAME } from "@/configs/constants";
 
 export default function TaskViewPage() {
   const [task, setTask] = useState<TaskResponse>();
@@ -206,7 +206,7 @@ function TaskDisplay({
           <CardTitle className="text-2xl font-bold break-words">
             {title}
           </CardTitle>
-          <p className="break-words">{details}</p>
+          <p className="break-words whitespace-pre-wrap">{details}</p>
 
           {/* <div className="flex items-center">
           <CheckCircleIcon className="mr-2 h-4 w-4 text-muted-foreground" />
