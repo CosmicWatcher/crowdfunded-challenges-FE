@@ -19,6 +19,7 @@ import { OverallMetric, UserMetric } from "@/components/ui/metrics";
 import NotFoundAlert from "@/components/ui/not-found";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Time from "@/components/ui/time";
+import { NO_USERNAME } from "@/configs/constants";
 import { SITE_PAGES } from "@/configs/routes";
 import { getSolutionList, voteForSolution } from "@/lib/api";
 import { handleError } from "@/lib/error";
@@ -219,7 +220,7 @@ export default function SolutionsList({
           <ScrollArea className="rounded-3xl p-2 bg-primary flex-grow overflow-y-auto">
             <div className="grid gap-2">
               {topSolutions.map((solution, idx) => {
-                const username = solution.createdBy?.username ?? "anonymous";
+                const username = solution.createdBy?.username ?? NO_USERNAME;
                 return (
                   <div key={idx} className="flex justify-between">
                     <Card className="px-3 py-2 space-y-1 w-full">
@@ -283,7 +284,7 @@ function SolutionCard({
   handleVoteConfirm: (id: string, amount: number) => void;
 }) {
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
-  const username = createdBy?.username ?? "anonymous";
+  const username = createdBy?.username ?? NO_USERNAME;
 
   useEffect(() => {
     async function checkAuth() {

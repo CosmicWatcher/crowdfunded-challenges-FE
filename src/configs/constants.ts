@@ -9,3 +9,5 @@ export const FORM_LIMITS = {
     DESCRIPTION: { MIN: 50, MAX: 10000 },
   },
 } as const;
+
+export const NO_USERNAME = "No-Name";

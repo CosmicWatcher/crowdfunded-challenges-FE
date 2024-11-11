@@ -28,6 +28,7 @@ import {
 } from "@/types/api.types";
 import { TaskKind } from "@/types/task.types";
 import { getTaskKindColor } from "@/utils/colors";
+import { NO_USERNAME } from "@/configs/constants";
 
 export default function TaskViewPage() {
   const [task, setTask] = useState<TaskResponse>();
@@ -174,7 +175,7 @@ function TaskDisplay({
   userVotingRights: number | null;
   handleFundConfirm: (amount: number) => void;
 }) {
-  const username = createdBy?.username ?? "anonymous";
+  const username = createdBy?.username ?? NO_USERNAME;
   const kindColor = getTaskKindColor(kind);
 
   return (

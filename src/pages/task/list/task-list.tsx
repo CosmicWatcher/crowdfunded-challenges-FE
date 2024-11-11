@@ -1,7 +1,6 @@
 import {
   ArrowBigDownDash,
   CalendarIcon,
-  CheckCircleIcon,
   CirclePlus,
   OctagonX,
 } from "lucide-react";
@@ -17,6 +16,7 @@ import { Loading } from "@/components/ui/loading";
 import { OverallMetric, UserMetric } from "@/components/ui/metrics";
 import NotFoundAlert from "@/components/ui/not-found";
 import Time from "@/components/ui/time";
+import { NO_USERNAME } from "@/configs/constants";
 import { SITE_PAGES } from "@/configs/routes";
 import { getTaskList } from "@/lib/api";
 import { handleError } from "@/lib/error";
@@ -120,7 +120,7 @@ export default function TaskListPage() {
 
 function TaskCard({ task }: { task: TaskResponse }) {
   const [_location, setLocation] = useLocation();
-  const username = task.createdBy?.username ?? "anonymous";
+  const username = task.createdBy?.username ?? NO_USERNAME;
   const kindColor = getTaskKindColor(task.kind);
 
   return (

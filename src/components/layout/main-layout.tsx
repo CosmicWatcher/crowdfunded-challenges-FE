@@ -24,6 +24,7 @@ import { SITE_PAGES } from "@/configs/routes";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
 import { getUserSession, logout } from "@/lib/supabase";
+import { NO_USERNAME } from "@/configs/constants";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -119,7 +120,7 @@ function NavSection({ isInSheet = false }: NavSectionProps) {
 function AccountDropdown() {
   const [_location, setLocation] = useLocation();
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
-  const [username, setUsername] = useState<string>("anonymous");
+  const [username, setUsername] = useState<string>(NO_USERNAME);
 
   useEffect(() => {
     async function checkAuth() {
@@ -127,7 +128,7 @@ function AccountDropdown() {
         const session = await getUserSession();
         if (!session) setAuthenticated(false);
         else {
-          setUsername(session.user.email ?? "anonymous");
+          setUsername(session.user.email ?? NO_USERNAME);
           setAuthenticated(true);
         }
       } catch (err) {
