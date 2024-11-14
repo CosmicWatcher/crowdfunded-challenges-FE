@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import { useLocation } from "wouter";
 
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,7 @@ import { SITE_PAGES } from "@/configs/routes";
 import { taskCreationFormSchema } from "@/configs/schema";
 import { createTask } from "@/lib/api";
 import { handleError } from "@/lib/error";
-import { notifyInfo, notifySuccess } from "@/lib/notification";
+import { notifyInfo } from "@/lib/notification";
 import { getUserSession } from "@/lib/supabase";
 import { TaskCreationForm, TaskKind } from "@/types/task.types";
 import { getTaskKindColor } from "@/utils/colors";
@@ -69,13 +70,23 @@ export default function TaskCreationPage() {
 
   async function onSubmit(values: TaskCreationForm) {
     try {
-      await createTask(values, taskKind);
-      notifySuccess("Task successfully created");
+      await toast.promise(createTask(values, taskKind), {
+        pending: "Submitting task...",
+        success: "Task successfully created",
+      });
       setLocation(SITE_PAGES.TASKS);
     } catch (err) {
       handleError(err, "Task creation failed");
+      form.setError("root.serverError", { type: "500" });
     }
   }
+
+  const { formState, reset } = form;
+  useEffect(() => {
+    if (formState.isSubmitSuccessful) {
+      reset();
+    }
+  }, [formState, reset]);
 
   const handleTaskKindChange = (newTaskKind: TaskKind) => {
     setTaskKind(newTaskKind);
@@ -194,8 +205,8 @@ export default function TaskCreationPage() {
                 )}
               />
             </div>
-            <Button type="submit" className="w-full">
-              Submit
+            <Button disabled={formState.isSubmitting}>
+              {formState.isSubmitting ? "Submitting..." : "Submit"}
             </Button>
           </form>
         </Form>
