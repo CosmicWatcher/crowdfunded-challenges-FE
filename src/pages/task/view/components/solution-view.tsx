@@ -283,15 +283,15 @@ function SolutionCard({
   totalVotesByUser: number | null;
   handleVoteConfirm: (id: string, amount: number) => void;
 }) {
-  const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
   const username = createdBy?.username ?? NO_USERNAME;
 
   useEffect(() => {
     async function checkAuth() {
       try {
         const session = await getUserSession();
-        if (!session) setAuthenticated(false);
-        else setAuthenticated(true);
+        if (!session) setAuthUserId(null);
+        else setAuthUserId(session.user.id);
       } catch (err) {
         handleError(err);
       }
@@ -300,7 +300,7 @@ function SolutionCard({
   });
 
   useEffect(() => {
-    if (isAuthenticated && userVotingRights === null) {
+    if (authUserId && userVotingRights === null) {
       handleError(
         new Error(
           "Failed to fetch your vote data! Please try reloading the page.",
@@ -309,7 +309,7 @@ function SolutionCard({
         false,
       );
     }
-  }, [isAuthenticated, userVotingRights]);
+  }, [authUserId, userVotingRights]);
 
   return (
     <Card>
@@ -337,7 +337,7 @@ function SolutionCard({
       </CardContent>
       <div className="flex justify-center items-center mb-4">
         <div className="flex flex-col">
-          {isAuthenticated && (
+          {authUserId && authUserId !== createdBy?.id && (
             <UserMetric
               metric={totalVotesByUser?.toString() ?? "0"}
               label="Your Votes"
@@ -351,12 +351,20 @@ function SolutionCard({
           )}
         </div>
         <div className="m-2 ml-4">
-          {isAuthenticated ? (
-            <VotingPopup
-              userVotingRights={userVotingRights ?? -1}
-              onVoteConfirm={(amount) => handleVoteConfirm(solutionId, amount)}
-              enabled={userVotingRights !== null && userVotingRights > 0}
-            />
+          {authUserId ? (
+            authUserId !== createdBy?.id ? (
+              <VotingPopup
+                userVotingRights={userVotingRights ?? -1}
+                onVoteConfirm={(amount) =>
+                  handleVoteConfirm(solutionId, amount)
+                }
+                enabled={userVotingRights !== null && userVotingRights > 0}
+              />
+            ) : (
+              <Button disabled className="break-words whitespace-pre-wrap">
+                Cannot vote for your own solution
+              </Button>
+            )
           ) : (
             <Button variant="default">
               <Link href={SITE_PAGES.LOGIN}>Please Login to Vote</Link>
