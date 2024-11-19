@@ -342,12 +342,6 @@ function SolutionCard({
               metric={totalVotesByUser?.toString() ?? "0"}
               label="Your Votes"
             />
-            // <div className="text-center p-4 m-2 mr-4 bg-gradient-to-b from-sky-300 to-sky-600 from-40% rounded-full flex flex-col shadow-xl">
-            //   <h3 className="text-xs font-bold text-slate-800">Your Votes</h3>
-            //   <p className="text-md font-bold text-primary">
-            //     {totalVotesByUser}
-            //   </p>
-            // </div>
           )}
         </div>
         <div className="m-2 ml-4">
