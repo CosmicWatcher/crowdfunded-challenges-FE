@@ -1,3 +1,4 @@
+import { Kin } from "@code-wallet/currency";
 import { CalendarIcon, Copy, TrophyIcon, WalletIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -250,7 +251,7 @@ function TaskDisplay({
         <>
           <div className="flex justify-center">
             <UserMetric
-              metric={`${userTotalFunds.toString()} Kin`}
+              metric={`${userTotalFunds.toLocaleString(undefined, { minimumFractionDigits: Number(Kin.decimals) })} Kin`}
               label="Your Fund Contribution"
               className="border-4 ring-offset-2 ring-1 border-cyan-800 ring-offset-cyan-700 ring-cyan-600"
             />

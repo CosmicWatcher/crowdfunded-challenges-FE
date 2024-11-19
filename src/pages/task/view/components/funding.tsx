@@ -1,3 +1,4 @@
+import { Kin } from "@code-wallet/currency";
 import { CoinsIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
@@ -62,7 +63,7 @@ export default function FundingPopup({
         >
           <CoinsIcon className="size-8 mx-2 text-yellow-300 animate-pulse" />
           <div className="flex flex-col mr-5">
-            <p className="text-xl">{`${totalFunds.toLocaleString()} Kin`}</p>
+            <p className="text-xl">{`${totalFunds.toLocaleString(undefined, { minimumFractionDigits: Number(Kin.decimals) })} Kin`}</p>
             <p>
               {isAuthenticated ? "Click to Contribute" : "Login to Contribute"}
             </p>
