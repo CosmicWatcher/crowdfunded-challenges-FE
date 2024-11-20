@@ -35,12 +35,16 @@ import {
 
 export default function SolutionsList({
   taskId,
+  taskKind,
+  taskCreatorId,
   newSolution,
   userVotingRights,
   updateUserVotingRights,
   updateVoteCounts,
 }: {
   taskId: TaskResponse["id"];
+  taskKind: TaskResponse["kind"];
+  taskCreatorId: NonNullable<TaskResponse["createdBy"]>["id"];
   newSolution: SolutionResponse | null;
   userVotingRights: number | null;
   updateUserVotingRights: (newRights: number | null) => void;
@@ -185,6 +189,8 @@ export default function SolutionsList({
               return (
                 <SolutionCard
                   key={solution.id}
+                  taskKind={taskKind}
+                  taskCreatorId={taskCreatorId}
                   solutionId={solution.id}
                   createdBy={solution.createdBy}
                   createdAt={solution.createdAt}
@@ -265,6 +271,8 @@ export default function SolutionsList({
 }
 
 function SolutionCard({
+  taskKind,
+  taskCreatorId,
   solutionId,
   createdBy,
   createdAt,
@@ -274,6 +282,8 @@ function SolutionCard({
   totalVotesByUser,
   handleVoteConfirm,
 }: {
+  taskKind: TaskResponse["kind"];
+  taskCreatorId: NonNullable<TaskResponse["createdBy"]>["id"];
   solutionId: string;
   createdBy: UserResponse | null;
   createdAt: string;
@@ -299,17 +309,65 @@ function SolutionCard({
     void checkAuth();
   });
 
-  useEffect(() => {
-    if (authUserId && userVotingRights === null) {
-      handleError(
-        new Error(
-          "Failed to fetch your vote data! Please try reloading the page.",
-        ),
-        undefined,
-        false,
+  // useEffect(() => {
+  //   if (authUserId && userVotingRights === null) {
+  //     handleError(
+  //       new Error(
+  //         "Failed to fetch your vote data! Please try reloading the page.",
+  //       ),
+  //       undefined,
+  //       false,
+  //     );
+  //   }
+  // }, [authUserId, userVotingRights]);
+
+  let metricElement: JSX.Element | null = null;
+  if (authUserId) {
+    if (taskKind === "personal") {
+      if (authUserId == taskCreatorId) {
+        metricElement = (
+          <OverallMetric
+            metric={totalVotesByUser?.toString() ?? "0"}
+            label="Total Votes"
+          />
+        );
+      }
+    } else {
+      metricElement = (
+        <UserMetric
+          metric={totalVotesByUser?.toString() ?? "0"}
+          label="Your Votes"
+        />
       );
     }
-  }, [authUserId, userVotingRights]);
+  }
+
+  let voteElement: JSX.Element | null = null;
+  if (authUserId) {
+    if (userVotingRights !== null) {
+      if (authUserId === createdBy?.id) {
+        voteElement = (
+          <Button disabled className="break-words whitespace-pre-wrap">
+            Cannot vote for your own solution
+          </Button>
+        );
+      } else {
+        voteElement = (
+          <VotingPopup
+            userVotingRights={userVotingRights ?? -1}
+            onVoteConfirm={(amount) => handleVoteConfirm(solutionId, amount)}
+            enabled={userVotingRights !== null && userVotingRights > 0}
+          />
+        );
+      }
+    }
+  } else {
+    voteElement = (
+      <Button variant="default">
+        <Link href={SITE_PAGES.LOGIN}>Please Login to Vote</Link>
+      </Button>
+    );
+  }
 
   return (
     <Card>
@@ -336,35 +394,8 @@ function SolutionCard({
         <p className="flex-grow break-words whitespace-pre-wrap">{details}</p>
       </CardContent>
       <div className="flex justify-center items-center mb-4">
-        <div className="flex flex-col">
-          {authUserId && authUserId !== createdBy?.id && (
-            <UserMetric
-              metric={totalVotesByUser?.toString() ?? "0"}
-              label="Your Votes"
-            />
-          )}
-        </div>
-        <div className="m-2 ml-4">
-          {authUserId ? (
-            authUserId !== createdBy?.id ? (
-              <VotingPopup
-                userVotingRights={userVotingRights ?? -1}
-                onVoteConfirm={(amount) =>
-                  handleVoteConfirm(solutionId, amount)
-                }
-                enabled={userVotingRights !== null && userVotingRights > 0}
-              />
-            ) : (
-              <Button disabled className="break-words whitespace-pre-wrap">
-                Cannot vote for your own solution
-              </Button>
-            )
-          ) : (
-            <Button variant="default">
-              <Link href={SITE_PAGES.LOGIN}>Please Login to Vote</Link>
-            </Button>
-          )}
-        </div>
+        <div className="flex flex-col">{metricElement}</div>
+        <div className="m-2 ml-4">{voteElement}</div>
       </div>
     </Card>
   );

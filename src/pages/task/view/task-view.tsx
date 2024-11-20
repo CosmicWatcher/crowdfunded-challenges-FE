@@ -139,6 +139,8 @@ export default function TaskViewPage() {
       />
       <SolutionSection
         taskId={task.id}
+        taskKind={task.kind}
+        taskCreatorId={task.createdBy?.id ?? ""}
         userVotingRights={userVotingRights}
         updateUserVotingRights={updateUserVotingRights}
         updateVoteCounts={updateVoteCounts}
@@ -238,6 +240,8 @@ function TaskDisplay({
           <FundingPopup
             totalFunds={totalFunds}
             depositAddress={depositAddress}
+            taskCreatorId={createdBy?.id ?? ""}
+            taskKind={kind}
             handleFundConfirm={handleFundConfirm}
           />
           <div className="flex items-center justify-center">
@@ -317,11 +321,15 @@ function CopyAddressButton({ address }: { address: string }) {
 
 function SolutionSection({
   taskId,
+  taskKind,
+  taskCreatorId,
   userVotingRights,
   updateUserVotingRights,
   updateVoteCounts,
 }: {
   taskId: TaskResponse["id"];
+  taskKind: TaskResponse["kind"];
+  taskCreatorId: NonNullable<TaskResponse["createdBy"]>["id"];
   userVotingRights: number | null;
   updateUserVotingRights: (newRights: number | null) => void;
   updateVoteCounts: (newVotes: number) => void;
@@ -332,6 +340,8 @@ function SolutionSection({
       <SolutionCreator taskId={taskId} setNewSolution={setNewSolution} />
       <SolutionsList
         taskId={taskId}
+        taskKind={taskKind}
+        taskCreatorId={taskCreatorId}
         newSolution={newSolution}
         userVotingRights={userVotingRights}
         updateUserVotingRights={updateUserVotingRights}

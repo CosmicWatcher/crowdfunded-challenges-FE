@@ -20,23 +20,40 @@ import { TaskResponse } from "@/types/api.types";
 export default function FundingPopup({
   totalFunds,
   depositAddress,
+  taskCreatorId,
+  taskKind,
   handleFundConfirm,
 }: {
   totalFunds: number;
   depositAddress: TaskResponse["depositAddress"];
+  taskCreatorId: NonNullable<TaskResponse["createdBy"]>["id"];
+  taskKind: TaskResponse["kind"];
   handleFundConfirm: (amount: number) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState(0.01);
-  const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
   const [_location, setLocation] = useLocation();
+  const [fundingText, setFundingText] = useState("");
+
+  useEffect(() => {
+    if (!authUserId) {
+      setFundingText("Login to contribute");
+    } else if (taskKind === "personal" && authUserId !== taskCreatorId) {
+      setFundingText("");
+    } else {
+      setFundingText("Click to contribute");
+    }
+  }, [authUserId, taskKind, taskCreatorId]);
+
+  const p = <p>{fundingText}</p>;
 
   useEffect(() => {
     async function checkAuth() {
       try {
         const session = await getUserSession();
-        if (!session) setAuthenticated(false);
-        else setAuthenticated(true);
+        if (!session) setAuthUserId(null);
+        else setAuthUserId(session.user.id);
       } catch (err) {
         handleError(err);
       }
@@ -50,8 +67,12 @@ export default function FundingPopup({
   }
 
   function handleOpenChange(open: boolean) {
-    if (!isAuthenticated) setLocation(SITE_PAGES.LOGIN);
-    else setOpen(open);
+    if (!authUserId) {
+      setLocation(SITE_PAGES.LOGIN);
+    } else if (taskKind === "personal" && authUserId !== taskCreatorId) {
+      return;
+    }
+    setOpen(open);
   }
 
   return (
@@ -64,9 +85,7 @@ export default function FundingPopup({
           <CoinsIcon className="size-8 mx-2 text-yellow-300 animate-pulse" />
           <div className="flex flex-col mr-5">
             <p className="text-xl">{`${totalFunds.toLocaleString(undefined, { minimumFractionDigits: Number(Kin.decimals) })} Kin`}</p>
-            <p>
-              {isAuthenticated ? "Click to Contribute" : "Login to Contribute"}
-            </p>
+            {p}
           </div>
         </Badge>
       </PopoverTrigger>
