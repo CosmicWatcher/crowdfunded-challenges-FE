@@ -228,7 +228,7 @@ function TaskDisplay({
           <div className="absolute right-0 top-8 rotate-[30deg]">
             <Badge
               variant="secondary"
-              className={`pb-[0.25rem] w-32 justify-center text-sm ring-offset-4 ring-1 ring-offset-${statusColor}-border ring-secondary-foreground`}
+              className={`pb-[0.25rem] w-32 justify-center text-sm ring-offset-2 ring-1 ring-offset-${statusColor}-border ring-secondary-foreground`}
             >
               {status}
             </Badge>
