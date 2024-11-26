@@ -1,5 +1,5 @@
 import { Kin } from "@code-wallet/currency";
-import { CoinsIcon } from "lucide-react";
+import { CoinsIcon, DollarSign } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
@@ -13,8 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { SITE_PAGES } from "@/configs/routes";
-import { handleError } from "@/lib/error";
-import { getUserSession } from "@/lib/supabase";
+import useUserId from "@/hooks/useUserId";
 import { TaskResponse } from "@/types/api.types";
 
 export default function FundingPopup({
@@ -22,44 +21,36 @@ export default function FundingPopup({
   depositAddress,
   taskCreatorId,
   taskKind,
+  taskStatus,
   handleFundConfirm,
 }: {
   totalFunds: number;
   depositAddress: TaskResponse["depositAddress"];
   taskCreatorId: NonNullable<TaskResponse["createdBy"]>["id"];
   taskKind: TaskResponse["kind"];
+  taskStatus: TaskResponse["status"];
   handleFundConfirm: (amount: number) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState(0.01);
-  const [authUserId, setAuthUserId] = useState<string | null>(null);
+  const authUserId = useUserId();
   const [_location, setLocation] = useLocation();
   const [fundingText, setFundingText] = useState("");
 
   useEffect(() => {
     if (!authUserId) {
       setFundingText("Login to contribute");
-    } else if (taskKind === "personal" && authUserId !== taskCreatorId) {
+    } else if (
+      (taskKind === "personal" && authUserId !== taskCreatorId) ||
+      taskStatus !== "active"
+    ) {
       setFundingText("");
     } else {
       setFundingText("Click to contribute");
     }
-  }, [authUserId, taskKind, taskCreatorId]);
+  }, [authUserId, taskKind, taskCreatorId, taskStatus]);
 
   const p = <p>{fundingText}</p>;
-
-  useEffect(() => {
-    async function checkAuth() {
-      try {
-        const session = await getUserSession();
-        if (!session) setAuthUserId(null);
-        else setAuthUserId(session.user.id);
-      } catch (err) {
-        handleError(err);
-      }
-    }
-    void checkAuth();
-  });
 
   function handleConfirm() {
     setOpen(false);
@@ -69,7 +60,10 @@ export default function FundingPopup({
   function handleOpenChange(open: boolean) {
     if (!authUserId) {
       setLocation(SITE_PAGES.LOGIN);
-    } else if (taskKind === "personal" && authUserId !== taskCreatorId) {
+    } else if (
+      (taskKind === "personal" && authUserId !== taskCreatorId) ||
+      taskStatus !== "active"
+    ) {
       return;
     }
     setOpen(open);
@@ -92,15 +86,19 @@ export default function FundingPopup({
       <PopoverContent className="bg-secondary max-w-md">
         {depositAddress ? (
           <>
-            <Input
-              id="myFund"
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
-              max={100}
-              min={0.01}
-              className="w-32"
-            />
+            <div className="flex items-center justify-center">
+              <DollarSign />
+              <Input
+                id="myFund"
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(Number(e.target.value))}
+                max={100}
+                step={0.01}
+                min={0.01}
+                className="w-32 ml-2"
+              />
+            </div>
             <Button
               className="mt-4 w-full bg-blue-600 hover:bg-blue-700"
               onClick={handleConfirm}

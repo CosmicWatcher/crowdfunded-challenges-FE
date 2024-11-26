@@ -32,6 +32,10 @@
     --chart-5: 27 87% 67%;
     --task-community: 214 100% 65%;
     --task-personal: 175 30% 65%;
+    --status-success: 80 50% 80%;
+    --status-fail: 0 30% 70%;
+    --border-status-success: 80 60% 40%;
+    --border-status-fail: 0 80% 40%;
   }
 
   .dark {
@@ -62,6 +66,10 @@
     --chart-5: 340 75% 55%;
     --task-community: 214 100% 35%;
     --task-personal: 175 30% 35%;
+    --status-success: 80 50% 15%;
+    --status-fail: 0 30% 30%;
+    --border-status-success: 80 60% 60%;
+    --border-status-fail: 0 80% 60%;
   }
 }
 

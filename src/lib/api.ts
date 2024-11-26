@@ -46,6 +46,14 @@ async function apiCall<T = null>(
   if (res.status >= 500) throw new Error("Server Error!");
 
   const resJson = (await res.json()) as ApiResponse<T>;
+  console.log(
+    `%c ${new Date(Date.now()).toLocaleTimeString()} %c Api success:%c ${resJson.success}%c, message:%c ${resJson.message}`,
+    "color:orange; font-weight:bold;",
+    "color:lightgreen;",
+    "color:white;",
+    "color:lightgreen;",
+    "color:white;",
+  );
   if (!resJson.success) throw new Error(resJson.message);
 
   return resJson.responseObject;
@@ -147,6 +155,21 @@ export async function fundTask(
     amount,
   });
 
+  return resObj;
+}
+
+export async function endTask(
+  taskId: TaskResponse["id"],
+  isSuccess: boolean,
+): Promise<ResponseObject<TaskResponse>> {
+  let endpoint: string;
+
+  if (isSuccess) endpoint = API_ROUTES.TASKS.END.SUCCESS.replace(":id", taskId);
+  else endpoint = API_ROUTES.TASKS.END.FAIL.replace(":id", taskId);
+
+  const resObj = await apiCall<TaskResponse>("POST", endpoint, true);
+
+  if (!resObj) throw new Error("No response object!");
   return resObj;
 }
 

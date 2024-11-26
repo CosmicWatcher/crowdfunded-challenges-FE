@@ -12,6 +12,10 @@ export const API_ROUTES = {
     CREATE: "/tasks/create",
     GET_LIST: "/tasks",
     GET_BY_ID: "/tasks/:id",
+    END: {
+      SUCCESS: "/tasks/:id/success",
+      FAIL: "/tasks/:id/fail",
+    },
   },
   SOLUTIONS: {
     CREATE: "/solutions/create",

@@ -21,7 +21,7 @@ import { SITE_PAGES } from "@/configs/routes";
 import { getTaskList } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { ResponseObject, TaskResponse } from "@/types/api.types";
-import { getTaskKindColor } from "@/utils/colors";
+import { getTaskKindColor, getTaskStatusColor } from "@/utils/colors";
 
 export default function TaskListPage() {
   const [tasks, setTasks] = useState<ResponseObject<TaskResponse[]>>({
@@ -97,7 +97,7 @@ export default function TaskListPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-10">
       <Link href={SITE_PAGES.CREATE_TASK}>
         <Button className="w-full py-8">
           <CirclePlus className="size-9 mr-2 my-4" />
@@ -122,29 +122,40 @@ function TaskCard({ task }: { task: TaskResponse }) {
   const [_location, setLocation] = useLocation();
   const username = task.createdBy?.username ?? NO_USERNAME;
   const kindColor = getTaskKindColor(task.kind);
+  const statusColor = getTaskStatusColor(task.status);
 
   return (
     <Card
-      className="max-w-7xl mx-auto relative cursor-pointer"
+      className={`max-w-7xl mx-auto relative cursor-pointer bg-${statusColor}-main`}
       onClick={() => setLocation(SITE_PAGES.VIEW_TASK.replace(":id", task.id))}
     >
-      <div className=" px-6 py-4 md:flex grid gap-2 justify-center md:justify-between items-center text-sm">
-        <div className="flex items-center justify-center space-x-2">
+      <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
+        <Badge variant="outline" className={`bg-${kindColor} pb-[0.25rem]`}>
+          {task.kind}
+        </Badge>
+      </div>
+      {task.status !== "active" && (
+        <div className="absolute right-0 top-8 rotate-[30deg]">
+          <Badge
+            variant="secondary"
+            className={`pb-[0.25rem] w-32 justify-center text-sm ring-offset-2 ring-1 ring-offset-${statusColor}-border ring-secondary-foreground`}
+          >
+            {task.status}
+          </Badge>
+        </div>
+      )}
+      <div className="space-y-2 p-4">
+        <div className="flex items-center text-sm">
+          <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+          <Time timestamp={new Date(task.createdAt)} />
+        </div>
+        <div className="flex items-center text-sm space-x-2">
           <Avatar>
             <AvatarFallback>
               {`${username[0].toUpperCase()}${username[1].toUpperCase()}`}
             </AvatarFallback>
           </Avatar>
           <span>{username}</span>
-        </div>
-        <div className="flex items-center justify-center">
-          <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-          <Time timestamp={new Date(task.createdAt)} />
-        </div>
-        <div className="flex items-center justify-center">
-          <Badge variant="outline" className={kindColor}>
-            {task.kind}
-          </Badge>
         </div>
       </div>
       <CardContent className="space-y-4">

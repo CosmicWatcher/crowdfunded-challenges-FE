@@ -55,6 +55,16 @@ export default {
           community: "hsl(var(--task-community))",
           personal: "hsl(var(--task-personal))",
         },
+        status: {
+          success: {
+            main: "hsl(var(--status-success))",
+            border: "hsl(var(--border-status-success))",
+          },
+          fail: {
+            main: "hsl(var(--status-fail))",
+            border: "hsl(var(--border-status-fail))",
+          },
+        },
       },
     },
   },

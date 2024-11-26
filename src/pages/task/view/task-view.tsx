@@ -6,10 +6,16 @@ import { useParams } from "wouter";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
 import { OverallMetric, UserMetric } from "@/components/ui/metrics";
 import NotFoundAlert from "@/components/ui/not-found";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import Time from "@/components/ui/time";
 import {
   Tooltip,
@@ -18,7 +24,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { NO_USERNAME } from "@/configs/constants";
-import { fundTask, getTaskById } from "@/lib/api";
+import useUserId from "@/hooks/useUserId";
+import { endTask, fundTask, getTaskById } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import FundingPopup from "@/pages/task/view/components/funding";
 import SolutionCreator from "@/pages/task/view/components/solution-create";
@@ -28,8 +35,8 @@ import {
   TaskResponse,
   UserResponse,
 } from "@/types/api.types";
-import { TaskKind } from "@/types/task.types";
-import { getTaskKindColor } from "@/utils/colors";
+import { TaskKind, TaskStatus } from "@/types/task.types";
+import { getTaskKindColor, getTaskStatusColor } from "@/utils/colors";
 
 export default function TaskViewPage() {
   const [task, setTask] = useState<TaskResponse>();
@@ -98,6 +105,25 @@ export default function TaskViewPage() {
     void func();
   }
 
+  function handleEndTask(isSuccess: boolean) {
+    async function func() {
+      try {
+        if (task) {
+          const res = await toast.promise(endTask(task.id, isSuccess), {
+            pending: "Ending task...",
+            success: "Task ended successfully",
+          });
+          if (res) {
+            setTask(res.data);
+          }
+        }
+      } catch (err) {
+        handleError(err, "Ending task failed!");
+      }
+    }
+    void func();
+  }
+
   function updateUserVotingRights(newRights: number | null) {
     setUserVotingRights(newRights);
   }
@@ -127,6 +153,7 @@ export default function TaskViewPage() {
         title={task.title}
         details={task.details}
         kind={task.kind}
+        status={task.status}
         depositAddress={task.depositAddress}
         createdAt={task.createdAt}
         maxWinners={task.maxWinners}
@@ -136,10 +163,12 @@ export default function TaskViewPage() {
         userTotalVotes={userTotalVotes}
         userVotingRights={userVotingRights}
         handleFundConfirm={handleFundConfirm}
+        handleEndTask={handleEndTask}
       />
       <SolutionSection
         taskId={task.id}
         taskKind={task.kind}
+        taskStatus={task.status}
         taskCreatorId={task.createdBy?.id ?? ""}
         userVotingRights={userVotingRights}
         updateUserVotingRights={updateUserVotingRights}
@@ -154,6 +183,7 @@ function TaskDisplay({
   title,
   details,
   kind,
+  status,
   depositAddress,
   createdAt,
   maxWinners,
@@ -163,11 +193,13 @@ function TaskDisplay({
   userTotalVotes,
   userVotingRights,
   handleFundConfirm,
+  handleEndTask,
 }: {
   createdBy: UserResponse | null;
   title: string | null;
   details: string | null;
   kind: TaskKind;
+  status: TaskStatus;
   depositAddress: string | null;
   createdAt: string;
   maxWinners: number;
@@ -177,31 +209,70 @@ function TaskDisplay({
   userTotalVotes: number;
   userVotingRights: number | null;
   handleFundConfirm: (amount: number) => void;
+  handleEndTask: (isSuccess: boolean) => void;
 }) {
+  const authUserId = useUserId();
   const username = createdBy?.username ?? NO_USERNAME;
   const kindColor = getTaskKindColor(kind);
+  const statusColor = getTaskStatusColor(status);
 
   return (
     <>
-      <Card className="max-w-7xl mx-auto relative">
-        <div className="absolute top-4 right-4">
-          <Badge variant="outline" className={kindColor}>
+      <Card className={`max-w-7xl mx-auto relative bg-${statusColor}-main`}>
+        <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
+          <Badge variant="outline" className={`bg-${kindColor} pb-[0.25rem]`}>
             {kind}
           </Badge>
         </div>
+        {status !== "active" && (
+          <div className="absolute right-0 top-8 rotate-[30deg]">
+            <Badge
+              variant="secondary"
+              className={`pb-[0.25rem] w-32 justify-center text-sm ring-offset-4 ring-1 ring-offset-${statusColor}-border ring-secondary-foreground`}
+            >
+              {status}
+            </Badge>
+          </div>
+        )}
         <CardHeader>
-          <div className="space-y-2">
-            <div className="flex items-center text-sm">
-              <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-              <Time timestamp={new Date(createdAt)} />
+          <div className="flex justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center text-sm">
+                <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                <Time timestamp={new Date(createdAt)} />
+              </div>
+              <div className="flex items-center text-sm space-x-2">
+                <Avatar>
+                  <AvatarFallback>
+                    {`${username[0].toUpperCase()}${username[1].toUpperCase()}`}
+                  </AvatarFallback>
+                </Avatar>
+                <span>{username}</span>
+              </div>
             </div>
-            <div className="flex items-center text-sm space-x-2">
-              <Avatar>
-                <AvatarFallback>
-                  {`${username[0].toUpperCase()}${username[1].toUpperCase()}`}
-                </AvatarFallback>
-              </Avatar>
-              <span>{username}</span>
+            <div className="flex flex-col gap-4">
+              {authUserId === createdBy?.id && status === "active" && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button>End Task</Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="flex justify-between">
+                    <Button
+                      className="bg-green-700 hover:bg-green-800 w-24"
+                      onClick={() => handleEndTask(true)}
+                    >
+                      Success
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      className="w-24"
+                      onClick={() => handleEndTask(false)}
+                    >
+                      Fail
+                    </Button>
+                  </PopoverContent>
+                </Popover>
+              )}
             </div>
           </div>
         </CardHeader>
@@ -242,6 +313,7 @@ function TaskDisplay({
             depositAddress={depositAddress}
             taskCreatorId={createdBy?.id ?? ""}
             taskKind={kind}
+            taskStatus={status}
             handleFundConfirm={handleFundConfirm}
           />
           <div className="flex items-center justify-center">
@@ -322,6 +394,7 @@ function CopyAddressButton({ address }: { address: string }) {
 function SolutionSection({
   taskId,
   taskKind,
+  taskStatus,
   taskCreatorId,
   userVotingRights,
   updateUserVotingRights,
@@ -329,6 +402,7 @@ function SolutionSection({
 }: {
   taskId: TaskResponse["id"];
   taskKind: TaskResponse["kind"];
+  taskStatus: TaskResponse["status"];
   taskCreatorId: NonNullable<TaskResponse["createdBy"]>["id"];
   userVotingRights: number | null;
   updateUserVotingRights: (newRights: number | null) => void;
@@ -337,10 +411,13 @@ function SolutionSection({
   const [newSolution, setNewSolution] = useState<SolutionResponse | null>(null);
   return (
     <>
-      <SolutionCreator taskId={taskId} setNewSolution={setNewSolution} />
+      {taskStatus === "active" && (
+        <SolutionCreator taskId={taskId} setNewSolution={setNewSolution} />
+      )}
       <SolutionsList
         taskId={taskId}
         taskKind={taskKind}
+        taskStatus={taskStatus}
         taskCreatorId={taskCreatorId}
         newSolution={newSolution}
         userVotingRights={userVotingRights}

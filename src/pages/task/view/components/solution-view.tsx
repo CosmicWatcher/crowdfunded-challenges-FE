@@ -21,9 +21,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import Time from "@/components/ui/time";
 import { NO_USERNAME } from "@/configs/constants";
 import { SITE_PAGES } from "@/configs/routes";
+import useUserId from "@/hooks/useUserId";
 import { getSolutionList, voteForSolution } from "@/lib/api";
 import { handleError } from "@/lib/error";
-import { getUserSession } from "@/lib/supabase";
 import VotingPopup from "@/pages/task/view/components/voting";
 import {
   ResponseObject,
@@ -36,6 +36,7 @@ import {
 export default function SolutionsList({
   taskId,
   taskKind,
+  taskStatus,
   taskCreatorId,
   newSolution,
   userVotingRights,
@@ -44,6 +45,7 @@ export default function SolutionsList({
 }: {
   taskId: TaskResponse["id"];
   taskKind: TaskResponse["kind"];
+  taskStatus: TaskResponse["status"];
   taskCreatorId: NonNullable<TaskResponse["createdBy"]>["id"];
   newSolution: SolutionResponse | null;
   userVotingRights: number | null;
@@ -190,6 +192,7 @@ export default function SolutionsList({
                 <SolutionCard
                   key={solution.id}
                   taskKind={taskKind}
+                  taskStatus={taskStatus}
                   taskCreatorId={taskCreatorId}
                   solutionId={solution.id}
                   createdBy={solution.createdBy}
@@ -273,6 +276,7 @@ export default function SolutionsList({
 function SolutionCard({
   taskKind,
   taskCreatorId,
+  taskStatus,
   solutionId,
   createdBy,
   createdAt,
@@ -284,6 +288,7 @@ function SolutionCard({
 }: {
   taskKind: TaskResponse["kind"];
   taskCreatorId: NonNullable<TaskResponse["createdBy"]>["id"];
+  taskStatus: TaskResponse["status"];
   solutionId: string;
   createdBy: UserResponse | null;
   createdAt: string;
@@ -293,21 +298,8 @@ function SolutionCard({
   totalVotesByUser: number | null;
   handleVoteConfirm: (id: string, amount: number) => void;
 }) {
-  const [authUserId, setAuthUserId] = useState<string | null>(null);
+  const authUserId = useUserId();
   const username = createdBy?.username ?? NO_USERNAME;
-
-  useEffect(() => {
-    async function checkAuth() {
-      try {
-        const session = await getUserSession();
-        if (!session) setAuthUserId(null);
-        else setAuthUserId(session.user.id);
-      } catch (err) {
-        handleError(err);
-      }
-    }
-    void checkAuth();
-  });
 
   // useEffect(() => {
   //   if (authUserId && userVotingRights === null) {
@@ -344,7 +336,7 @@ function SolutionCard({
 
   let voteElement: JSX.Element | null = null;
   if (authUserId) {
-    if (userVotingRights !== null) {
+    if (userVotingRights !== null && taskStatus === "active") {
       if (authUserId === createdBy?.id) {
         voteElement = (
           <Button disabled className="break-words whitespace-pre-wrap">

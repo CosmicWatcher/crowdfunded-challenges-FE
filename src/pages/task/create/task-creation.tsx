@@ -124,7 +124,7 @@ export default function TaskCreationPage() {
               <div className="relative w-64 h-10 mx-auto bg-gray-200 rounded-full">
                 <div
                   ref={taskKindRef}
-                  className={`absolute top-1 left-1 w-[calc(50%-4px)] h-8 rounded-full transition-all duration-300 ease-in-out ${
+                  className={`absolute top-1 left-1 w-[calc(50%-4px)] h-8 rounded-full transition-all duration-300 ease-in-out bg-${
                     kindColor
                   }`}
                 ></div>
