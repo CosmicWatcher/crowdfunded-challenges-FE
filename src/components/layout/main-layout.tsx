@@ -20,11 +20,11 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { NO_USERNAME } from "@/configs/constants";
 import { SITE_PAGES } from "@/configs/routes";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
 import { getUserSession, logout } from "@/lib/supabase";
-import { NO_USERNAME } from "@/configs/constants";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -156,15 +156,18 @@ function AccountDropdown() {
       <DropdownMenuItem>Settings</DropdownMenuItem>
       <DropdownMenuItem>Support</DropdownMenuItem>
       <DropdownMenuSeparator />
-      <DropdownMenuItem onClick={() => void handleLogout()}>
+      <DropdownMenuItem
+        className="cursor-pointer"
+        onClick={() => void handleLogout()}
+      >
         Logout
       </DropdownMenuItem>
     </>
   ) : (
     <>
-      <DropdownMenuItem>
-        <Link href={SITE_PAGES.LOGIN}>Login</Link>
-      </DropdownMenuItem>
+      <Link href={SITE_PAGES.LOGIN}>
+        <DropdownMenuItem className="cursor-pointer">Login</DropdownMenuItem>
+      </Link>
     </>
   );
 
