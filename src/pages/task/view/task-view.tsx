@@ -218,9 +218,9 @@ function TaskDisplay({
 
   return (
     <>
-      <Card className={`max-w-7xl mx-auto relative bg-${statusColor}-main`}>
+      <Card className={`max-w-7xl mx-auto relative ${statusColor.background}`}>
         <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
-          <Badge variant="outline" className={`bg-${kindColor} pb-[0.25rem]`}>
+          <Badge variant="outline" className={`${kindColor} pb-[0.25rem]`}>
             {kind}
           </Badge>
         </div>
@@ -228,7 +228,7 @@ function TaskDisplay({
           <div className="absolute right-0 top-8 rotate-[30deg]">
             <Badge
               variant="secondary"
-              className={`pb-[0.25rem] w-32 justify-center text-sm ring-offset-2 ring-1 ring-offset-${statusColor}-border ring-secondary-foreground`}
+              className={`pb-[0.25rem] w-32 justify-center text-sm ring-offset-2 ring-1 ${statusColor.border} ring-secondary-foreground`}
             >
               {status}
             </Badge>
@@ -281,15 +281,6 @@ function TaskDisplay({
             {title}
           </CardTitle>
           <p className="break-words whitespace-pre-wrap">{details}</p>
-
-          {/* <div className="flex items-center">
-          <CheckCircleIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-          <span className="font-semibold">Status:</span>
-          <Badge variant="outline" className="ml-2">
-            {task.status}
-          </Badge>
-        </div> */}
-
           <div className="flex justify-end">
             <OverallMetric
               metric={totalVotes.toString()}
@@ -299,14 +290,22 @@ function TaskDisplay({
         </CardContent>
         <div className="border-4 px-6 py-4 md:flex grid gap-2 m-2 justify-center md:justify-between items-center">
           <div className="flex items-center justify-center">
-            <WalletIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-            <span className="font-semibold text-sm">Address:</span>
-            <span className="ml-2 font-mono text-sm">
-              {depositAddress
-                ? `${depositAddress.slice(0, 5)}...${depositAddress.slice(-5)}`
-                : "no wallet found"}
-            </span>
-            {depositAddress && <CopyAddressButton address={depositAddress} />}
+            {status === "active" ? (
+              <>
+                <WalletIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                <span className="font-semibold text-sm">Address:</span>
+                <span className="ml-2 font-mono text-sm">
+                  {depositAddress
+                    ? `${depositAddress.slice(0, 5)}...${depositAddress.slice(-5)}`
+                    : "no wallet found"}
+                </span>
+                {depositAddress && (
+                  <CopyAddressButton address={depositAddress} />
+                )}
+              </>
+            ) : (
+              <span className="w-32"></span>
+            )}
           </div>
           <FundingPopup
             totalFunds={totalFunds}

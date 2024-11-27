@@ -69,7 +69,7 @@
     --status-success: 80 50% 15%;
     --status-fail: 0 30% 30%;
     --border-status-success: 80 60% 60%;
-    --border-status-fail: 0 80% 60%;
+    --border-status-fail: 0 100% 50%;
   }
 }
 

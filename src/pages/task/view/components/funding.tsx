@@ -3,7 +3,6 @@ import { CoinsIcon, DollarSign } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import NotFoundAlert from "@/components/ui/not-found";
@@ -32,23 +31,28 @@ export default function FundingPopup({
   handleFundConfirm: (amount: number) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [isClickable, setIsClickable] = useState(false);
   const [amount, setAmount] = useState(0.01);
   const authUserId = useUserId();
   const [_location, setLocation] = useLocation();
   const [fundingText, setFundingText] = useState("");
 
   useEffect(() => {
+    setIsClickable(
+      taskStatus === "active" &&
+        (taskKind !== "personal" || authUserId === taskCreatorId),
+    );
+  }, [authUserId, taskCreatorId, taskKind, taskStatus]);
+
+  useEffect(() => {
     if (!authUserId) {
       setFundingText("Login to contribute");
-    } else if (
-      (taskKind === "personal" && authUserId !== taskCreatorId) ||
-      taskStatus !== "active"
-    ) {
+    } else if (!isClickable) {
       setFundingText("");
     } else {
       setFundingText("Click to contribute");
     }
-  }, [authUserId, taskKind, taskCreatorId, taskStatus]);
+  }, [authUserId, isClickable]);
 
   const p = <p>{fundingText}</p>;
 
@@ -60,10 +64,7 @@ export default function FundingPopup({
   function handleOpenChange(open: boolean) {
     if (!authUserId) {
       setLocation(SITE_PAGES.LOGIN);
-    } else if (
-      (taskKind === "personal" && authUserId !== taskCreatorId) ||
-      taskStatus !== "active"
-    ) {
+    } else if (!isClickable) {
       return;
     }
     setOpen(open);
@@ -71,17 +72,19 @@ export default function FundingPopup({
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger>
-        <Badge
+      <PopoverTrigger asChild>
+        <Button
           variant="default"
-          className="flex items-center justify-center p-2"
+          className={`flex items-center justify-center p-8 rounded-2xl ${
+            !isClickable ? "hover:cursor-default" : "md:-translate-x-9"
+          }`}
         >
           <CoinsIcon className="size-8 mx-2 text-yellow-300 animate-pulse" />
           <div className="flex flex-col mr-5">
             <p className="text-xl">{`${totalFunds.toLocaleString(undefined, { minimumFractionDigits: Number(Kin.decimals) })} Kin`}</p>
             {p}
           </div>
-        </Badge>
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="bg-secondary max-w-md">
         {depositAddress ? (

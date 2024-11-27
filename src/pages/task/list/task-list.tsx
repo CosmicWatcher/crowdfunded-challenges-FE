@@ -99,10 +99,12 @@ export default function TaskListPage() {
   return (
     <div className="space-y-10">
       <Link href={SITE_PAGES.CREATE_TASK}>
-        <Button className="w-full py-8">
-          <CirclePlus className="size-9 mr-2 my-4" />
-          <p className="text-xl font-bold">Create Task</p>
-        </Button>
+        <div className="flex justify-center mx-auto">
+          <Button className="w-full max-w-7xl py-8">
+            <CirclePlus className="size-9 mr-2 my-4" />
+            <p className="text-xl font-bold">Create Task</p>
+          </Button>
+        </div>
       </Link>
       {tasks.data.map((task) => (
         <TaskCard key={task.id} task={task} />
@@ -126,11 +128,11 @@ function TaskCard({ task }: { task: TaskResponse }) {
 
   return (
     <Card
-      className={`max-w-7xl mx-auto relative cursor-pointer bg-${statusColor}-main`}
+      className={`max-w-7xl mx-auto relative cursor-pointer ${statusColor.background}`}
       onClick={() => setLocation(SITE_PAGES.VIEW_TASK.replace(":id", task.id))}
     >
       <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
-        <Badge variant="outline" className={`bg-${kindColor} pb-[0.25rem]`}>
+        <Badge variant="outline" className={`${kindColor} pb-[0.25rem]`}>
           {task.kind}
         </Badge>
       </div>
@@ -138,7 +140,7 @@ function TaskCard({ task }: { task: TaskResponse }) {
         <div className="absolute right-0 top-8 rotate-[30deg]">
           <Badge
             variant="secondary"
-            className={`pb-[0.25rem] w-32 justify-center text-sm ring-offset-2 ring-1 ring-offset-${statusColor}-border ring-secondary-foreground`}
+            className={`pb-[0.25rem] w-32 justify-center text-sm ring-offset-2 ring-1 ${statusColor.border} ring-secondary-foreground`}
           >
             {task.status}
           </Badge>
@@ -163,13 +165,6 @@ function TaskCard({ task }: { task: TaskResponse }) {
           {task.title}
         </CardTitle>
         <p className="line-clamp-2 break-words">{task.details}</p>
-
-        {/* <div className="flex items-center">
-          <CheckCircleIcon className="mr-1 h-4 w-4 text-muted-foreground" />
-          <Badge variant="outline" className="ml-1">
-            {task.status}
-          </Badge>
-        </div> */}
       </CardContent>
       <CardFooter className="flex flex-col items-center">
         <div className="flex items-center">
