@@ -4,6 +4,21 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      animation: {
+        funding: "funding 15s linear infinite",
+      },
+      keyframes: {
+        funding: {
+          "0%, 100%": {
+            "background-size": "800% 800%",
+            "background-position": "left center",
+          },
+          "50%": {
+            "background-size": "800% 800%",
+            "background-position": "right center",
+          },
+        },
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

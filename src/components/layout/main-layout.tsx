@@ -1,15 +1,13 @@
-import { CircleUser, House, Menu, Search } from "lucide-react";
+import { CircleUser, House, Menu, Search, UserCog } from "lucide-react";
 import { Fragment, ReactNode, useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 
 import { ModeToggle } from "@/components/theme/toggle";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -20,7 +18,6 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { NO_USERNAME } from "@/configs/constants";
 import { SITE_PAGES } from "@/configs/routes";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
@@ -53,8 +50,8 @@ export function AppLayout({ children }: AppLayoutProps) {
             </nav>
           </SheetContent>
         </Sheet>
-        <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-          <form className="ml-auto flex-1 sm:flex-initial">
+        <div className="flex w-full items-center justify-end gap-4 md:ml-auto md:gap-2 lg:gap-4">
+          {/* <form className="ml-auto flex-1 sm:flex-initial">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -63,7 +60,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
               />
             </div>
-          </form>
+          </form> */}
           <ModeToggle />
           <AccountDropdown />
         </div>
@@ -75,10 +72,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   );
 }
 
-interface NavSectionProps {
-  isInSheet?: boolean;
-}
-function NavSection({ isInSheet = false }: NavSectionProps) {
+function NavSection({ isInSheet = false }: { isInSheet?: boolean }) {
   const [location, _setLocation] = useLocation();
   const [SheetCloseWrapper, shetCloseWrapperProps] = isInSheet
     ? [SheetClose, { asChild: true }]
@@ -99,16 +93,16 @@ function NavSection({ isInSheet = false }: NavSectionProps) {
       </SheetCloseWrapper>
       <SheetCloseWrapper {...shetCloseWrapperProps}>
         <Link
-          href={SITE_PAGES.TASKS}
-          className={`${secondary} ${location === SITE_PAGES.TASKS.toString() ? "text-foreground" : "text-muted-foreground"}`}
+          href={SITE_PAGES.TASKS.LIST}
+          className={`${secondary} ${location === SITE_PAGES.TASKS.LIST.toString() ? "text-foreground" : "text-muted-foreground"}`}
         >
           View
         </Link>
       </SheetCloseWrapper>
       <SheetCloseWrapper {...shetCloseWrapperProps}>
         <Link
-          href={SITE_PAGES.CREATE_TASK}
-          className={`${secondary} ${location === SITE_PAGES.TASKS.toString() ? "text-foreground" : "text-muted-foreground"}`}
+          href={SITE_PAGES.TASKS.CREATE}
+          className={`${secondary} ${location === SITE_PAGES.TASKS.CREATE.toString() ? "text-foreground" : "text-muted-foreground"}`}
         >
           Create
         </Link>
@@ -120,17 +114,13 @@ function NavSection({ isInSheet = false }: NavSectionProps) {
 function AccountDropdown() {
   const [_location, setLocation] = useLocation();
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
-  const [username, setUsername] = useState<string>(NO_USERNAME);
 
   useEffect(() => {
     async function checkAuth() {
       try {
         const session = await getUserSession();
         if (!session) setAuthenticated(false);
-        else {
-          setUsername(session.user.email ?? NO_USERNAME);
-          setAuthenticated(true);
-        }
+        else setAuthenticated(true);
       } catch (err) {
         handleError(err);
       }
@@ -151,10 +141,12 @@ function AccountDropdown() {
 
   const content = isAuthenticated ? (
     <>
-      <DropdownMenuLabel>My Account</DropdownMenuLabel>
-      <DropdownMenuSeparator />
-      <DropdownMenuItem>Settings</DropdownMenuItem>
-      <DropdownMenuItem>Support</DropdownMenuItem>
+      <DropdownMenuItem
+        className="cursor-pointer"
+        onClick={() => setLocation(SITE_PAGES.ACCOUNT)}
+      >
+        My Account
+      </DropdownMenuItem>
       <DropdownMenuSeparator />
       <DropdownMenuItem
         className="cursor-pointer"
@@ -164,25 +156,28 @@ function AccountDropdown() {
       </DropdownMenuItem>
     </>
   ) : (
-    <>
-      <Link href={SITE_PAGES.LOGIN}>
-        <DropdownMenuItem className="cursor-pointer">Login</DropdownMenuItem>
-      </Link>
-    </>
+    <DropdownMenuItem
+      className="cursor-pointer"
+      onClick={() => setLocation(SITE_PAGES.AUTH.LOGIN)}
+    >
+      Login
+    </DropdownMenuItem>
   );
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="secondary" size="icon" className="rounded-full">
+        <Button
+          variant="secondary"
+          size="icon"
+          className={`rounded-full shadow-md ${
+            isAuthenticated ? "bg-primary" : ""
+          }`}
+        >
           {isAuthenticated ? (
-            <Avatar>
-              <AvatarFallback>
-                {`${username[0].toUpperCase()}${username[1].toUpperCase()}`}
-              </AvatarFallback>
-            </Avatar>
+            <UserCog className="size-6" />
           ) : (
-            <CircleUser className="h-5 w-5" />
+            <CircleUser className="size-8" />
           )}
           <span className="sr-only">Toggle user menu</span>
         </Button>

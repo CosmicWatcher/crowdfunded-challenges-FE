@@ -356,7 +356,7 @@ function SolutionCard({
   } else {
     voteElement = (
       <Button variant="default">
-        <Link href={SITE_PAGES.LOGIN}>Please Login to Vote</Link>
+        <Link href={SITE_PAGES.AUTH.LOGIN}>Please Login to Vote</Link>
       </Button>
     );
   }

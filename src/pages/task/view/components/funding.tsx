@@ -63,7 +63,7 @@ export default function FundingPopup({
 
   function handleOpenChange(open: boolean) {
     if (!authUserId) {
-      setLocation(SITE_PAGES.LOGIN);
+      setLocation(SITE_PAGES.AUTH.LOGIN);
     } else if (!isClickable) {
       return;
     }
@@ -75,9 +75,10 @@ export default function FundingPopup({
       <PopoverTrigger asChild>
         <Button
           variant="default"
-          className={`flex items-center justify-center p-8 rounded-2xl ${
-            !isClickable ? "hover:cursor-default" : "md:-translate-x-9"
-          }`}
+          className={`flex items-center justify-center p-8 rounded-2xl animate-funding 
+            bg-gradient-to-tr from-sky-500 from-20% via-rose-800 via-50% to-indigo-500 to-80% ${
+              !isClickable ? "hover:cursor-default" : "md:-translate-x-9"
+            }`}
         >
           <CoinsIcon className="size-8 mx-2 text-yellow-300 animate-pulse" />
           <div className="flex flex-col mr-5">

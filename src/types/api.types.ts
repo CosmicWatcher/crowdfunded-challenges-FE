@@ -16,6 +16,7 @@ export interface ResponsePagination {
 export interface UserResponse {
   id: string;
   username: string | null;
+  depositAddress?: string | null;
 }
 
 export interface TaskResponse {

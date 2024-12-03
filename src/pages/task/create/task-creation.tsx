@@ -45,7 +45,7 @@ export default function TaskCreationPage() {
         if (!ignore) {
           if (!session) {
             notifyInfo("Please login to continue!");
-            setLocation(SITE_PAGES.LOGIN);
+            setLocation(SITE_PAGES.AUTH.LOGIN);
           } else setAuthenticated(true);
         }
       } catch (err) {
@@ -74,7 +74,7 @@ export default function TaskCreationPage() {
         pending: "Submitting task...",
         success: "Task successfully created",
       });
-      setLocation(SITE_PAGES.TASKS);
+      setLocation(SITE_PAGES.TASKS.LIST);
     } catch (err) {
       handleError(err, "Task creation failed");
       form.setError("root.serverError", { type: "500" });
@@ -121,7 +121,7 @@ export default function TaskCreationPage() {
               >
                 Choose the Task Type
               </Label>
-              <div className="relative w-64 h-10 mx-auto bg-gray-200 rounded-full">
+              <div className="relative w-64 h-10 mx-auto bg-muted rounded-full">
                 <div
                   ref={taskKindRef}
                   className={`absolute top-1 left-1 w-[calc(50%-4px)] h-8 rounded-full transition-all duration-300 ease-in-out ${

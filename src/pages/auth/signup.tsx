@@ -154,7 +154,7 @@ export function SignupPage() {
         </div>
         <div className="mt-4 text-center text-sm">
           Already have an account?{" "}
-          <Link href={SITE_PAGES.LOGIN} className="underline">
+          <Link href={SITE_PAGES.AUTH.LOGIN} className="underline">
             Login
           </Link>
         </div>

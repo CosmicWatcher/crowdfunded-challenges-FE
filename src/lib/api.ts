@@ -6,6 +6,7 @@ import {
   SolutionResponse,
   SolutionVoteResponse,
   TaskResponse,
+  UserResponse,
 } from "@/types/api.types";
 import { TaskCreationForm } from "@/types/task.types";
 import { TaskKind } from "@/types/task.types";
@@ -18,7 +19,7 @@ interface ApiResponse<T = null> {
 }
 
 async function apiCall<T = null>(
-  method: "GET" | "POST",
+  method: "GET" | "POST" | "PUT" | "DELETE",
   endpoint: string,
   authRequired = false,
   body?: object,
@@ -168,6 +169,34 @@ export async function endTask(
   else endpoint = API_ROUTES.TASKS.END.FAIL.replace(":id", taskId);
 
   const resObj = await apiCall<TaskResponse>("POST", endpoint, true);
+
+  if (!resObj) throw new Error("No response object!");
+  return resObj;
+}
+
+export async function getUserAccount(): Promise<ResponseObject<UserResponse>> {
+  const endpoint = API_ROUTES.ACCOUNT.GET;
+  const resObj = await apiCall<UserResponse>("GET", endpoint, true);
+
+  if (!resObj) throw new Error("No response object!");
+  return resObj;
+}
+
+export async function checkUsernameExists(username: string): Promise<boolean> {
+  const endpoint = API_ROUTES.ACCOUNT.CHECK_USERNAME_EXISTS;
+  const resObj = await apiCall<boolean>("POST", endpoint, false, {
+    username,
+  });
+
+  if (!resObj) throw new Error("No response object!");
+  return resObj.data;
+}
+
+export async function updateUser(
+  vals: Omit<UserResponse, "id">,
+): Promise<ResponseObject<UserResponse>> {
+  const endpoint = API_ROUTES.ACCOUNT.UPDATE;
+  const resObj = await apiCall<UserResponse>("PUT", endpoint, true, vals);
 
   if (!resObj) throw new Error("No response object!");
   return resObj;

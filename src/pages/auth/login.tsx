@@ -137,7 +137,7 @@ export function LoginPage() {
         </div>
         <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}
-          <Link href={SITE_PAGES.SIGNUP} className="underline">
+          <Link href={SITE_PAGES.AUTH.SIGNUP} className="underline">
             Sign up
           </Link>
         </div>

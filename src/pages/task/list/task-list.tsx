@@ -98,7 +98,7 @@ export default function TaskListPage() {
 
   return (
     <div className="space-y-10">
-      <Link href={SITE_PAGES.CREATE_TASK}>
+      <Link href={SITE_PAGES.TASKS.CREATE}>
         <div className="flex justify-center mx-auto">
           <Button className="w-full max-w-7xl py-8">
             <CirclePlus className="size-9 mr-2 my-4" />
@@ -129,7 +129,7 @@ function TaskCard({ task }: { task: TaskResponse }) {
   return (
     <Card
       className={`max-w-7xl mx-auto relative cursor-pointer ${statusColor.background}`}
-      onClick={() => setLocation(SITE_PAGES.VIEW_TASK.replace(":id", task.id))}
+      onClick={() => setLocation(SITE_PAGES.TASKS.VIEW.replace(":id", task.id))}
     >
       <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
         <Badge variant="outline" className={`${kindColor} pb-[0.25rem]`}>

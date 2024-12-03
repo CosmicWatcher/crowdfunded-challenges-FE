@@ -1,4 +1,7 @@
 export const FORM_LIMITS = {
+  ACCOUNT: {
+    USERNAME: { MIN: 3, MAX: 20 },
+  },
   TASK_CREATION: {
     TITLE: { MIN: 3, MAX: 200 },
     DESCRIPTION: { MAX: 20000 },

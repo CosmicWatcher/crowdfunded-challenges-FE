@@ -7,11 +7,13 @@ import { Route, Switch } from "wouter";
 import { MainErrorFallback } from "@/components/error/main-error";
 import { AppLayout } from "@/components/layout/main-layout";
 import { ThemeProvider } from "@/components/theme/provider";
+import NotFoundAlert from "@/components/ui/not-found";
 import { SITE_PAGES } from "@/configs/routes";
 import { LoginPage } from "@/pages/auth/login";
 import { SignupPage } from "@/pages/auth/signup";
 import SolutionList from "@/pages/solution-list";
 import { TaskCreationPage, TaskListPage, TaskViewPage } from "@/pages/task";
+import UserAccountPage from "@/pages/user/account";
 
 export default function App() {
   return (
@@ -39,26 +41,32 @@ export default function App() {
               <DollarSign className="animate-ping fixed left-1/2 top-2/3 size-4" />
               <DollarSign className="animate-ping fixed left-2/3 top-1/3 size-8" />
             </Route>
-            <Route path={SITE_PAGES.SIGNUP}>
+            <Route path={SITE_PAGES.AUTH.SIGNUP}>
               <SignupPage />
             </Route>
-            <Route path={SITE_PAGES.LOGIN}>
+            <Route path={SITE_PAGES.AUTH.LOGIN}>
               <LoginPage />
             </Route>
-            <Route path={SITE_PAGES.TASKS}>
+            <Route path={SITE_PAGES.TASKS.LIST}>
               <TaskListPage />
             </Route>
-            <Route path={SITE_PAGES.CREATE_TASK}>
+            <Route path={SITE_PAGES.TASKS.CREATE}>
               <TaskCreationPage />
             </Route>
-            <Route path={SITE_PAGES.VIEW_TASK}>
+            <Route path={SITE_PAGES.TASKS.VIEW}>
               <TaskViewPage />
+            </Route>
+            <Route path={SITE_PAGES.ACCOUNT}>
+              <UserAccountPage />
             </Route>
             <Route path={"/tst"}>
               <SolutionList />
             </Route>
             <Route>
-              <h1 className="fixed left-1/2 top-1/4">404, Not Found!</h1>
+              <NotFoundAlert
+                title="Page Not Found!"
+                description="Please check the URL and try again."
+              />
             </Route>
           </Switch>
         </AppLayout>

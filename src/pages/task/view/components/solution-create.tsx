@@ -88,7 +88,7 @@ export default function SolutionCreator({
         <CardContent>
           <div className="mt-4 text-center text-sm">
             Please{" "}
-            <Link href={SITE_PAGES.LOGIN} className="underline">
+            <Link href={SITE_PAGES.AUTH.LOGIN} className="underline">
               Login
             </Link>{" "}
             to submit your work!

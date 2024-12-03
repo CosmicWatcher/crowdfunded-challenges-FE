@@ -6,7 +6,7 @@ import { SITE_PAGES } from "@/configs/routes";
 
 export function MainErrorFallback() {
   return (
-    <Alert variant="destructive">
+    <Alert variant="destructive" className="mx-auto max-w-sm my-10">
       <AlertCircle className="size-5" />
       <AlertTitle>Error</AlertTitle>
       <AlertDescription>
