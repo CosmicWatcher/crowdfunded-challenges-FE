@@ -35,7 +35,7 @@ import {
   TaskResponse,
   UserResponse,
 } from "@/types/api.types";
-import { TaskKind, TaskStatus } from "@/types/task.types";
+import { TaskKind, TaskStatus } from "@/types/misc.types";
 import { getTaskKindColor, getTaskStatusColor } from "@/utils/colors";
 
 export default function TaskViewPage() {

@@ -1,4 +1,4 @@
-import { TaskKind, TaskStatus } from "@/types/task.types";
+import { TaskKind, TaskStatus } from "@/types/misc.types";
 
 export interface ResponseObject<T> {
   data: T;

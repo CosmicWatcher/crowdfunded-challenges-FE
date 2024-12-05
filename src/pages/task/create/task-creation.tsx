@@ -25,7 +25,7 @@ import { createTask } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { notifyInfo } from "@/lib/notification";
 import { getUserSession } from "@/lib/supabase";
-import { TaskCreationForm, TaskKind } from "@/types/task.types";
+import { TaskCreationForm, TaskKind } from "@/types/misc.types";
 import { getTaskKindColor } from "@/utils/colors";
 
 export default function TaskCreationPage() {

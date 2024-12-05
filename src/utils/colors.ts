@@ -1,4 +1,4 @@
-import { TaskKind, TaskStatus } from "@/types/task.types";
+import { TaskKind, TaskStatus } from "@/types/misc.types";
 
 export function getTaskKindColor(kind: TaskKind) {
   return kind === "community"

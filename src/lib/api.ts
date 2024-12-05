@@ -8,8 +8,8 @@ import {
   TaskResponse,
   UserResponse,
 } from "@/types/api.types";
-import { TaskCreationForm } from "@/types/task.types";
-import { TaskKind } from "@/types/task.types";
+import { SolanaAddressType, TaskCreationForm } from "@/types/misc.types";
+import { TaskKind } from "@/types/misc.types";
 
 interface ApiResponse<T = null> {
   success: boolean;
@@ -193,10 +193,17 @@ export async function checkUsernameExists(username: string): Promise<boolean> {
 }
 
 export async function updateUser(
-  vals: Omit<UserResponse, "id">,
+  username?: string,
+  depositAddressInfo?: {
+    address: string;
+    kind: SolanaAddressType;
+  },
 ): Promise<ResponseObject<UserResponse>> {
   const endpoint = API_ROUTES.ACCOUNT.UPDATE;
-  const resObj = await apiCall<UserResponse>("PUT", endpoint, true, vals);
+  const resObj = await apiCall<UserResponse>("PUT", endpoint, true, {
+    username,
+    depositAddressInfo,
+  });
 
   if (!resObj) throw new Error("No response object!");
   return resObj;
