@@ -9,8 +9,8 @@ export function OverallMetric({
 }) {
   return (
     <div className="bg-gradient-to-tr from-sky-400 to-red-300 hover:opacity-90 hover:transition-opacity p-2 m-2 px-4 rounded-full shadow-md flex flex-col justify-center items-center">
-      <h3 className="text-xs font-bold text-slate-800">{label}</h3>
-      <p className="text-sm font-bold text-primary">{metric}</p>
+      <h3 className="text-xs font-bold text-center text-slate-800">{label}</h3>
+      <p className="text-sm font-bold text-center text-primary">{metric}</p>
     </div>
   );
 }

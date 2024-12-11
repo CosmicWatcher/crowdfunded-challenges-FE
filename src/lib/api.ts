@@ -8,7 +8,11 @@ import {
   TaskResponse,
   UserResponse,
 } from "@/types/api.types";
-import { SolanaAddressType, TaskCreationForm } from "@/types/misc.types";
+import {
+  SolanaAddressType,
+  TaskCreationForm,
+  TaskStatus,
+} from "@/types/misc.types";
 import { TaskKind } from "@/types/misc.types";
 
 interface ApiResponse<T = null> {
@@ -71,10 +75,13 @@ export async function createTask(
 
 export async function getTaskList(
   page = 1,
+  status?: TaskStatus,
 ): Promise<ResponseObject<TaskResponse[]>> {
   const queryParams = new URLSearchParams({
     page: page.toString(),
   });
+  if (status) queryParams.append("status", status);
+
   const endpoint = `${API_ROUTES.TASKS.GET_LIST}?${queryParams}`;
   const resObj = await apiCall<TaskResponse[]>("GET", endpoint);
 

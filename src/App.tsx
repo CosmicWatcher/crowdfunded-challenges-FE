@@ -1,4 +1,3 @@
-import { DollarSign } from "lucide-react";
 import { ErrorBoundary } from "react-error-boundary";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,6 +10,7 @@ import NotFoundAlert from "@/components/ui/not-found";
 import { SITE_PAGES } from "@/configs/routes";
 import { LoginPage } from "@/pages/auth/login";
 import { SignupPage } from "@/pages/auth/signup";
+import HomePage from "@/pages/home/home";
 import SolutionList from "@/pages/solution-list";
 import { TaskCreationPage, TaskListPage, TaskViewPage } from "@/pages/task";
 import UserAccountPage from "@/pages/user/account";
@@ -34,12 +34,7 @@ export default function App() {
         <AppLayout>
           <Switch>
             <Route path={SITE_PAGES.HOME}>
-              <DollarSign className="animate-ping fixed left-1/3 top-1/3 size-32" />
-              <DollarSign className="animate-ping fixed left-1/4 top-1/4 size-16" />
-              <DollarSign className="animate-ping fixed right-1/4 top-2/3 size-20" />
-              <DollarSign className="animate-ping fixed left-1/4 top-3/4 size-12" />
-              <DollarSign className="animate-ping fixed left-1/2 top-2/3 size-4" />
-              <DollarSign className="animate-ping fixed left-2/3 top-1/3 size-8" />
+              <HomePage />
             </Route>
             <Route path={SITE_PAGES.AUTH.SIGNUP}>
               <SignupPage />
