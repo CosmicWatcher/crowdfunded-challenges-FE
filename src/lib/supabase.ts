@@ -31,7 +31,7 @@ export async function signup(email: string, password: string) {
     email,
     password,
     options: {
-      emailRedirectTo: `${APP_URL}/${SITE_PAGES.ACCOUNT}`,
+      emailRedirectTo: `${APP_URL}${SITE_PAGES.ACCOUNT}`,
     },
   });
   if (error) {
