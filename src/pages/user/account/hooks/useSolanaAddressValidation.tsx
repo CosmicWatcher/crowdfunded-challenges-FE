@@ -4,7 +4,7 @@ import { UseFormGetFieldState, UseFormSetError } from "react-hook-form";
 import { SolanaAddressType } from "@/types/misc.types";
 import { validateSolanaAddress } from "@/utils/solana";
 
-export default function useSolanaAddressValidation(
+export function useSolanaAddressValidation(
   depositAddressInput: string,
   getFieldState: UseFormGetFieldState<{
     depositAddress: string;

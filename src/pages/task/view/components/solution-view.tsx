@@ -21,7 +21,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import Time from "@/components/ui/time";
 import { NO_USERNAME } from "@/configs/constants";
 import { SITE_PAGES } from "@/configs/routes";
-import useUserId from "@/hooks/useUserId";
+import { useUserId } from "@/hooks/useUserId";
 import { getSolutionList, voteForSolution } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import VotingPopup from "@/pages/task/view/components/voting";

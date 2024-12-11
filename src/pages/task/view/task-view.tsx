@@ -24,7 +24,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { NO_USERNAME } from "@/configs/constants";
-import useUserId from "@/hooks/useUserId";
+import { useUserId } from "@/hooks/useUserId";
 import { endTask, fundTask, getTaskById } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import FundingPopup from "@/pages/task/view/components/funding";

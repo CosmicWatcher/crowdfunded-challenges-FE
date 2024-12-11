@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { handleError } from "@/lib/error";
 import { getUserSession } from "@/lib/supabase";
 
-export default function useUserId() {
+export function useUserId() {
   const [authUserId, setAuthUserId] = useState<string | null>(null);
 
   useEffect(() => {

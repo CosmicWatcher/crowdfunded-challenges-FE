@@ -27,8 +27,8 @@ import { updateUserProfileSchema } from "@/configs/schema";
 import { getUserAccount, updateUser } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
-import useSolanaAddressValidation from "@/pages/user/account/hooks/useSolanaAddressValidation";
-import useUsernameCheck from "@/pages/user/account/hooks/useUsernameCheck";
+import { useSolanaAddressValidation } from "@/pages/user/account/hooks/useSolanaAddressValidation";
+import { useUsernameCheck } from "@/pages/user/account/hooks/useUsernameCheck";
 
 export default function Profile() {
   const [username, setUsername] = useState<string | null>(null);

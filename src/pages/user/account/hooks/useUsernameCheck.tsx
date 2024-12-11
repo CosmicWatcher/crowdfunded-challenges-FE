@@ -3,7 +3,7 @@ import { UseFormGetFieldState, UseFormSetError } from "react-hook-form";
 
 import { checkUsernameExists } from "@/lib/api";
 
-export default function useUsernameCheck(
+export function useUsernameCheck(
   usernameInput: string,
   getFieldState: UseFormGetFieldState<{
     username: string;

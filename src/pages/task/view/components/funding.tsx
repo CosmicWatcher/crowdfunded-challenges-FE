@@ -12,7 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { SITE_PAGES } from "@/configs/routes";
-import useUserId from "@/hooks/useUserId";
+import { useUserId } from "@/hooks/useUserId";
 import { TaskResponse } from "@/types/api.types";
 
 export default function FundingPopup({
