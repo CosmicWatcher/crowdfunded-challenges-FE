@@ -10,6 +10,7 @@ import NotFoundAlert from "@/components/ui/not-found";
 import { SITE_PAGES } from "@/configs/routes";
 import { LoginPage } from "@/pages/auth/login";
 import { SignupPage } from "@/pages/auth/signup";
+import VerifyEmailPage from "@/pages/auth/verify-email";
 import HomePage from "@/pages/home/home";
 import SolutionList from "@/pages/solution-list";
 import { TaskCreationPage, TaskListPage, TaskViewPage } from "@/pages/task";
@@ -41,6 +42,9 @@ export default function App() {
             </Route>
             <Route path={SITE_PAGES.AUTH.LOGIN}>
               <LoginPage />
+            </Route>
+            <Route path={SITE_PAGES.AUTH.VERIFY}>
+              <VerifyEmailPage />
             </Route>
             <Route path={SITE_PAGES.TASKS.LIST}>
               <TaskListPage />

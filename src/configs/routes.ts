@@ -3,6 +3,7 @@ export const SITE_PAGES = {
   AUTH: {
     SIGNUP: "/auth/signup",
     LOGIN: "/auth/login",
+    VERIFY: "/auth/welcome",
   },
   ACCOUNT: "/account",
   TASKS: {

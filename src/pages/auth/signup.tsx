@@ -71,7 +71,7 @@ export function SignupPage() {
     try {
       await signup(values.email, values.password);
       notifySuccess("Account successfully created");
-      setLocation(SITE_PAGES.HOME);
+      setLocation(SITE_PAGES.AUTH.VERIFY);
     } catch (err) {
       handleError(err, "Signup failed");
     }
