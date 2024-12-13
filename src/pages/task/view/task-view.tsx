@@ -249,29 +249,23 @@ function TaskDisplay({
                 <span>{username}</span>
               </div>
             </div>
-            <div className="flex flex-col gap-4">
-              {authUserId === createdBy?.id && status === "active" && (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button>End Task</Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="flex justify-between">
-                    <Button
-                      className="bg-green-700 hover:bg-green-800 w-24"
-                      onClick={() => handleEndTask(true)}
-                    >
-                      Success
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      className="w-24"
-                      onClick={() => handleEndTask(false)}
-                    >
-                      Fail
-                    </Button>
-                  </PopoverContent>
-                </Popover>
+            <div className="flex justify-end">
+              <OverallMetric
+                metric={`${totalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}
+                label="Funds"
+              />
+              {userVotingRights !== null && (
+                <div className="flex justify-center">
+                  <UserMetric
+                    metric={`${userTotalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}
+                    label="Your Contribution"
+                  />
+                </div>
               )}
+              <OverallMetric
+                metric={totalVotes.toString()}
+                label="Total Solution Votes"
+              />
             </div>
           </div>
         </CardHeader>
@@ -281,10 +275,28 @@ function TaskDisplay({
           </CardTitle>
           <p className="break-words whitespace-pre-wrap">{details}</p>
           <div className="flex justify-end">
-            <OverallMetric
-              metric={totalVotes.toString()}
-              label="Total Solution Votes"
-            />
+            {authUserId === createdBy?.id && status === "active" && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button>End Task</Button>
+                </PopoverTrigger>
+                <PopoverContent className="flex justify-between">
+                  <Button
+                    className="bg-green-700 hover:bg-green-800 w-24"
+                    onClick={() => handleEndTask(true)}
+                  >
+                    Success
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="w-24"
+                    onClick={() => handleEndTask(false)}
+                  >
+                    Fail
+                  </Button>
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
         </CardContent>
         <div className="border-4 px-6 py-4 m-2">
@@ -326,7 +338,7 @@ function TaskDisplay({
               <UserMetric
                 metric={`${userTotalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}
                 label="Your Contribution"
-                className="mb-0 "
+                className="mb-0"
               />
             </div>
           )}
