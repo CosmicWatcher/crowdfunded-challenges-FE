@@ -1,4 +1,3 @@
-import { Kin } from "@code-wallet/currency";
 import { CoinsIcon, DollarSign } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
@@ -32,7 +31,7 @@ export default function FundingPopup({
 }) {
   const [open, setOpen] = useState(false);
   const [isClickable, setIsClickable] = useState(false);
-  const [amount, setAmount] = useState(0.01);
+  const [amount, setAmount] = useState(0.5);
   const authUserId = useUserId();
   const [_location, setLocation] = useLocation();
   const [fundingText, setFundingText] = useState("");
@@ -82,7 +81,7 @@ export default function FundingPopup({
         >
           <CoinsIcon className="size-8 mx-2 text-yellow-300 animate-pulse" />
           <div className="flex flex-col mr-5">
-            <p className="text-xl">{`${totalFunds.toLocaleString(undefined, { minimumFractionDigits: Number(Kin.decimals) })} Kin`}</p>
+            <p className="text-xl">{`${totalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}</p>
             {p}
           </div>
         </Button>
@@ -98,8 +97,8 @@ export default function FundingPopup({
                 value={amount}
                 onChange={(e) => setAmount(Number(e.target.value))}
                 max={100}
-                step={0.01}
-                min={0.01}
+                step={0.5}
+                min={0.5}
                 className="w-32 ml-2"
               />
             </div>

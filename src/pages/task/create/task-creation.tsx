@@ -147,6 +147,38 @@ export default function TaskCreationPage() {
                   </button>
                 </div>
               </div>
+              <div className="flex justify-center">
+                {taskKind === "community" ? (
+                  <Label
+                    htmlFor="taskKind-toggle"
+                    className={`text-center rounded-2xl px-4 py-2 w-fit ${kindColor}`}
+                  >
+                    The
+                    <em>
+                      <b> COMMUNITY </b>
+                    </em>
+                    determines the success of the task
+                  </Label>
+                ) : (
+                  // <p
+                  //   className={`text-md rounded-2xl px-4 py-2 w-fit ${kindColor}`}
+                  // >
+                  //   The <em>COMMUNITY</em> determines the success of the task
+                  // </p>
+                  <Label
+                    htmlFor="taskKind-toggle"
+                    className={`text-center rounded-2xl px-4 py-2 w-fit ${kindColor}`}
+                  >
+                    <em>
+                      <b>YOU </b>
+                    </em>
+                    determine the success of the task
+                  </Label>
+                  // <p className={`text-md ${kindColor}`}>
+                  //   <em>You</em> determine the success of the task
+                  // </p>
+                )}
+              </div>
             </div>
             <div className="space-y-2">
               <FormField

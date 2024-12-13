@@ -89,6 +89,16 @@ export async function getTaskList(
   return resObj;
 }
 
+export async function getFeaturedTasks(): Promise<
+  ResponseObject<TaskResponse[]>
+> {
+  const endpoint = API_ROUTES.TASKS.GET_FEATURED;
+  const resObj = await apiCall<TaskResponse[]>("GET", endpoint);
+
+  if (!resObj) throw new Error("No response object!");
+  return resObj;
+}
+
 export async function getTaskById(
   id: TaskResponse["id"],
 ): Promise<ResponseObject<TaskResponse>> {

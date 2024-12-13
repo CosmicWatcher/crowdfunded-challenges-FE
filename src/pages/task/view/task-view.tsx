@@ -1,4 +1,3 @@
-import { Kin } from "@code-wallet/currency";
 import { CalendarIcon, Copy, TrophyIcon, WalletIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -225,10 +224,10 @@ function TaskDisplay({
           </Badge>
         </div>
         {status !== "active" && (
-          <div className="absolute right-0 top-8 rotate-[30deg]">
+          <div className="absolute -right-2 top-8 rotate-[30deg]">
             <Badge
               variant="secondary"
-              className={`pb-[0.25rem] w-32 justify-center text-sm ring-offset-2 ring-1 ${statusColor.border} ring-secondary-foreground`}
+              className={`pb-[0.25rem] w-40 justify-center text-sm ring-offset-2 ring-1 ${statusColor.border} ring-secondary-foreground`}
             >
               {status}
             </Badge>
@@ -288,64 +287,66 @@ function TaskDisplay({
             />
           </div>
         </CardContent>
-        <div className="border-4 px-6 py-4 md:flex grid gap-2 m-2 justify-center md:justify-between items-center">
-          <div className="flex items-center justify-center">
-            {status === "active" ? (
-              <>
-                <WalletIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                <span className="font-semibold text-sm">Address:</span>
-                <span className="ml-2 font-mono text-sm">
-                  {depositAddress
-                    ? `${depositAddress.slice(0, 5)}...${depositAddress.slice(-5)}`
-                    : "no wallet found"}
-                </span>
-                {depositAddress && (
-                  <CopyAddressButton address={depositAddress} />
-                )}
-              </>
-            ) : (
-              <span className="w-32"></span>
-            )}
+        <div className="border-4 px-6 py-4 m-2">
+          <div className="md:flex grid gap-2 justify-center md:justify-between items-center">
+            <div className="flex items-center justify-center">
+              {status === "active" ? (
+                <>
+                  <WalletIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                  <span className="font-semibold text-sm">Address:</span>
+                  <span className="ml-2 font-mono text-sm">
+                    {depositAddress
+                      ? `${depositAddress.slice(0, 5)}...${depositAddress.slice(-5)}`
+                      : "no wallet found"}
+                  </span>
+                  {depositAddress && (
+                    <CopyAddressButton address={depositAddress} />
+                  )}
+                </>
+              ) : (
+                <span className="w-32"></span>
+              )}
+            </div>
+            <FundingPopup
+              totalFunds={totalFunds}
+              depositAddress={depositAddress}
+              taskCreatorId={createdBy?.id ?? ""}
+              taskKind={kind}
+              taskStatus={status}
+              handleFundConfirm={handleFundConfirm}
+            />
+            <div className="flex items-center justify-center order-first md:order-none">
+              <TrophyIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+              <span className="font-semibold text-sm">Max Winners:</span>
+              <span className="ml-2 text-sm">{maxWinners}</span>
+            </div>
           </div>
-          <FundingPopup
-            totalFunds={totalFunds}
-            depositAddress={depositAddress}
-            taskCreatorId={createdBy?.id ?? ""}
-            taskKind={kind}
-            taskStatus={status}
-            handleFundConfirm={handleFundConfirm}
-          />
-          <div className="flex items-center justify-center">
-            <TrophyIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-            <span className="font-semibold text-sm">Max Winners:</span>
-            <span className="ml-2 text-sm">{maxWinners}</span>
-          </div>
+          {userVotingRights !== null && (
+            <div className="flex justify-center">
+              <UserMetric
+                metric={`${userTotalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}
+                label="Your Contribution"
+                className="mb-0 "
+              />
+            </div>
+          )}
         </div>
       </Card>
       {userVotingRights !== null && (
-        <>
-          <div className="flex justify-center">
+        <div className="sticky top-16 z-10 bg-backgroundTransparent">
+          <div className="flex justify-evenly">
             <UserMetric
-              metric={`${userTotalFunds.toLocaleString(undefined, { minimumFractionDigits: Number(Kin.decimals) })} Kin`}
-              label="Your Fund Contribution"
+              metric={userVotingRights.toString()}
+              label="Your Available Votes"
+              className="border-4 ring-offset-2 ring-1 border-cyan-800 ring-offset-cyan-700 ring-cyan-600"
+            />
+            <UserMetric
+              metric={userTotalVotes.toString()}
+              label="Your Votes Cast"
               className="border-4 ring-offset-2 ring-1 border-cyan-800 ring-offset-cyan-700 ring-cyan-600"
             />
           </div>
-          <div className="sticky top-16 z-10 bg-backgroundTransparent">
-            <div className="flex justify-evenly">
-              <UserMetric
-                metric={userVotingRights.toString()}
-                label="Your Available Votes"
-                className="border-4 ring-offset-2 ring-1 border-cyan-800 ring-offset-cyan-700 ring-cyan-600"
-              />
-              <UserMetric
-                metric={userTotalVotes.toString()}
-                label="Your Votes Cast"
-                className="border-4 ring-offset-2 ring-1 border-cyan-800 ring-offset-cyan-700 ring-cyan-600"
-              />
-            </div>
-          </div>
-        </>
+        </div>
       )}
     </>
   );

@@ -22,6 +22,7 @@ export const API_ROUTES = {
   TASKS: {
     CREATE: "/tasks/create",
     GET_LIST: "/tasks",
+    GET_FEATURED: "/tasks/featured",
     GET_BY_ID: "/tasks/:id",
     END: {
       SUCCESS: "/tasks/:id/success",
