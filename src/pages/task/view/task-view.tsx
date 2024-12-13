@@ -26,6 +26,7 @@ import { NO_USERNAME } from "@/configs/constants";
 import { useUserId } from "@/hooks/useUserId";
 import { endTask, fundTask, getTaskById } from "@/lib/api";
 import { handleError } from "@/lib/error";
+import { notifySuccess } from "@/lib/notification";
 import FundingPopup from "@/pages/task/view/components/funding";
 import SolutionCreator from "@/pages/task/view/components/solution-create";
 import SolutionsList from "@/pages/task/view/components/solution-view";
@@ -110,11 +111,10 @@ export default function TaskViewPage() {
         if (task) {
           const res = await toast.promise(endTask(task.id, isSuccess), {
             pending: "Ending task...",
-            success: "Task ended successfully",
+            success: "Task Has Ended",
           });
-          if (res) {
-            setTask(res.data);
-          }
+          if (res.message) notifySuccess(res.message);
+          setTask(res.data);
         }
       } catch (err) {
         handleError(err, "Ending task failed!");
