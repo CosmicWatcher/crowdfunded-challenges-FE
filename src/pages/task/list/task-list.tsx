@@ -110,7 +110,8 @@ export default function TaskListPage() {
         }
       } catch (err) {
         console.error(
-          new Date().toLocaleString(),
+          `%c ${new Date(Date.now()).toLocaleTimeString()}`,
+          "color:CornflowerBlue; font-weight:bold;",
           "Error fetching tasks:",
           err,
         );
@@ -157,7 +158,8 @@ export default function TaskListPage() {
         }
       } catch (err) {
         console.error(
-          new Date().toLocaleString(),
+          `%c ${new Date(Date.now()).toLocaleTimeString()}`,
+          "color:CornflowerBlue; font-weight:bold;",
           "Error fetching more tasks:",
           err,
         );

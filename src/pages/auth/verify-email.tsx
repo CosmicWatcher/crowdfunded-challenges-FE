@@ -19,7 +19,12 @@ export default function VerifyEmailPage() {
       else setLocation(SITE_PAGES.ACCOUNT);
     }
     checkAuth().catch((err) =>
-      console.log(new Date().toLocaleString(), "Error checking auth:", err),
+      console.log(
+        `%c ${new Date(Date.now()).toLocaleTimeString()}`,
+        "color:CornflowerBlue; font-weight:bold;",
+        "Error checking auth:",
+        err,
+      ),
     );
   }, [setLocation]);
 
