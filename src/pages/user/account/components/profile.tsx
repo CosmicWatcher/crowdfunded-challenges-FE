@@ -229,7 +229,7 @@ export default function Profile() {
             </div>
           </form>
         </Form>
-        {`usernameExists: ${usernameExists}, addressType: ${addressType}, isValid: ${form.formState.isValid}, usernameIsLoading: ${usernameIsLoading}, addressIsLoading: ${addressIsLoading}, addressDirty: ${form.getFieldState("depositAddress").isDirty}, addressInvalid: ${form.getFieldState("depositAddress").invalid}`}
+        {/* {`usernameExists: ${usernameExists}, addressType: ${addressType}, isValid: ${form.formState.isValid}, usernameIsLoading: ${usernameIsLoading}, addressIsLoading: ${addressIsLoading}, addressDirty: ${form.getFieldState("depositAddress").isDirty}, addressInvalid: ${form.getFieldState("depositAddress").invalid}`} */}
       </CardContent>
     </Card>
   );

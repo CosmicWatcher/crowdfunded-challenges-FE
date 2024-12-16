@@ -16,7 +16,7 @@ export default function VerifyEmailPage() {
     async function checkAuth() {
       const session = await getUserSession();
       if (!session) setAuthenticated(false);
-      else setLocation(SITE_PAGES.HOME);
+      else setLocation(SITE_PAGES.ACCOUNT);
     }
     checkAuth().catch((err) =>
       console.log(new Date().toLocaleString(), "Error checking auth:", err),
