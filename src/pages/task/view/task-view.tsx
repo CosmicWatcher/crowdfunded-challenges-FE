@@ -224,7 +224,7 @@ function TaskDisplay({
           </Badge>
         </div>
         {status !== "active" && (
-          <div className="absolute -right-2 top-8 rotate-[30deg]">
+          <div className="absolute -left-2 bottom-8 rotate-[30deg]">
             <Badge
               variant="secondary"
               className={`pb-[0.25rem] w-40 justify-center text-sm ring-offset-2 ring-1 ${statusColor.border} ring-secondary-foreground`}
@@ -265,6 +265,7 @@ function TaskDisplay({
               <OverallMetric
                 metric={totalVotes.toString()}
                 label="Total Solution Votes"
+                className="mr-0"
               />
             </div>
           </div>
