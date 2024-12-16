@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 
 export function notifySuccess(message: string) {
-  console.log(message);
+  console.log(new Date().toLocaleString(), message);
   toast.success(message);
 }
 

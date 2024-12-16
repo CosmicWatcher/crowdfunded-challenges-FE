@@ -18,7 +18,9 @@ export default function VerifyEmailPage() {
       if (!session) setAuthenticated(false);
       else setLocation(SITE_PAGES.HOME);
     }
-    checkAuth().catch((err) => console.log("Error checking auth:", err));
+    checkAuth().catch((err) =>
+      console.log(new Date().toLocaleString(), "Error checking auth:", err),
+    );
   }, [setLocation]);
 
   return isAuthenticated === undefined || isAuthenticated ? null : (
