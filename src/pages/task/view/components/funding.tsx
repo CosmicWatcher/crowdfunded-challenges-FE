@@ -1,4 +1,4 @@
-import { CoinsIcon, DollarSign } from "lucide-react";
+import { DollarSign } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
@@ -79,7 +79,7 @@ export default function FundingPopup({
               !isClickable ? "hover:cursor-default" : "md:-translate-x-9"
             }`}
         >
-          <CoinsIcon className="size-8 mx-2 text-yellow-300 animate-pulse" />
+          <img src="/kin_logo.jpg" className="size-8 mr-6" />
           <div className="flex flex-col mr-5">
             <p className="text-xl">{`${totalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}</p>
             {p}
