@@ -226,6 +226,14 @@ export async function updateUser(
   return resObj;
 }
 
+export async function createLoginIntent(): Promise<ResponseObject<string>> {
+  const endpoint = "/code-wallet/login/create-intent";
+  const resObj = await apiCall<string>("POST", endpoint, false);
+
+  if (!resObj) throw new Error("No response object!");
+  return resObj;
+}
+
 // export async function testSecurity() {
 // (async () => {
 //   const { data, error } = await supabase.from("post").select();

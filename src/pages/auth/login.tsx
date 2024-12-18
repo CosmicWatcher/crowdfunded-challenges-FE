@@ -1,5 +1,6 @@
+import { elements } from "@code-wallet/elements";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation } from "wouter";
 import { z } from "zod";
@@ -22,6 +23,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { SITE_PAGES } from "@/configs/routes";
+import { createLoginIntent } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
 import { getUserSession, login } from "@/lib/supabase";
@@ -75,11 +77,15 @@ export function LoginPage() {
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account
+          Login with Code Wallet <em className="font-bold">OR</em> with your
+          email
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4">
+        <div className="flex justify-center">
+          <CodeWalletLogin />
+        </div>
+        <div className="grid gap-4 mt-10">
           <Form {...form}>
             {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -144,4 +150,57 @@ export function LoginPage() {
       </CardContent>
     </Card>
   );
+}
+
+function CodeWalletLogin() {
+  const codeElement = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function createCodeButton() {
+      if (ignore) return;
+
+      try {
+        const { button } = elements.create("button", {
+          mode: "login",
+
+          login: {
+            verifier: "DrAjE1JnYCttMubZ63vFejjTXbEkx5TtXFTS8DNtkUhY",
+            domain: "mydomain.local",
+          },
+
+          confirmParams: {
+            success: { url: `${"mydomain.local"}/success/{{INTENT_ID}}` },
+            cancel: { url: `${"mydomain.local"}/` },
+          },
+        });
+        if (codeElement.current && button !== undefined) {
+          button.on("invoke", async () => {
+            const res = await createLoginIntent();
+            const clientSecret = res.data;
+            console.log("clientSecret: ", clientSecret);
+
+            // Update the button with the new client secret so that our server
+            // can be notified once the payment is complete.
+            button.update({ clientSecret });
+          });
+
+          button.mount(codeElement.current);
+          // codeBtnCreated.current = true;
+        } else {
+          console.error("codeElement.current is null or undefined");
+        }
+      } catch (error) {
+        console.error("createCodeButton failed: ", error);
+      }
+    }
+    void createCodeButton();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  return <div ref={codeElement} />;
 }
