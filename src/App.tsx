@@ -12,7 +12,6 @@ import { LoginPage } from "@/pages/auth/login";
 import { SignupPage } from "@/pages/auth/signup";
 import VerifyEmailPage from "@/pages/auth/verify-email";
 import HomePage from "@/pages/home/home";
-import SolutionList from "@/pages/solution-list";
 import { TaskCreationPage, TaskListPage, TaskViewPage } from "@/pages/task";
 import UserAccountPage from "@/pages/user/account";
 
@@ -57,9 +56,6 @@ export default function App() {
             </Route>
             <Route path={SITE_PAGES.ACCOUNT}>
               <UserAccountPage />
-            </Route>
-            <Route path={"/tst"}>
-              <SolutionList />
             </Route>
             <Route>
               <NotFoundAlert
