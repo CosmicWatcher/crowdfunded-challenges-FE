@@ -28,6 +28,9 @@ export const API_ROUTES = {
       SUCCESS: "/tasks/:id/success",
       FAIL: "/tasks/:id/fail",
     },
+    FUNDING: {
+      CREATE_INTENT: "/task-funds/create-intent/:id",
+    },
   },
   SOLUTIONS: {
     CREATE: "/solutions/create",

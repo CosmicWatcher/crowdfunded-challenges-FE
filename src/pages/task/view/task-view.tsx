@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/tooltip";
 import { NO_USERNAME } from "@/configs/constants";
 import { useUserId } from "@/hooks/useUserId";
-import { endTask, fundTask, getTaskById } from "@/lib/api";
+import { endTask, getTaskById } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
 import FundingPopup from "@/pages/task/view/components/funding";
@@ -81,30 +81,6 @@ export default function TaskViewPage() {
     };
   }, [taskId]);
 
-  function handleFundConfirm(amount: number) {
-    async function func() {
-      try {
-        if (task) {
-          const res = await toast.promise(fundTask(task.id, amount), {
-            pending: "Funding task...",
-            success: "Funding successful",
-          });
-          if (res) {
-            setTask(res.data);
-            updateUserVotingRights(res.data.metrics.user?.votingRights ?? null);
-            setTotalFunds(res.data.metrics.overall.totalFunds);
-            setTotalVotes(res.data.metrics.overall.totalVotes);
-            setUserTotalFunds(res.data.metrics.user?.totalFunds ?? 0);
-            setUserTotalVotes(res.data.metrics.user?.totalVotes ?? 0);
-          }
-        }
-      } catch (err) {
-        handleError(err, "Funding failed!");
-      }
-    }
-    void func();
-  }
-
   function handleEndTask(isSuccess: boolean) {
     async function func() {
       try {
@@ -148,6 +124,7 @@ export default function TaskViewPage() {
   return (
     <div className="min-h-screen space-y-4">
       <TaskDisplay
+        taskId={task.id}
         createdBy={task.createdBy}
         title={task.title}
         details={task.details}
@@ -161,7 +138,6 @@ export default function TaskViewPage() {
         userTotalFunds={userTotalFunds}
         userTotalVotes={userTotalVotes}
         userVotingRights={userVotingRights}
-        handleFundConfirm={handleFundConfirm}
         handleEndTask={handleEndTask}
       />
       <SolutionSection
@@ -178,6 +154,7 @@ export default function TaskViewPage() {
 }
 
 function TaskDisplay({
+  taskId,
   createdBy,
   title,
   details,
@@ -191,9 +168,9 @@ function TaskDisplay({
   userTotalFunds,
   userTotalVotes,
   userVotingRights,
-  handleFundConfirm,
   handleEndTask,
 }: {
+  taskId: TaskResponse["id"];
   createdBy: UserResponse | null;
   title: string | null;
   details: string | null;
@@ -207,7 +184,6 @@ function TaskDisplay({
   userTotalFunds: number;
   userTotalVotes: number;
   userVotingRights: number | null;
-  handleFundConfirm: (amount: number) => void;
   handleEndTask: (isSuccess: boolean) => void;
 }) {
   const authUserId = useUserId();
@@ -234,6 +210,27 @@ function TaskDisplay({
           </div>
         )}
         <CardHeader>
+          <div className="flex justify-end pb-4 px-0 mx-0">
+            <OverallMetric
+              metric={`${totalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}
+              label="Funds"
+              className="mx-0"
+            />
+            {userVotingRights !== null && (
+              <div className="flex justify-center">
+                <UserMetric
+                  metric={`${userTotalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}
+                  label="Your Contribution"
+                  className="mx-1"
+                />
+              </div>
+            )}
+            <OverallMetric
+              metric={totalVotes.toString()}
+              label="Total Solution Votes"
+              className="mx-0"
+            />
+          </div>
           <div className="flex justify-between">
             <div className="space-y-2">
               <div className="flex items-center text-sm">
@@ -248,25 +245,6 @@ function TaskDisplay({
                 </Avatar>
                 <span>{username}</span>
               </div>
-            </div>
-            <div className="flex justify-end">
-              <OverallMetric
-                metric={`${totalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}
-                label="Funds"
-              />
-              {userVotingRights !== null && (
-                <div className="flex justify-center">
-                  <UserMetric
-                    metric={`${userTotalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}
-                    label="Your Contribution"
-                  />
-                </div>
-              )}
-              <OverallMetric
-                metric={totalVotes.toString()}
-                label="Total Solution Votes"
-                className="mr-0"
-              />
             </div>
           </div>
         </CardHeader>
@@ -324,9 +302,9 @@ function TaskDisplay({
               totalFunds={totalFunds}
               depositAddress={depositAddress}
               taskCreatorId={createdBy?.id ?? ""}
+              taskId={taskId}
               taskKind={kind}
               taskStatus={status}
-              handleFundConfirm={handleFundConfirm}
             />
             <div className="flex items-center justify-center order-first md:order-none">
               <TrophyIcon className="mr-2 h-4 w-4 text-muted-foreground" />

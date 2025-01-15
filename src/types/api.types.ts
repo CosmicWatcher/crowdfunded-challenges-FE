@@ -1,3 +1,5 @@
+import { CurrencyCode } from "@code-wallet/currency";
+
 import { TaskKind, TaskStatus } from "@/types/misc.types";
 
 export interface ResponseObject<T> {
@@ -70,4 +72,11 @@ export interface SolutionVoteResponse {
     editedAt: string | null;
   }[];
   userVoteMetrics: SolutionVoteMetrics;
+}
+
+export interface CreateIntentResponse {
+  clientSecret: string;
+  amount: number;
+  currency: CurrencyCode;
+  destination: string;
 }

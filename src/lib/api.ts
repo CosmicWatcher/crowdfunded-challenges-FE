@@ -1,7 +1,10 @@
+import { CurrencyCode } from "@code-wallet/currency";
+
 import { SERVER_URL } from "@/configs/env";
 import { API_ROUTES } from "@/configs/routes";
 import { getUserSession } from "@/lib/supabase";
 import {
+  CreateIntentResponse,
   ResponseObject,
   SolutionResponse,
   SolutionVoteResponse,
@@ -163,18 +166,18 @@ export async function voteForSolution(
   return resObj;
 }
 
-export async function fundTask(
-  taskId: TaskResponse["id"],
-  amount: number,
-): Promise<ResponseObject<TaskResponse> | null> {
-  const endpoint = "/task-funds/post";
-  const resObj = await apiCall<TaskResponse>("POST", endpoint, true, {
-    taskId,
-    amount,
-  });
+// export async function fundTask(
+//   taskId: TaskResponse["id"],
+//   amount: number,
+// ): Promise<ResponseObject<TaskResponse> | null> {
+//   const endpoint = API_ROUTES.TASKS.FUND;
+//   const resObj = await apiCall<TaskResponse>("POST", endpoint, true, {
+//     taskId,
+//     amount,
+//   });
 
-  return resObj;
-}
+//   return resObj;
+// }
 
 export async function endTask(
   taskId: TaskResponse["id"],
@@ -226,9 +229,25 @@ export async function updateUser(
   return resObj;
 }
 
+export async function createTaskFundingIntent(
+  taskId: TaskResponse["id"],
+  amount: number,
+  currency: CurrencyCode,
+): Promise<ResponseObject<CreateIntentResponse>> {
+  const endpoint = API_ROUTES.TASKS.FUNDING.CREATE_INTENT.replace(
+    ":id",
+    taskId,
+  );
+  const resObj = await apiCall<CreateIntentResponse>("POST", endpoint, true, {
+    amount,
+    currency,
+  });
+
+  if (!resObj) throw new Error("No response object!");
+  return resObj;
+}
+
 // export async function testSecurity() {
-// (async () => {
-//   const { data, error } = await supabase.from("post").select();
+//   const { data, error } = await supabase.from("users").select();
 //   console.log(error, data);
-// })();
 // }
