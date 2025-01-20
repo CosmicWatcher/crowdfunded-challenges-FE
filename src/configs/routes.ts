@@ -18,6 +18,7 @@ export const API_ROUTES = {
     GET: "/users/account",
     UPDATE: "/users",
     CHECK_USERNAME_EXISTS: "/users/check-username-exists",
+    VALIDATE_SOLANA_ADDRESS: "/users/validate-solana-address",
   },
   TASKS: {
     CREATE: "/tasks/create",

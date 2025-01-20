@@ -1,6 +1,6 @@
 import { CurrencyCode } from "@code-wallet/currency";
 
-import { TaskKind, TaskStatus } from "@/types/misc.types";
+import { SolanaAddressType, TaskKind, TaskStatus } from "@/types/misc.types";
 
 export interface ResponseObject<T> {
   data: T;
@@ -79,4 +79,8 @@ export interface CreateIntentResponse {
   amount: number;
   currency: CurrencyCode;
   destination: string;
+}
+
+export interface SolanaAddressValidationResponse {
+  type: SolanaAddressType | null;
 }

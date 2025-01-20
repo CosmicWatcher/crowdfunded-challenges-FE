@@ -6,6 +6,7 @@ import { getUserSession } from "@/lib/supabase";
 import {
   CreateIntentResponse,
   ResponseObject,
+  SolanaAddressValidationResponse,
   SolutionResponse,
   SolutionVoteResponse,
   TaskResponse,
@@ -242,6 +243,23 @@ export async function createTaskFundingIntent(
     amount,
     currency,
   });
+
+  if (!resObj) throw new Error("No response object!");
+  return resObj;
+}
+
+export async function validateSolanaAddress(
+  address: string,
+): Promise<ResponseObject<SolanaAddressValidationResponse>> {
+  const endpoint = API_ROUTES.ACCOUNT.VALIDATE_SOLANA_ADDRESS;
+  const resObj = await apiCall<SolanaAddressValidationResponse>(
+    "POST",
+    endpoint,
+    false,
+    {
+      address,
+    },
+  );
 
   if (!resObj) throw new Error("No response object!");
   return resObj;

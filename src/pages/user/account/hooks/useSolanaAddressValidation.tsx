@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { UseFormGetFieldState, UseFormSetError } from "react-hook-form";
 
+import { validateSolanaAddress } from "@/lib/api";
 import { SolanaAddressType } from "@/types/misc.types";
-import { validateSolanaAddress } from "@/utils/solana";
 
 export function useSolanaAddressValidation(
   depositAddressInput: string,
@@ -23,9 +23,9 @@ export function useSolanaAddressValidation(
   // when address changes, ask the backend if it exists
   const callback = useCallback(() => {
     async function checkAddress(address: string) {
-      const type = await validateSolanaAddress(address);
-      setAddressType(type);
-      if (type === null) {
+      const { data } = await validateSolanaAddress(address);
+      setAddressType(data.type);
+      if (data.type === null) {
         setError("depositAddress", {
           type: "manual",
           message: "Address not found!",
@@ -44,10 +44,7 @@ export function useSolanaAddressValidation(
       checkAddress(depositAddressInput).catch((err) => {
         setError("depositAddress", {
           type: "500",
-          message:
-            err instanceof Error
-              ? `Address validation failed: ${err.message}`
-              : String(err),
+          message: err instanceof Error ? err.message : String(err),
         });
       });
     }
@@ -65,7 +62,7 @@ export function useSolanaAddressValidation(
     const timeoutId = setTimeout(() => {
       callback();
       setIsLoading(false);
-    }, 1000);
+    }, 2000);
 
     return () => {
       clearTimeout(timeoutId);
