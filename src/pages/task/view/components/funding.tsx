@@ -105,7 +105,6 @@ export default function FundingPopup({
           },
         });
 
-        setIsLoading(false);
         if (codeElement.current && button !== undefined) {
           button.mount(codeElement.current);
           setIsIntentCreated(true);
@@ -114,6 +113,8 @@ export default function FundingPopup({
         }
       } catch (reason) {
         handleError(reason);
+      } finally {
+        setIsLoading(false);
       }
     }
     void createCodeButton();
@@ -147,13 +148,10 @@ export default function FundingPopup({
           </div>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="bg-secondary max-w-md">
+      <PopoverContent className="bg-secondary max-w-md w-fit">
         {depositAddress ? (
           <>
-            <div className="flex flex-col items-center justify-center mt-6">
-              <h1 className="text-md pb-4 text-center">
-                Confirm the amount to prepare Code payment
-              </h1>
+            <div className="flex flex-col items-center justify-center">
               <div className="flex items-center justify-center gap-2">
                 <Input
                   id="myFund"
@@ -182,6 +180,14 @@ export default function FundingPopup({
                   </SelectContent>
                 </Select>
               </div>
+              <div className="mt-2">
+                <p className="text-xs self-start">
+                  * MIN: $0.05 USD or equivalent in other currencies
+                </p>
+                <p className="text-xs self-start">
+                  * MAX: $5 USD or equivalent in other currencies
+                </p>
+              </div>
               <div className="flex gap-8 mt-4">
                 <Button
                   variant="destructive"
@@ -197,7 +203,7 @@ export default function FundingPopup({
                   onClick={handleConfirm}
                   disabled={isIntentCreated || isLoading}
                 >
-                  Confirm Amount
+                  Select Amount
                 </Button>
               </div>
             </div>
