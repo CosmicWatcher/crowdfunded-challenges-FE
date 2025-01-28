@@ -55,6 +55,21 @@ export default function HomePage() {
     };
 
     animate();
+
+    function handleResize() {
+      if (!canvas) return;
+      if (
+        Math.abs(window.innerWidth - canvas.width) < 0.1 * canvas.width &&
+        Math.abs(window.innerHeight - canvas.height) < 0.1 * canvas.height
+      )
+        return;
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
