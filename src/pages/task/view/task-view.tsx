@@ -214,14 +214,14 @@ function TaskDisplay({
             <OverallMetric
               metric={`${totalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}
               label="Funds"
-              className="mx-0"
+              className="mr-1"
             />
             {userVotingRights !== null && (
               <div className="flex justify-center">
                 <UserMetric
                   metric={`${userTotalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}
                   label="Your Contribution"
-                  className="mx-1"
+                  className="ml-0 mr-1"
                 />
               </div>
             )}
