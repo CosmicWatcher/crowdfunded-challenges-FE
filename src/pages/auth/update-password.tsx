@@ -69,7 +69,7 @@ export default function UpdatePasswordPage() {
     try {
       await updatePassword(values.password);
       notifySuccess("Successfully updated password");
-      setLocation(SITE_PAGES.HOME);
+      setLocation(SITE_PAGES.TASKS.LIST);
     } catch (err) {
       handleError(err, "Password update failed");
     }

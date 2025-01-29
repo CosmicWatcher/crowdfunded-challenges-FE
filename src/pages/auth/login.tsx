@@ -46,7 +46,7 @@ export function LoginPage() {
       try {
         const session = await getUserSession();
         if (!session) setAuthenticated(false);
-        else setLocation(SITE_PAGES.HOME);
+        else setLocation(SITE_PAGES.TASKS.LIST);
       } catch (err) {
         handleError(err);
       }
@@ -73,7 +73,7 @@ export function LoginPage() {
     try {
       await login(values.email, values.password);
       notifySuccess("Successfully logged in");
-      setLocation(SITE_PAGES.HOME);
+      setLocation(SITE_PAGES.TASKS.LIST);
     } catch (err) {
       handleError(err, "Login failed");
     }

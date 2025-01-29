@@ -37,7 +37,7 @@ export function SignupPage() {
       try {
         const session = await getUserSession();
         if (!session) setAuthenticated(false);
-        else setLocation(SITE_PAGES.HOME);
+        else setLocation(SITE_PAGES.TASKS.LIST);
       } catch (err) {
         handleError(err);
       }
