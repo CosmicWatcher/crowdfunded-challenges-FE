@@ -37,6 +37,7 @@
     "react-error-boundary": "^4.0.13",
     "react-hook-form": "^7.53.0",
     "react-toastify": "^10.0.5",
+    "simplex-noise": "^4.0.3",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "wouter": "^3.3.5",

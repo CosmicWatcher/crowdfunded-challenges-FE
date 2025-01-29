@@ -1,5 +1,6 @@
 import { CircleUser, House, Menu, Search, UserCog } from "lucide-react";
 import { Fragment, ReactNode, useEffect, useRef, useState } from "react";
+import { createNoise2D } from "simplex-noise";
 import { Link, useLocation } from "wouter";
 
 import { ModeToggle } from "@/components/theme/toggle";
@@ -188,6 +189,8 @@ function AccountDropdown() {
   );
 }
 
+const noise2D = createNoise2D();
+
 function BackgroundCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -210,8 +213,10 @@ function BackgroundCanvas() {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       for (let i = 0; i < colors.length; i++) {
-        const noiseX = Math.sin(frame * 0.05 + i * 2.1) * 0.3;
-        const noiseY = Math.cos(frame * 0.07 + i * 1.7) * 0.3;
+        // const noiseX = Math.sin(frame * 0.05 + i * 2.1) * 0.3;
+        // const noiseY = Math.cos(frame * 0.07 + i * 1.7) * 0.3;
+        const noiseX = noise2D(frame * 0.05 + i * 2.1, frame * 0.05 + i * 2.1);
+        const noiseY = noise2D(frame * 0.07 + i * 1.7, frame * 0.07 + i * 1.7);
 
         const x =
           (Math.sin(frame * 0.1 + i + noiseX) * canvas.width) / 2 +
@@ -223,7 +228,9 @@ function BackgroundCanvas() {
           canvas.height / 2 +
           Math.cos(frame * 0.04 + i * 2.8) * 100;
 
-        const size = Math.sin(frame * 0.02 + i * 0.5) * 15 + 25;
+        const size = Math.abs(
+          noise2D(frame * 0.01 + i * 0.5, frame * 0.02 + i * 0.3) * 20 + 1,
+        );
 
         ctx.beginPath();
         ctx.arc(x, y, size, 0, Math.PI * 2);
