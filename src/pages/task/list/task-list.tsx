@@ -215,7 +215,7 @@ export default function TaskListPage() {
   return (
     <div>
       <FeaturedSection />
-      <div className="flex items-center justify-center gap-4 mt-20 mb-8 p-4 rounded-full border-2 self-center w-full max-w-md mx-auto">
+      <div className="flex items-center justify-center bg-background gap-4 mt-20 mb-8 p-4 rounded-full border-2 self-center w-full max-w-md mx-auto">
         <Button
           variant={statusFilter === "active" ? "default" : "secondary"}
           className="text-lg"

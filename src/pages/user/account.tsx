@@ -32,7 +32,7 @@ export default function UserAccountPage() {
 
   return isAuthenticated === undefined ? null : (
     <>
-      <div className="flex items-center justify-center gap-4 p-4 rounded-full border-2 self-center w-full max-w-md mx-auto">
+      <div className="flex items-center justify-center bg-background gap-4 p-4 rounded-full border-2 self-center w-full max-w-md mx-auto">
         <Button
           variant={page === "profile" ? "default" : "secondary"}
           className="text-lg"
@@ -54,5 +54,5 @@ export default function UserAccountPage() {
 }
 
 function Stats() {
-  return <div>Stats</div>;
+  return <div className="text-center">Coming Soon</div>;
 }

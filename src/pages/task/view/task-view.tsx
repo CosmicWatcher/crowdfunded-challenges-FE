@@ -324,7 +324,7 @@ function TaskDisplay({
         </div>
       </Card>
       {userVotingRights !== null && (
-        <div className="sticky top-16 z-10 bg-backgroundTransparent">
+        <div className="sticky top-16 z-10 max-w-7xl mx-auto rounded-full bg-backgroundTransparent">
           <div className="flex justify-evenly">
             <UserMetric
               metric={userVotingRights.toString()}
