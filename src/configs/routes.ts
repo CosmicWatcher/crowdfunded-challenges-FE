@@ -4,6 +4,7 @@ export const SITE_PAGES = {
     SIGNUP: "/auth/signup",
     LOGIN: "/auth/login",
     VERIFY: "/auth/welcome",
+    UPDATE_PASSWORD: "/auth/update-password",
   },
   ACCOUNT: "/account",
   TASKS: {

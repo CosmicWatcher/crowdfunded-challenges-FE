@@ -13,6 +13,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   Form,
   FormControl,
   FormField,
@@ -24,7 +33,7 @@ import { Input } from "@/components/ui/input";
 import { SITE_PAGES } from "@/configs/routes";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
-import { getUserSession, login } from "@/lib/supabase";
+import { forgotPassword, getUserSession, login } from "@/lib/supabase";
 
 export function LoginPage() {
   const [_location, setLocation] = useLocation();
@@ -104,14 +113,9 @@ export function LoginPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex items-center">
+                      <div className="flex items-center justify-between">
                         <FormLabel>Password</FormLabel>
-                        <Link
-                          href="#"
-                          className="ml-auto inline-block text-sm underline"
-                        >
-                          Forgot your password?
-                        </Link>
+                        <ForgotPassword />
                       </div>
                       <FormControl>
                         <Input
@@ -143,5 +147,86 @@ export function LoginPage() {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function ForgotPassword() {
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const formSchema = z.object({
+    email: z.string().email({ message: "Invalid email address" }),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+
+    try {
+      await forgotPassword(values.email);
+      notifySuccess("Reset instructions sent to email");
+    } catch (err) {
+      handleError(err);
+    } finally {
+      setIsLoading(false);
+      setOpen(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="link" type="button">
+          Forgot Password?
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Reset Password</DialogTitle>
+          <DialogDescription>
+            Enter your email address and we&apos;ll send you instructions to
+            reset your password. Make sure to check your spam folder.
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              void form.handleSubmit(onSubmit)(e);
+            }}
+          >
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="email@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Sending..." : "Send Reset Instructions"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }
