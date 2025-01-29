@@ -33,15 +33,11 @@ export default {
         "glow-border": {
           "0%, 100%": {
             "box-shadow":
-              "0 0 30px theme(colors.primary.DEFAULT), 0 0 30px theme(colors.primary.DEFAULT)",
+              "0 0 10px theme(colors.primary.foreground), 0 0 10px theme(colors.primary.foreground)",
           },
-          "33%": {
+          "50%": {
             "box-shadow":
-              "0 0 30px theme(colors.task.community), 0 0 30px theme(colors.task.community)",
-          },
-          "66%": {
-            "box-shadow":
-              "0 0 30px theme(colors.task.personal), 0 0 30px theme(colors.task.personal)",
+              "0 0 50px theme(colors.backgroundTransparent), 0 0 50px theme(colors.backgroundTransparent)",
           },
         },
       },
