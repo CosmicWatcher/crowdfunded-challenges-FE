@@ -24,12 +24,21 @@ export function TaskPreview({ task }: { task: TaskResponse }) {
       className={`max-w-7xl mx-auto relative cursor-pointer border-2 ${statusColor.background}`}
       onClick={() => setLocation(SITE_PAGES.TASKS.VIEW.replace(":id", task.id))}
     >
-      <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
+      <div className="absolute bottom-0 translate-y-1/3 left-1/2 -translate-x-1/2">
         <Badge variant="outline" className={`${kindColor} pb-[0.25rem]`}>
           {task.kind}
         </Badge>
       </div>
-      <div className="flex justify-between">
+      <div className="absolute top-0 -translate-y-1/2 translate-x-1/4">
+        {task.endedAt && (
+          <Badge variant="destructive" className="text-md">
+            <p className="mr-1">End</p>
+            <Time timestamp={new Date(task.endedAt)} />
+          </Badge>
+        )}
+      </div>
+
+      <div className="flex justify-between mt-2">
         <div className="space-y-2 p-4">
           <div className="flex items-center text-sm">
             <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />

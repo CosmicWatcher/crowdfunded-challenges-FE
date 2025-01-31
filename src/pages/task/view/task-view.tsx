@@ -132,6 +132,7 @@ export default function TaskViewPage() {
         status={task.status}
         depositAddress={task.depositAddress}
         createdAt={task.createdAt}
+        endedAt={task.endedAt}
         maxWinners={task.maxWinners}
         totalFunds={totalFunds}
         totalVotes={totalVotes}
@@ -162,6 +163,7 @@ function TaskDisplay({
   status,
   depositAddress,
   createdAt,
+  endedAt,
   maxWinners,
   totalFunds,
   totalVotes,
@@ -178,6 +180,7 @@ function TaskDisplay({
   status: TaskStatus;
   depositAddress: string | null;
   createdAt: string;
+  endedAt: string | null;
   maxWinners: number;
   totalFunds: number;
   totalVotes: number;
@@ -227,11 +230,11 @@ function TaskDisplay({
             )}
             <OverallMetric
               metric={totalVotes.toString()}
-              label="Total Solution Votes"
+              label="Solution Votes"
               className="mx-0"
             />
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between items-start">
             <div className="space-y-2">
               <div className="flex items-center text-sm">
                 <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -246,6 +249,12 @@ function TaskDisplay({
                 <span>{username}</span>
               </div>
             </div>
+            {endedAt && (
+              <Badge variant="destructive" className="text-md">
+                <p className="mr-1">End</p>
+                <Time timestamp={new Date(endedAt)} />
+              </Badge>
+            )}
           </div>
         </CardHeader>
         <CardContent className="space-y-4">

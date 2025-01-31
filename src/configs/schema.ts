@@ -15,6 +15,7 @@ export const taskCreationFormSchema = z.object({
     message: `Description must be less than ${FORM_LIMITS.TASK_CREATION.DESCRIPTION.MAX} characters`,
   }),
   maxWinners: z.number(),
+  endedAt: z.string().datetime(),
 });
 
 export const solutionFormSchema = z.object({
