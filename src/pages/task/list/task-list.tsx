@@ -182,15 +182,6 @@ export default function TaskListPage() {
         ? successfulTasks
         : failedTasks;
 
-  if (currentTasks.data.length === 0) {
-    return (
-      <NotFoundAlert
-        title="No tasks available!"
-        description="Please check back later."
-      />
-    );
-  }
-
   return (
     <div>
       <FeaturedTasks />
@@ -227,9 +218,16 @@ export default function TaskListPage() {
         </Button>
       </div>
       <div className="space-y-10">
-        {currentTasks.data.map((task) => (
-          <TaskPreview key={task.id} task={task} />
-        ))}
+        {currentTasks.data.length > 0 ? (
+          currentTasks.data.map((task) => (
+            <TaskPreview key={task.id} task={task} />
+          ))
+        ) : (
+          <NotFoundAlert
+            title="No tasks found!"
+            description="Try changing the filters above."
+          />
+        )}
         {loading && <Loading />}
         {!loading && currentTasks.pagination?.next_page && (
           <ArrowBigDownDash
