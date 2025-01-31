@@ -4,13 +4,13 @@ export default function Time({ timestamp }: { timestamp: Date }) {
   const [showFull, setShowFull] = useState(false);
   const [, setUpdateTrigger] = useState(0);
 
-  // Force update every second if showing time with seconds
+  // Force update every so often if showing time with seconds
   useEffect(() => {
     if (showFull) return;
 
     const interval = setInterval(() => {
       setUpdateTrigger((prev) => prev + 1);
-    }, 10000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [showFull]);

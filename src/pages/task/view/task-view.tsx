@@ -189,10 +189,29 @@ function TaskDisplay({
   userVotingRights: number | null;
   handleEndTask: (isSuccess: boolean) => void;
 }) {
+  const [hasEnded, setHasEnded] = useState(false);
   const authUserId = useUserId();
   const username = createdBy?.username ?? NO_USERNAME;
   const kindColor = getTaskKindColor(kind);
   const statusColor = getTaskStatusColor(status);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | undefined;
+
+    if (endedAt && !hasEnded) {
+      interval = setInterval(() => {
+        if (
+          endedAt &&
+          !hasEnded &&
+          new Date().getTime() - new Date(endedAt).getTime() > 0
+        ) {
+          setHasEnded(true);
+        }
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [endedAt, hasEnded]);
 
   return (
     <>
@@ -250,8 +269,11 @@ function TaskDisplay({
               </div>
             </div>
             {endedAt && (
-              <Badge variant="destructive" className="text-md">
-                <p className="mr-1">End</p>
+              <Badge
+                variant={hasEnded ? "secondary" : "destructive"}
+                className={hasEnded ? "text-sm" : "text-md"}
+              >
+                <p className="mr-1">{hasEnded ? "Ended" : "Ends"}</p>
                 <Time timestamp={new Date(endedAt)} />
               </Badge>
             )}

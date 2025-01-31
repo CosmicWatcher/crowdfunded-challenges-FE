@@ -1,4 +1,5 @@
 import { CalendarIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -15,9 +16,28 @@ import { getTaskStatusColor } from "@/utils/colors";
 
 export function TaskPreview({ task }: { task: TaskResponse }) {
   const [_location, setLocation] = useLocation();
+  const [hasEnded, setHasEnded] = useState(false);
   const username = task.createdBy?.username ?? NO_USERNAME;
   const kindColor = getTaskKindColor(task.kind);
   const statusColor = getTaskStatusColor(task.status);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | undefined;
+
+    if (task.endedAt && !hasEnded) {
+      interval = setInterval(() => {
+        if (
+          task.endedAt &&
+          !hasEnded &&
+          new Date().getTime() - new Date(task.endedAt).getTime() > 0
+        ) {
+          setHasEnded(true);
+        }
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [task.endedAt, hasEnded]);
 
   return (
     <Card
@@ -29,10 +49,13 @@ export function TaskPreview({ task }: { task: TaskResponse }) {
           {task.kind}
         </Badge>
       </div>
-      <div className="absolute top-0 -translate-y-1/2 translate-x-1/4">
+      <div className="absolute top-0 -translate-y-1/2 left-0 translate-x-3/4">
         {task.endedAt && (
-          <Badge variant="destructive" className="text-md">
-            <p className="mr-1">End</p>
+          <Badge
+            variant={hasEnded ? "secondary" : "destructive"}
+            className={hasEnded ? "text-sm" : "text-md"}
+          >
+            <p className="mr-1">{hasEnded ? "Ended" : "Ends"}</p>
             <Time timestamp={new Date(task.endedAt)} />
           </Badge>
         )}
