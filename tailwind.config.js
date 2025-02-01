@@ -101,6 +101,10 @@ export default {
             main: "hsl(var(--status-fail))",
             border: "hsl(var(--border-status-fail))",
           },
+          ended: {
+            main: "hsl(var(--status-ended))",
+            border: "hsl(var(--border-status-ended))",
+          },
         },
       },
     },

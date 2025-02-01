@@ -219,9 +219,12 @@ export default function TaskListPage() {
       </div>
       <div className="space-y-10">
         {currentTasks.data.length > 0 ? (
-          currentTasks.data.map((task) => (
-            <TaskPreview key={task.id} task={task} />
-          ))
+          currentTasks.data.map(
+            (task) =>
+              task.status !== "deleted" && (
+                <TaskPreview key={task.id} task={task} />
+              ),
+          )
         ) : (
           <NotFoundAlert
             title="No tasks found!"

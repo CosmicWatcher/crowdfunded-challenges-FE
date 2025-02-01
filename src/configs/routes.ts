@@ -26,7 +26,7 @@ export const API_ROUTES = {
     GET_LIST: "/tasks",
     GET_FEATURED: "/tasks/featured",
     GET_BY_ID: "/tasks/:id",
-    END: {
+    SETTLE: {
       SUCCESS: "/tasks/:id/success",
       FAIL: "/tasks/:id/fail",
     },

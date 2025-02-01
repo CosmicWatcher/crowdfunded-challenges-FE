@@ -7,14 +7,24 @@ export function getTaskKindColor(kind: TaskKind) {
 }
 
 export function getTaskStatusColor(status: TaskStatus) {
-  if (status === "active") return { background: "", border: "" };
-  return status === "successful"
-    ? {
-        background: "bg-status-success-main",
-        border: "ring-offset-status-success-border",
-      }
-    : {
-        background: "bg-status-fail-main",
-        border: "ring-offset-status-fail-border",
-      };
+  if (status === "successful") {
+    return {
+      background: "bg-status-success-main",
+      border: "ring-offset-status-success-border",
+    };
+  }
+  if (status === "failed") {
+    return {
+      background: "bg-status-fail-main",
+      border: "ring-offset-status-fail-border",
+    };
+  }
+  if (status === "ended") {
+    return {
+      background: "bg-status-ended-main",
+      border: "ring-offset-status-ended-border",
+    };
+  }
+
+  return { background: "", border: "" };
 }

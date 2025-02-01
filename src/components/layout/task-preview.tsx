@@ -108,7 +108,7 @@ export function TaskPreview({ task }: { task: TaskResponse }) {
               variant="secondary"
               className={`pb-[0.25rem] w-36 justify-center text-sm ring-offset-2 ring-1 ${statusColor.border} ring-secondary-foreground`}
             >
-              {task.status}
+              {task.status.toUpperCase()}
             </Badge>
           </div>
         </CardFooter>

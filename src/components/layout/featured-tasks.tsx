@@ -18,7 +18,7 @@ import { handleError } from "@/lib/error";
 import { TaskResponse } from "@/types/api.types";
 
 export function FeaturedTasks() {
-  const [tasks, setTasks] = useState<TaskResponse[] | null>(null);
+  const [tasks, setTasks] = useState<TaskResponse[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export function FeaturedTasks() {
         <CardTitle className="text-4xl text-center">Featured Tasks</CardTitle>
       </CardHeader>
       <CardContent className="px-0">
-        {tasks ? (
+        {tasks.length > 0 ? (
           <Carousel
             plugins={[
               Autoplay({

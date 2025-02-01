@@ -180,14 +180,15 @@ export async function voteForSolution(
 //   return resObj;
 // }
 
-export async function endTask(
+export async function settleTask(
   taskId: TaskResponse["id"],
   isSuccess: boolean,
 ): Promise<ResponseObject<TaskResponse>> {
   let endpoint: string;
 
-  if (isSuccess) endpoint = API_ROUTES.TASKS.END.SUCCESS.replace(":id", taskId);
-  else endpoint = API_ROUTES.TASKS.END.FAIL.replace(":id", taskId);
+  if (isSuccess)
+    endpoint = API_ROUTES.TASKS.SETTLE.SUCCESS.replace(":id", taskId);
+  else endpoint = API_ROUTES.TASKS.SETTLE.FAIL.replace(":id", taskId);
 
   const resObj = await apiCall<TaskResponse>("POST", endpoint, true);
 
