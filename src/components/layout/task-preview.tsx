@@ -16,7 +16,11 @@ import { getTaskStatusColor } from "@/utils/colors";
 
 export function TaskPreview({ task }: { task: TaskResponse }) {
   const [_location, setLocation] = useLocation();
-  const [hasEnded, setHasEnded] = useState(false);
+  const [hasEnded, setHasEnded] = useState(
+    task.endedAt && new Date().getTime() - new Date(task.endedAt).getTime() > 0
+      ? true
+      : false,
+  );
   const username = task.createdBy?.username ?? NO_USERNAME;
   const kindColor = getTaskKindColor(task.kind);
   const statusColor = getTaskStatusColor(task.status);
@@ -44,12 +48,12 @@ export function TaskPreview({ task }: { task: TaskResponse }) {
       className={`max-w-7xl mx-auto relative cursor-pointer border-2 ${statusColor.background}`}
       onClick={() => setLocation(SITE_PAGES.TASKS.VIEW.replace(":id", task.id))}
     >
-      <div className="absolute bottom-0 translate-y-1/3 left-1/2 -translate-x-1/2">
-        <Badge variant="outline" className={`${kindColor} pb-[0.25rem]`}>
+      <div className="absolute top-0 -translate-y-1/2 left-0 translate-x-2">
+        <Badge variant="outline" className={`${kindColor} py-[0.25rem]`}>
           {task.kind}
         </Badge>
       </div>
-      <div className="absolute top-0 -translate-y-1/2 left-0 translate-x-3/4">
+      <div className="absolute top-0 -translate-y-1/2 right-0 -translate-x-2">
         {task.endedAt && (
           <Badge
             variant={hasEnded ? "secondary" : "destructive"}

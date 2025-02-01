@@ -217,7 +217,7 @@ function TaskDisplay({
     <>
       <Card className={`max-w-7xl mx-auto relative ${statusColor.background}`}>
         <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
-          <Badge variant="outline" className={`${kindColor} pb-[0.25rem]`}>
+          <Badge variant="outline" className={`${kindColor} py-[0.25rem]`}>
             {kind}
           </Badge>
         </div>
