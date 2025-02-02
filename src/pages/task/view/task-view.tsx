@@ -1,4 +1,10 @@
-import { CalendarIcon, Copy, TrophyIcon, WalletIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  Copy,
+  Share2Icon,
+  TrophyIcon,
+  WalletIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useParams } from "wouter";
@@ -246,6 +252,25 @@ function TaskDisplay({
     return () => clearInterval(interval);
   }, [endedAt, onTaskEnd, status]);
 
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: title ?? "Task Details",
+          text: `Check out this task: ${title}`,
+          url: window.location.href,
+        });
+      } else {
+        // Fallback for desktop or browsers that don't support Web Share API
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Link copied to clipboard!");
+      }
+    } catch (error) {
+      // User cancelled share operation or something went wrong
+      console.error("Error sharing:", error);
+    }
+  };
+
   return (
     <>
       <Card className={`max-w-7xl mx-auto relative ${statusColor.background}`}>
@@ -317,11 +342,11 @@ function TaskDisplay({
             {title}
           </CardTitle>
           <p className="break-words whitespace-pre-wrap">{details}</p>
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-6">
             {authUserId === createdBy?.id && status === "ended" && (
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button>Choose Task Outcome</Button>
+                  <Button>Choose Outcome</Button>
                 </PopoverTrigger>
                 <PopoverContent className="flex justify-between">
                   <Button
@@ -340,6 +365,14 @@ function TaskDisplay({
                 </PopoverContent>
               </Popover>
             )}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => void handleShare()}
+              className="rounded-full"
+            >
+              <Share2Icon className="h-4 w-4" />
+            </Button>
           </div>
         </CardContent>
         <div className="border-4 px-6 py-4 m-2">
