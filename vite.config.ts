@@ -10,7 +10,10 @@ export default defineConfig({
     hmr: true,
     host: "0.0.0.0",
     port: 8090,
-    https: true,
+    https: {
+      key: "./localhost-key.pem",
+      cert: "./localhost.pem",
+    },
   },
   resolve: {
     alias: {
