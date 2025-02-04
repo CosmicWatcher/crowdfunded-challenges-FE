@@ -122,6 +122,7 @@ export default function FundingPopup({
 
   function handleOpenChange(open: boolean) {
     if (!authUserId) {
+      sessionStorage.setItem("previousLocation", window.location.pathname);
       setLocation(SITE_PAGES.AUTH.LOGIN);
     } else if (!isClickable) {
       return;

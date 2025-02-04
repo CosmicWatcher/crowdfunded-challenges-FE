@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation } from "wouter";
 import { z } from "zod";
@@ -40,19 +40,27 @@ export function LoginPage() {
   const [isAuthenticated, setAuthenticated] = useState<undefined | boolean>(
     undefined,
   );
+  const previousLocation = useRef(
+    sessionStorage.getItem("previousLocation") ?? SITE_PAGES.TASKS.LIST,
+  );
+
+  useEffect(() => {
+    if (sessionStorage.getItem("previousLocation"))
+      sessionStorage.removeItem("previousLocation");
+  }, []);
 
   useEffect(() => {
     async function checkAuth() {
       try {
         const session = await getUserSession();
         if (!session) setAuthenticated(false);
-        else setLocation(SITE_PAGES.TASKS.LIST);
+        else setLocation(previousLocation.current);
       } catch (err) {
         handleError(err);
       }
     }
     void checkAuth();
-  }, [setLocation]);
+  }, [previousLocation, setLocation]);
 
   const formSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -73,7 +81,7 @@ export function LoginPage() {
     try {
       await login(values.email, values.password);
       notifySuccess("Successfully logged in");
-      setLocation(SITE_PAGES.TASKS.LIST);
+      setLocation(previousLocation.current);
     } catch (err) {
       handleError(err, "Login failed");
     }

@@ -67,6 +67,10 @@ export default function TaskCreationPage() {
         if (!ignore) {
           if (!session) {
             notifyInfo("Please login to continue!");
+            sessionStorage.setItem(
+              "previousLocation",
+              window.location.pathname,
+            );
             setLocation(SITE_PAGES.AUTH.LOGIN);
           } else setAuthenticated(true);
         }

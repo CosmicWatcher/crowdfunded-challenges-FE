@@ -21,6 +21,7 @@ export default function UserAccountPage() {
         if (session) {
           setAuthenticated(true);
         } else {
+          sessionStorage.setItem("previousLocation", window.location.pathname);
           setLocation(SITE_PAGES.AUTH.LOGIN);
         }
       } catch (err) {

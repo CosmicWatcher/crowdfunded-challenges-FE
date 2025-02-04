@@ -160,7 +160,10 @@ function AccountDropdown() {
   ) : (
     <DropdownMenuItem
       className="cursor-pointer"
-      onClick={() => setLocation(SITE_PAGES.AUTH.LOGIN)}
+      onClick={() => {
+        sessionStorage.setItem("previousLocation", window.location.pathname);
+        setLocation(SITE_PAGES.AUTH.LOGIN);
+      }}
     >
       Login
     </DropdownMenuItem>
