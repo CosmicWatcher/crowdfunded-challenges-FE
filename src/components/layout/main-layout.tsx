@@ -1,4 +1,4 @@
-import { CircleUser, House, Menu, Search, UserCog } from "lucide-react";
+import { CircleUser, Menu, Search, UserCog } from "lucide-react";
 import { Fragment, ReactNode, useEffect, useRef, useState } from "react";
 import { createNoise2D } from "simplex-noise";
 import { Link, useLocation } from "wouter";
@@ -23,6 +23,8 @@ import { SITE_PAGES } from "@/configs/routes";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
 import { getUserSession, logout } from "@/lib/supabase";
+
+import logo from "/logo.png";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -87,10 +89,12 @@ function NavSection({ isInSheet = false }: { isInSheet?: boolean }) {
     <>
       <SheetCloseWrapper {...shetCloseWrapperProps}>
         <Link href={SITE_PAGES.HOME} className={primary}>
-          <House
-            className={`h-6 w-6 hover:stroke-[3px] ${location === SITE_PAGES.HOME.toString() ? "stroke-[3px]" : "stroke-[1.5px]"}`}
-          />
-          <span className="sr-only">This APP</span>
+          <img src={logo} alt="KinQuest" className="size-[40px]" />
+          <span
+            className={`text-xl mr-10 ${location === SITE_PAGES.HOME.toString() ? "text-foreground" : "text-muted-foreground"}`}
+          >
+            KinQuest
+          </span>
         </Link>
       </SheetCloseWrapper>
       <SheetCloseWrapper {...shetCloseWrapperProps}>
