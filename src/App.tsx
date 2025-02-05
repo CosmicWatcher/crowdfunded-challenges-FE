@@ -1,4 +1,8 @@
+import { useCallback, useEffect, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
+import { Document, Page, pdfjs } from "react-pdf";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Route, Switch } from "wouter";
@@ -61,6 +65,9 @@ export default function App() {
             <Route path={SITE_PAGES.ACCOUNT}>
               <UserAccountPage />
             </Route>
+            <Route path={"/alpha"}>
+              <AlphaPdf />
+            </Route>
             <Route>
               <NotFoundAlert
                 title="Page Not Found!"
@@ -71,5 +78,44 @@ export default function App() {
         </AppLayout>
       </ThemeProvider>
     </ErrorBoundary>
+  );
+}
+
+function AlphaPdf() {
+  const [numPages, setNumPages] = useState<number>();
+  const [containerWidth, setContainerWidth] = useState<number>(
+    0.95 * window.innerWidth,
+  );
+
+  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+    "pdfjs-dist/build/pdf.worker.min.mjs",
+    import.meta.url,
+  ).toString();
+
+  function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
+    setNumPages(numPages);
+  }
+
+  useEffect(() => {
+    function handleResize() {
+      setContainerWidth(0.95 * window.innerWidth);
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center">
+      <Document file="/welcome.pdf" onLoadSuccess={onDocumentLoadSuccess}>
+        {Array.from(new Array(numPages), (_el, index) => (
+          <Page
+            key={`page_${index + 1}`}
+            pageNumber={index + 1}
+            width={containerWidth}
+          />
+        ))}
+      </Document>
+    </div>
   );
 }
