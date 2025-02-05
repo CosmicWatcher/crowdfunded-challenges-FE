@@ -378,7 +378,7 @@ function TaskDisplay({
         <div className="border-4 px-6 py-4 m-2">
           <div className="md:flex grid gap-2 justify-center md:justify-between items-center">
             <div className="flex items-center justify-center">
-              {status === "active" ? (
+              {status === "active" || status === "ended" ? (
                 <>
                   <WalletIcon className="mr-2 h-4 w-4 text-muted-foreground" />
                   <span className="font-semibold text-sm">Address:</span>
