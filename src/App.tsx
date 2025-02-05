@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -84,7 +84,7 @@ export default function App() {
 function AlphaPdf() {
   const [numPages, setNumPages] = useState<number>();
   const [containerWidth, setContainerWidth] = useState<number>(
-    0.95 * window.innerWidth,
+    Math.min(0.95 * window.innerWidth, 1200),
   );
 
   pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -98,7 +98,7 @@ function AlphaPdf() {
 
   useEffect(() => {
     function handleResize() {
-      setContainerWidth(0.95 * window.innerWidth);
+      setContainerWidth(Math.min(0.95 * window.innerWidth, 1200));
     }
 
     window.addEventListener("resize", handleResize);
