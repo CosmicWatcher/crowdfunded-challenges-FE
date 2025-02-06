@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "wouter";
@@ -31,6 +32,8 @@ export default function UpdatePasswordPage() {
   const [isAuthenticated, setAuthenticated] = useState<undefined | boolean>(
     undefined,
   );
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     async function checkAuth() {
@@ -52,16 +55,23 @@ export default function UpdatePasswordPage() {
     );
   }, [setLocation]);
 
-  const formSchema = z.object({
-    password: z.string().min(6, {
-      message: "Password must be at least 6 characters",
-    }),
-  });
+  const formSchema = z
+    .object({
+      password: z.string().min(6, {
+        message: "Password must be at least 6 characters",
+      }),
+      confirm: z.string(),
+    })
+    .refine((data) => data.password === data.confirm, {
+      message: "Passwords don't match",
+      path: ["confirm"],
+    });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       password: "",
+      confirm: "",
     },
   });
 
@@ -98,11 +108,64 @@ export default function UpdatePasswordPage() {
                         <FormLabel>Password</FormLabel>
                       </div>
                       <FormControl>
-                        <Input
-                          placeholder="Password"
-                          type="password"
-                          {...field}
-                        />
+                        <div className="relative">
+                          <Input
+                            placeholder="Password"
+                            type={showPassword ? "text" : "password"}
+                            {...field}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOffIcon className="h-4 w-4" />
+                            ) : (
+                              <EyeIcon className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid gap-2">
+                <FormField
+                  control={form.control}
+                  name="confirm"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Confirm Password</FormLabel>
+                      </div>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            placeholder="Confirm Password"
+                            type={showConfirmPassword ? "text" : "password"}
+                            {...field}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={() =>
+                              setShowConfirmPassword(!showConfirmPassword)
+                            }
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOffIcon className="h-4 w-4" />
+                            ) : (
+                              <EyeIcon className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation } from "wouter";
@@ -43,6 +44,7 @@ export function LoginPage() {
   const previousLocation = useRef(
     sessionStorage.getItem("previousLocation") ?? SITE_PAGES.TASKS.LIST,
   );
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (sessionStorage.getItem("previousLocation"))
@@ -126,11 +128,26 @@ export function LoginPage() {
                         <ForgotPassword />
                       </div>
                       <FormControl>
-                        <Input
-                          placeholder="Password"
-                          type="password"
-                          {...field}
-                        />
+                        <div className="relative">
+                          <Input
+                            placeholder="Password"
+                            type={showPassword ? "text" : "password"}
+                            {...field}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
