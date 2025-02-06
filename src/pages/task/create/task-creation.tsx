@@ -328,7 +328,7 @@ function DatePicker({ onChange }: { onChange: (value: string) => void }) {
           <Calendar
             mode="single"
             month={date}
-            disabled={{ before: new Date() }}
+            disabled={{ before: addDays(new Date(), 1) }}
             selected={date}
             onSelect={(newDate) => {
               if (newDate) {
