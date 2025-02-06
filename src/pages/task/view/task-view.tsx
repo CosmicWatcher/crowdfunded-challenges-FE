@@ -1,4 +1,10 @@
-import { CalendarIcon, Copy, TrophyIcon, WalletIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  Copy,
+  Share2Icon,
+  TrophyIcon,
+  WalletIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useParams } from "wouter";
@@ -24,7 +30,7 @@ import {
 } from "@/components/ui/tooltip";
 import { NO_USERNAME } from "@/configs/constants";
 import { useUserId } from "@/hooks/useUserId";
-import { endTask, fundTask, getTaskById } from "@/lib/api";
+import { getTaskById, settleTask } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
 import FundingPopup from "@/pages/task/view/components/funding";
@@ -39,7 +45,16 @@ import { TaskKind, TaskStatus } from "@/types/misc.types";
 import { getTaskKindColor, getTaskStatusColor } from "@/utils/colors";
 
 export default function TaskViewPage() {
-  const [task, setTask] = useState<TaskResponse>();
+  const [taskId, setTaskId] = useState<string>();
+  const [createdBy, setCreatedBy] = useState<UserResponse | null>(null);
+  const [title, setTitle] = useState<string | null>(null);
+  const [details, setDetails] = useState<string | null>(null);
+  const [kind, setKind] = useState<TaskKind>("community");
+  const [status, setStatus] = useState<TaskStatus>("active");
+  const [depositAddress, setDepositAddress] = useState<string | null>(null);
+  const [createdAt, setCreatedAt] = useState<string>("");
+  const [endedAt, setEndedAt] = useState<string | null>(null);
+  const [maxWinners, setMaxWinners] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [userVotingRights, setUserVotingRights] = useState<number | null>(null);
   const [totalFunds, setTotalFunds] = useState(0);
@@ -47,7 +62,7 @@ export default function TaskViewPage() {
   const [userTotalFunds, setUserTotalFunds] = useState(0);
   const [userTotalVotes, setUserTotalVotes] = useState(0);
   const params = useParams();
-  const taskId = params.id;
+  const paramTaskId = params.id;
 
   useEffect(() => {
     let ignore = false;
@@ -55,17 +70,25 @@ export default function TaskViewPage() {
     async function fetchTask() {
       setLoading(true);
       try {
-        if (taskId !== undefined) {
-          const response = await getTaskById(taskId);
+        if (paramTaskId !== undefined) {
+          const response = await getTaskById(paramTaskId);
           if (!ignore && response.data) {
-            setTask(response.data);
-            updateUserVotingRights(
-              response.data.metrics.user?.votingRights ?? null,
-            );
-            setTotalFunds(response.data.metrics.overall.totalFunds);
-            setTotalVotes(response.data.metrics.overall.totalVotes);
-            setUserTotalFunds(response.data.metrics.user?.totalFunds ?? 0);
-            setUserTotalVotes(response.data.metrics.user?.totalVotes ?? 0);
+            const task = response.data;
+            setTaskId(task.id);
+            setCreatedBy(task.createdBy);
+            setTitle(task.title);
+            setDetails(task.details);
+            setKind(task.kind);
+            setStatus(task.status);
+            setDepositAddress(task.depositAddress);
+            setCreatedAt(task.createdAt);
+            setEndedAt(task.endedAt);
+            setMaxWinners(task.maxWinners);
+            updateUserVotingRights(task.metrics.user?.votingRights ?? null);
+            setTotalFunds(task.metrics.overall.totalFunds);
+            setTotalVotes(task.metrics.overall.totalVotes);
+            setUserTotalFunds(task.metrics.user?.totalFunds ?? 0);
+            setUserTotalVotes(task.metrics.user?.totalVotes ?? 0);
           }
         }
       } catch (err) {
@@ -79,48 +102,38 @@ export default function TaskViewPage() {
     return () => {
       ignore = true;
     };
-  }, [taskId]);
+  }, [paramTaskId]);
 
-  function handleFundConfirm(amount: number) {
+  function handleSettleTask(isSuccess: boolean) {
     async function func() {
       try {
-        if (task) {
-          const res = await toast.promise(fundTask(task.id, amount), {
-            pending: "Funding task...",
-            success: "Funding successful",
+        if (taskId) {
+          const res = await toast.promise(settleTask(taskId, isSuccess), {
+            pending: "Setting task outcome...",
+            success: "Task Outcome Set",
           });
-          if (res) {
-            setTask(res.data);
-            updateUserVotingRights(res.data.metrics.user?.votingRights ?? null);
-            setTotalFunds(res.data.metrics.overall.totalFunds);
-            setTotalVotes(res.data.metrics.overall.totalVotes);
-            setUserTotalFunds(res.data.metrics.user?.totalFunds ?? 0);
-            setUserTotalVotes(res.data.metrics.user?.totalVotes ?? 0);
-          }
+          if (res.message) notifySuccess(res.message);
+          const task = res.data;
+          setTaskId(task.id);
+          setCreatedBy(task.createdBy);
+          setTitle(task.title);
+          setDetails(task.details);
+          setKind(task.kind);
+          setStatus(task.status);
+          setDepositAddress(task.depositAddress);
+          setCreatedAt(task.createdAt);
+          setEndedAt(task.endedAt);
+          setMaxWinners(task.maxWinners);
         }
       } catch (err) {
-        handleError(err, "Funding failed!");
+        handleError(err, "Setting task outcome failed!");
       }
     }
     void func();
   }
 
-  function handleEndTask(isSuccess: boolean) {
-    async function func() {
-      try {
-        if (task) {
-          const res = await toast.promise(endTask(task.id, isSuccess), {
-            pending: "Ending task...",
-            success: "Task Has Ended",
-          });
-          if (res.message) notifySuccess(res.message);
-          setTask(res.data);
-        }
-      } catch (err) {
-        handleError(err, "Ending task failed!");
-      }
-    }
-    void func();
+  function onTaskEnd() {
+    setStatus("ended");
   }
 
   function updateUserVotingRights(newRights: number | null) {
@@ -136,7 +149,7 @@ export default function TaskViewPage() {
     return <Loading />;
   }
 
-  if (!task) {
+  if (!taskId || status === "deleted") {
     return (
       <NotFoundAlert
         title="Task not found!"
@@ -148,27 +161,29 @@ export default function TaskViewPage() {
   return (
     <div className="min-h-screen space-y-4">
       <TaskDisplay
-        createdBy={task.createdBy}
-        title={task.title}
-        details={task.details}
-        kind={task.kind}
-        status={task.status}
-        depositAddress={task.depositAddress}
-        createdAt={task.createdAt}
-        maxWinners={task.maxWinners}
+        taskId={taskId}
+        createdBy={createdBy}
+        title={title}
+        details={details}
+        kind={kind}
+        status={status}
+        depositAddress={depositAddress}
+        createdAt={createdAt}
+        endedAt={endedAt}
+        maxWinners={maxWinners}
         totalFunds={totalFunds}
         totalVotes={totalVotes}
         userTotalFunds={userTotalFunds}
         userTotalVotes={userTotalVotes}
         userVotingRights={userVotingRights}
-        handleFundConfirm={handleFundConfirm}
-        handleEndTask={handleEndTask}
+        handleSettleTask={handleSettleTask}
+        onTaskEnd={onTaskEnd}
       />
       <SolutionSection
-        taskId={task.id}
-        taskKind={task.kind}
-        taskStatus={task.status}
-        taskCreatorId={task.createdBy?.id ?? ""}
+        taskId={taskId}
+        taskKind={kind}
+        taskStatus={status}
+        taskCreatorId={createdBy?.id ?? ""}
         userVotingRights={userVotingRights}
         updateUserVotingRights={updateUserVotingRights}
         updateVoteCounts={updateVoteCounts}
@@ -178,6 +193,7 @@ export default function TaskViewPage() {
 }
 
 function TaskDisplay({
+  taskId,
   createdBy,
   title,
   details,
@@ -185,15 +201,17 @@ function TaskDisplay({
   status,
   depositAddress,
   createdAt,
+  endedAt,
   maxWinners,
   totalFunds,
   totalVotes,
   userTotalFunds,
   userTotalVotes,
   userVotingRights,
-  handleFundConfirm,
-  handleEndTask,
+  handleSettleTask,
+  onTaskEnd,
 }: {
+  taskId: TaskResponse["id"];
   createdBy: UserResponse | null;
   title: string | null;
   details: string | null;
@@ -201,25 +219,63 @@ function TaskDisplay({
   status: TaskStatus;
   depositAddress: string | null;
   createdAt: string;
+  endedAt: string | null;
   maxWinners: number;
   totalFunds: number;
   totalVotes: number;
   userTotalFunds: number;
   userTotalVotes: number;
   userVotingRights: number | null;
-  handleFundConfirm: (amount: number) => void;
-  handleEndTask: (isSuccess: boolean) => void;
+  handleSettleTask: (isSuccess: boolean) => void;
+  onTaskEnd: () => void;
 }) {
   const authUserId = useUserId();
   const username = createdBy?.username ?? NO_USERNAME;
   const kindColor = getTaskKindColor(kind);
   const statusColor = getTaskStatusColor(status);
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout | undefined;
+
+    if (endedAt && status === "active") {
+      interval = setInterval(() => {
+        if (
+          endedAt &&
+          status === "active" &&
+          new Date().getTime() - new Date(endedAt).getTime() > 0
+        ) {
+          onTaskEnd();
+        }
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [endedAt, onTaskEnd, status]);
+
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: title ?? "Task Details",
+          text: `Check out this task: ${title}`,
+          url: window.location.href,
+        });
+      } else {
+        // Fallback for desktop or browsers that don't support Web Share API
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Link copied to clipboard!");
+      }
+    } catch (error) {
+      // User cancelled share operation or something went wrong
+      console.error("Error sharing:", error);
+    }
+  };
+
   return (
     <>
       <Card className={`max-w-7xl mx-auto relative ${statusColor.background}`}>
         <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
-          <Badge variant="outline" className={`${kindColor} pb-[0.25rem]`}>
+          <Badge variant="outline" className={`${kindColor} py-[0.25rem]`}>
             {kind}
           </Badge>
         </div>
@@ -229,12 +285,33 @@ function TaskDisplay({
               variant="secondary"
               className={`pb-[0.25rem] w-40 justify-center text-sm ring-offset-2 ring-1 ${statusColor.border} ring-secondary-foreground`}
             >
-              {status}
+              {status.toUpperCase()}
             </Badge>
           </div>
         )}
         <CardHeader>
-          <div className="flex justify-between">
+          <div className="flex justify-end pb-4 px-0 mx-0">
+            <OverallMetric
+              metric={`${totalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}
+              label="Funds"
+              className="mr-1"
+            />
+            {userVotingRights !== null && (
+              <div className="flex justify-center">
+                <UserMetric
+                  metric={`${userTotalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}
+                  label="Your Contribution"
+                  className="ml-0 mr-1"
+                />
+              </div>
+            )}
+            <OverallMetric
+              metric={totalVotes.toString()}
+              label="Solution Votes"
+              className="mx-0"
+            />
+          </div>
+          <div className="flex justify-between items-start">
             <div className="space-y-2">
               <div className="flex items-center text-sm">
                 <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -249,25 +326,15 @@ function TaskDisplay({
                 <span>{username}</span>
               </div>
             </div>
-            <div className="flex justify-end">
-              <OverallMetric
-                metric={`${totalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}
-                label="Funds"
-              />
-              {userVotingRights !== null && (
-                <div className="flex justify-center">
-                  <UserMetric
-                    metric={`${userTotalFunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} Kin`}
-                    label="Your Contribution"
-                  />
-                </div>
-              )}
-              <OverallMetric
-                metric={totalVotes.toString()}
-                label="Total Solution Votes"
-                className="mr-0"
-              />
-            </div>
+            {endedAt && (
+              <Badge
+                variant={status === "active" ? "destructive" : "secondary"}
+                className={status === "active" ? "text-md" : "text-sm"}
+              >
+                <p className="mr-1">{status === "active" ? "Ends" : "Ended"}</p>
+                <Time timestamp={new Date(endedAt)} />
+              </Badge>
+            )}
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -275,35 +342,43 @@ function TaskDisplay({
             {title}
           </CardTitle>
           <p className="break-words whitespace-pre-wrap">{details}</p>
-          <div className="flex justify-end">
-            {authUserId === createdBy?.id && status === "active" && (
+          <div className="flex justify-end gap-6">
+            {authUserId === createdBy?.id && status === "ended" && (
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button>End Task</Button>
+                  <Button>Choose Outcome</Button>
                 </PopoverTrigger>
                 <PopoverContent className="flex justify-between">
                   <Button
                     className="bg-green-700 hover:bg-green-800 w-24"
-                    onClick={() => handleEndTask(true)}
+                    onClick={() => handleSettleTask(true)}
                   >
                     Success
                   </Button>
                   <Button
                     variant="destructive"
                     className="w-24"
-                    onClick={() => handleEndTask(false)}
+                    onClick={() => handleSettleTask(false)}
                   >
                     Fail
                   </Button>
                 </PopoverContent>
               </Popover>
             )}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => void handleShare()}
+              className="rounded-full"
+            >
+              <Share2Icon className="h-4 w-4" />
+            </Button>
           </div>
         </CardContent>
         <div className="border-4 px-6 py-4 m-2">
           <div className="md:flex grid gap-2 justify-center md:justify-between items-center">
             <div className="flex items-center justify-center">
-              {status === "active" ? (
+              {status === "active" || status === "ended" ? (
                 <>
                   <WalletIcon className="mr-2 h-4 w-4 text-muted-foreground" />
                   <span className="font-semibold text-sm">Address:</span>
@@ -324,9 +399,9 @@ function TaskDisplay({
               totalFunds={totalFunds}
               depositAddress={depositAddress}
               taskCreatorId={createdBy?.id ?? ""}
+              taskId={taskId}
               taskKind={kind}
               taskStatus={status}
-              handleFundConfirm={handleFundConfirm}
             />
             <div className="flex items-center justify-center order-first md:order-none">
               <TrophyIcon className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -346,7 +421,7 @@ function TaskDisplay({
         </div>
       </Card>
       {userVotingRights !== null && (
-        <div className="sticky top-16 z-10 bg-backgroundTransparent">
+        <div className="sticky top-16 z-10 max-w-7xl mx-auto rounded-full bg-backgroundTransparent">
           <div className="flex justify-evenly">
             <UserMetric
               metric={userVotingRights.toString()}

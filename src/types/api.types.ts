@@ -1,4 +1,6 @@
-import { TaskKind, TaskStatus } from "@/types/misc.types";
+import { CurrencyCode } from "@code-wallet/currency";
+
+import { SolanaAddressType, TaskKind, TaskStatus } from "@/types/misc.types";
 
 export interface ResponseObject<T> {
   data: T;
@@ -70,4 +72,15 @@ export interface SolutionVoteResponse {
     editedAt: string | null;
   }[];
   userVoteMetrics: SolutionVoteMetrics;
+}
+
+export interface CreateIntentResponse {
+  clientSecret: string;
+  amount: number;
+  currency: CurrencyCode;
+  destination: string;
+}
+
+export interface SolanaAddressValidationResponse {
+  type: SolanaAddressType | null;
 }

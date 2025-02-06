@@ -1,8 +1,12 @@
+import { CurrencyCode } from "@code-wallet/currency";
+
 import { SERVER_URL } from "@/configs/env";
 import { API_ROUTES } from "@/configs/routes";
 import { getUserSession } from "@/lib/supabase";
 import {
+  CreateIntentResponse,
   ResponseObject,
+  SolanaAddressValidationResponse,
   SolutionResponse,
   SolutionVoteResponse,
   TaskResponse,
@@ -163,27 +167,28 @@ export async function voteForSolution(
   return resObj;
 }
 
-export async function fundTask(
-  taskId: TaskResponse["id"],
-  amount: number,
-): Promise<ResponseObject<TaskResponse> | null> {
-  const endpoint = "/task-funds/post";
-  const resObj = await apiCall<TaskResponse>("POST", endpoint, true, {
-    taskId,
-    amount,
-  });
+// export async function fundTask(
+//   taskId: TaskResponse["id"],
+//   amount: number,
+// ): Promise<ResponseObject<TaskResponse> | null> {
+//   const endpoint = API_ROUTES.TASKS.FUND;
+//   const resObj = await apiCall<TaskResponse>("POST", endpoint, true, {
+//     taskId,
+//     amount,
+//   });
 
-  return resObj;
-}
+//   return resObj;
+// }
 
-export async function endTask(
+export async function settleTask(
   taskId: TaskResponse["id"],
   isSuccess: boolean,
 ): Promise<ResponseObject<TaskResponse>> {
   let endpoint: string;
 
-  if (isSuccess) endpoint = API_ROUTES.TASKS.END.SUCCESS.replace(":id", taskId);
-  else endpoint = API_ROUTES.TASKS.END.FAIL.replace(":id", taskId);
+  if (isSuccess)
+    endpoint = API_ROUTES.TASKS.SETTLE.SUCCESS.replace(":id", taskId);
+  else endpoint = API_ROUTES.TASKS.SETTLE.FAIL.replace(":id", taskId);
 
   const resObj = await apiCall<TaskResponse>("POST", endpoint, true);
 
@@ -236,6 +241,24 @@ export async function createCodeWalletLoginIntent(): Promise<
   return resObj;
 }
 
+export async function createTaskFundingIntent(
+  taskId: TaskResponse["id"],
+  amount: number,
+  currency: CurrencyCode,
+): Promise<ResponseObject<CreateIntentResponse>> {
+  const endpoint = API_ROUTES.TASKS.FUNDING.CREATE_INTENT.replace(
+    ":id",
+    taskId,
+  );
+  const resObj = await apiCall<CreateIntentResponse>("POST", endpoint, true, {
+    amount,
+    currency,
+  });
+
+  if (!resObj) throw new Error("No response object!");
+  return resObj;
+}
+
 export async function verifyCodeWalletLogin(intentId: string): Promise<void> {
   const endpoint = "/code-wallet/login/success/:id".replace(":id", intentId);
   await apiCall("GET", endpoint);
@@ -243,5 +266,24 @@ export async function verifyCodeWalletLogin(intentId: string): Promise<void> {
 
 // export async function testSecurity() {
 //   const { data, error } = await supabase.from("task_payout").select();
+export async function validateSolanaAddress(
+  address: string,
+): Promise<ResponseObject<SolanaAddressValidationResponse>> {
+  const endpoint = API_ROUTES.ACCOUNT.VALIDATE_SOLANA_ADDRESS;
+  const resObj = await apiCall<SolanaAddressValidationResponse>(
+    "POST",
+    endpoint,
+    false,
+    {
+      address,
+    },
+  );
+
+  if (!resObj) throw new Error("No response object!");
+  return resObj;
+}
+
+// export async function testSecurity() {
+//   const { data, error } = await supabase.from("users").select();
 //   console.log(error, data);
 // }

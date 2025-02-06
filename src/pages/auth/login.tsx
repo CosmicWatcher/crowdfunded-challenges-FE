@@ -1,5 +1,6 @@
 import { elements } from "@code-wallet/elements";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation } from "wouter";
@@ -14,6 +15,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   Form,
   FormControl,
   FormField,
@@ -27,26 +37,35 @@ import { SITE_PAGES } from "@/configs/routes";
 import { createCodeWalletLoginIntent } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
-import { getUserSession, login } from "@/lib/supabase";
+import { forgotPassword, getUserSession, login } from "@/lib/supabase";
 
 export function LoginPage() {
   const [_location, setLocation] = useLocation();
   const [isAuthenticated, setAuthenticated] = useState<undefined | boolean>(
     undefined,
   );
+  const previousLocation = useRef(
+    sessionStorage.getItem("previousLocation") ?? SITE_PAGES.TASKS.LIST,
+  );
+  const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem("previousLocation"))
+      sessionStorage.removeItem("previousLocation");
+  }, []);
 
   useEffect(() => {
     async function checkAuth() {
       try {
         const session = await getUserSession();
         if (!session) setAuthenticated(false);
-        else setLocation(SITE_PAGES.HOME);
+        else setLocation(previousLocation.current);
       } catch (err) {
         handleError(err);
       }
     }
     void checkAuth();
-  }, [setLocation]);
+  }, [previousLocation, setLocation]);
 
   const formSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -67,7 +86,7 @@ export function LoginPage() {
     try {
       await login(values.email, values.password);
       notifySuccess("Successfully logged in");
-      setLocation(SITE_PAGES.HOME);
+      setLocation(previousLocation.current);
     } catch (err) {
       handleError(err, "Login failed");
     }
@@ -111,21 +130,31 @@ export function LoginPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex items-center">
+                      <div className="flex items-center justify-between">
                         <FormLabel>Password</FormLabel>
-                        <Link
-                          href="#"
-                          className="ml-auto inline-block text-sm underline"
-                        >
-                          Forgot your password?
-                        </Link>
+                        <ForgotPassword />
                       </div>
                       <FormControl>
-                        <Input
-                          placeholder="Password"
-                          type="password"
-                          {...field}
-                        />
+                        <div className="relative">
+                          <Input
+                            placeholder="Password"
+                            type={showPassword ? "text" : "password"}
+                            {...field}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -159,7 +188,7 @@ function CodeWalletLogin() {
   useEffect(() => {
     let ignore = false;
 
-    async function createCodeButton() {
+    function createCodeButton() {
       if (ignore) return;
 
       try {
@@ -206,4 +235,85 @@ function CodeWalletLogin() {
   }, []);
 
   return <div ref={codeElement} />;
+}
+
+function ForgotPassword() {
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const formSchema = z.object({
+    email: z.string().email({ message: "Invalid email address" }),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+
+    try {
+      await forgotPassword(values.email);
+      notifySuccess("Reset instructions sent to email");
+    } catch (err) {
+      handleError(err);
+    } finally {
+      setIsLoading(false);
+      setOpen(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="link" type="button">
+          Forgot Password?
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Reset Password</DialogTitle>
+          <DialogDescription>
+            Enter your email address and we&apos;ll send you instructions to
+            reset your password. Make sure to check your spam folder.
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              void form.handleSubmit(onSubmit)(e);
+            }}
+          >
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="email@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Sending..." : "Send Reset Instructions"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
 }

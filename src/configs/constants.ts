@@ -14,3 +14,5 @@ export const FORM_LIMITS = {
 } as const;
 
 export const NO_USERNAME = "No-Name";
+
+export const DEFAULT_TASK_END_DAYS = 7;

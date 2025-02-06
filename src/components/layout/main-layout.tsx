@@ -1,5 +1,6 @@
-import { CircleUser, House, Menu, Search, UserCog } from "lucide-react";
-import { Fragment, ReactNode, useEffect, useState } from "react";
+import { CircleUser, Menu, Search, UserCog } from "lucide-react";
+import { Fragment, ReactNode, useEffect, useRef, useState } from "react";
+import { createNoise2D } from "simplex-noise";
 import { Link, useLocation } from "wouter";
 
 import { ModeToggle } from "@/components/theme/toggle";
@@ -22,6 +23,8 @@ import { SITE_PAGES } from "@/configs/routes";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
 import { getUserSession, logout } from "@/lib/supabase";
+
+import logo from "/logo.png";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -66,8 +69,42 @@ export function AppLayout({ children }: AppLayoutProps) {
         </div>
       </header>
       <main className="flex flex-1 flex-col gap-4 p-4 px-1 md:gap-8 md:p-8">
+        <BackgroundCanvas />
         {children}
       </main>
+      <footer className="flex flex-col h-fit items-center gap-4 border-t bg-background p-4 text-muted-foreground text-sm">
+        <div className="flex justify-around md:justify-evenly w-full max-w-screen-2xl border-b pb-4">
+          <div className="flex flex-col items-start">
+            <Link
+              href={SITE_PAGES.HOME}
+              className="flex items-center gap-2 text-xl font-semibold pb-2"
+            >
+              <img src={logo} alt="KinQuest" className="size-[40px]" />
+              <span className="text-xl mr-10 ">KinQuest</span>
+            </Link>
+            <p className="self-start">Complete Tasks</p>
+            <p className="self-center">Earn Rewards</p>
+            <p className="self-end">Build the Future</p>
+          </div>
+          <div className="flex flex-col items-start gap-2">
+            <p className="font-semibold text-foreground pb-2">Links</p>
+            <Link href={SITE_PAGES.TASKS.LIST}>View Tasks</Link>
+            <Link href={SITE_PAGES.TASKS.CREATE}>Create Task</Link>
+            <Link href={SITE_PAGES.ACCOUNT}>My Account</Link>
+          </div>
+          {/* <div className="flex flex-col items-start">
+            <p className="font-semibold text-foreground">Community</p>
+            <p>8</p>
+            <p>9</p>
+          </div>
+          <div className="flex flex-col items-start">
+            <p className="font-semibold text-foreground">Social</p>
+            <p>8</p>
+            <p>9</p>
+          </div> */}
+        </div>
+        <p>&copy; {new Date().getFullYear()} KinQuest. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
@@ -85,10 +122,12 @@ function NavSection({ isInSheet = false }: { isInSheet?: boolean }) {
     <>
       <SheetCloseWrapper {...shetCloseWrapperProps}>
         <Link href={SITE_PAGES.HOME} className={primary}>
-          <House
-            className={`h-6 w-6 hover:stroke-[3px] ${location === SITE_PAGES.HOME.toString() ? "stroke-[3px]" : "stroke-[1.5px]"}`}
-          />
-          <span className="sr-only">This APP</span>
+          <img src={logo} alt="KinQuest" className="size-[40px]" />
+          <span
+            className={`text-xl mr-10 ${location === SITE_PAGES.HOME.toString() ? "text-foreground" : "text-muted-foreground"}`}
+          >
+            KinQuest
+          </span>
         </Link>
       </SheetCloseWrapper>
       <SheetCloseWrapper {...shetCloseWrapperProps}>
@@ -158,7 +197,10 @@ function AccountDropdown() {
   ) : (
     <DropdownMenuItem
       className="cursor-pointer"
-      onClick={() => setLocation(SITE_PAGES.AUTH.LOGIN)}
+      onClick={() => {
+        sessionStorage.setItem("previousLocation", window.location.pathname);
+        setLocation(SITE_PAGES.AUTH.LOGIN);
+      }}
     >
       Login
     </DropdownMenuItem>
@@ -184,5 +226,86 @@ function AccountDropdown() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">{content}</DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+const noise2D = createNoise2D();
+
+function BackgroundCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ["rgb(0 77 179)", "rgb(116 80 62)", "rgb(109 40 217)"];
+    let frame = 0;
+
+    const animate = () => {
+      frame++;
+      ctx.fillStyle = "rgba(0,0,0,0.01)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < colors.length; i++) {
+        // const noiseX = Math.sin(frame * 0.05 + i * 2.1) * 0.3;
+        // const noiseY = Math.cos(frame * 0.07 + i * 1.7) * 0.3;
+        const noiseX = noise2D(frame * 0.05 + i * 2.1, frame * 0.05 + i * 2.1);
+        const noiseY = noise2D(frame * 0.07 + i * 1.7, frame * 0.07 + i * 1.7);
+
+        const x =
+          (Math.sin(frame * 0.1 + i + noiseX) * canvas.width) / 2 +
+          canvas.width / 2 +
+          Math.sin(frame * 0.03 + i * 3.2) * 100;
+
+        const y =
+          (Math.cos(frame * 0.15 + i + noiseY) * canvas.height) / 2 +
+          canvas.height / 2 +
+          Math.cos(frame * 0.04 + i * 2.8) * 100;
+
+        const size = Math.abs(
+          noise2D(frame * 0.01 + i * 0.5, frame * 0.02 + i * 0.3) * 20 + 1,
+        );
+
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.globalAlpha = 0.1;
+        ctx.fill();
+      }
+
+      setTimeout(() => {
+        requestAnimationFrame(animate);
+      }, 1000 / 30);
+    };
+
+    animate();
+
+    function handleResize() {
+      if (!canvas) return;
+      if (
+        Math.abs(window.innerWidth - canvas.width) < 0.1 * canvas.width &&
+        Math.abs(window.innerHeight - canvas.height) < 0.1 * canvas.height
+      )
+        return;
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed top-0 left-0 w-full h-full -z-10"
+    />
   );
 }

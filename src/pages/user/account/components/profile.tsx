@@ -35,12 +35,20 @@ export default function Profile() {
   const [depositAddress, setDepositAddress] = useState<string | null>(null);
 
   useEffect(() => {
+    let ignore = false;
+
     async function getUser() {
       const res = await getUserAccount();
-      setUsername(res.data.username);
-      setDepositAddress(res.data.depositAddress ?? null);
+      if (!ignore) {
+        setUsername(res.data.username);
+        setDepositAddress(res.data.depositAddress ?? null);
+      }
     }
     void getUser();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const form = useForm<z.infer<typeof updateUserProfileSchema>>({
@@ -161,7 +169,8 @@ export default function Profile() {
                     <FormLabel>Deposit Address</FormLabel>
                     <FormDescription>
                       Your Solana account or Kin token address where you want to
-                      receive your Kin earnings
+                      receive your Kin earnings (e.g. Code Wallet Deposit
+                      Address)
                     </FormDescription>
                     <FormControl>
                       <div className="relative">

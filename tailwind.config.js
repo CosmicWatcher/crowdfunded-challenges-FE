@@ -6,6 +6,8 @@ export default {
     extend: {
       animation: {
         funding: "funding 15s linear infinite",
+        "button-pulse": "button-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "glow-border": "glow-border 5s linear infinite",
       },
       keyframes: {
         funding: {
@@ -16,6 +18,26 @@ export default {
           "50%": {
             "background-size": "800% 800%",
             "background-position": "right center",
+          },
+        },
+        "button-pulse": {
+          "0%, 100%": {
+            opacity: "1",
+            transform: "scale(1.2)",
+          },
+          "50%": {
+            opacity: "0.9",
+            transform: "scale(0.95)",
+          },
+        },
+        "glow-border": {
+          "0%, 100%": {
+            "box-shadow":
+              "0 0 10px theme(colors.primary.foreground), 0 0 10px theme(colors.primary.foreground)",
+          },
+          "50%": {
+            "box-shadow":
+              "0 0 50px theme(colors.backgroundTransparent), 0 0 50px theme(colors.backgroundTransparent)",
           },
         },
       },
@@ -78,6 +100,10 @@ export default {
           fail: {
             main: "hsl(var(--status-fail))",
             border: "hsl(var(--border-status-fail))",
+          },
+          ended: {
+            main: "hsl(var(--status-ended))",
+            border: "hsl(var(--border-status-ended))",
           },
         },
       },

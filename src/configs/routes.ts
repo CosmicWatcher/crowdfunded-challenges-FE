@@ -4,6 +4,7 @@ export const SITE_PAGES = {
     SIGNUP: "/auth/signup",
     LOGIN: "/auth/login",
     VERIFY: "/auth/welcome",
+    UPDATE_PASSWORD: "/auth/update-password",
   },
   ACCOUNT: "/account",
   TASKS: {
@@ -18,15 +19,19 @@ export const API_ROUTES = {
     GET: "/users/account",
     UPDATE: "/users",
     CHECK_USERNAME_EXISTS: "/users/check-username-exists",
+    VALIDATE_SOLANA_ADDRESS: "/users/validate-solana-address",
   },
   TASKS: {
     CREATE: "/tasks/create",
     GET_LIST: "/tasks",
     GET_FEATURED: "/tasks/featured",
     GET_BY_ID: "/tasks/:id",
-    END: {
+    SETTLE: {
       SUCCESS: "/tasks/:id/success",
       FAIL: "/tasks/:id/fail",
+    },
+    FUNDING: {
+      CREATE_INTENT: "/task-funds/create-intent/:id",
     },
   },
   SOLUTIONS: {

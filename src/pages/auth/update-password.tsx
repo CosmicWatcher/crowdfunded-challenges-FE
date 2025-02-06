@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useLocation } from "wouter";
+import { useLocation } from "wouter";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -25,9 +25,9 @@ import { Input } from "@/components/ui/input";
 import { SITE_PAGES } from "@/configs/routes";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
-import { getUserSession, signup } from "@/lib/supabase";
+import { getUserSession, updatePassword } from "@/lib/supabase";
 
-export function SignupPage() {
+export default function UpdatePasswordPage() {
   const [_location, setLocation] = useLocation();
   const [isAuthenticated, setAuthenticated] = useState<undefined | boolean>(
     undefined,
@@ -37,20 +37,26 @@ export function SignupPage() {
 
   useEffect(() => {
     async function checkAuth() {
-      try {
-        const session = await getUserSession();
-        if (!session) setAuthenticated(false);
-        else setLocation(SITE_PAGES.TASKS.LIST);
-      } catch (err) {
-        handleError(err);
+      const session = await getUserSession();
+      if (!session) {
+        setAuthenticated(false);
+        setLocation(SITE_PAGES.AUTH.LOGIN);
+      } else {
+        setAuthenticated(true);
       }
     }
-    void checkAuth();
+    checkAuth().catch((err) =>
+      console.log(
+        `%c ${new Date(Date.now()).toLocaleTimeString()}`,
+        "color:CornflowerBlue; font-weight:bold;",
+        "Error checking auth:",
+        err,
+      ),
+    );
   }, [setLocation]);
 
   const formSchema = z
     .object({
-      email: z.string().email({ message: "Invalid email address" }),
       password: z.string().min(6, {
         message: "Password must be at least 6 characters",
       }),
@@ -64,7 +70,6 @@ export function SignupPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
       password: "",
       confirm: "",
     },
@@ -72,20 +77,20 @@ export function SignupPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await signup(values.email, values.password);
-      notifySuccess("Account successfully created");
-      setLocation(SITE_PAGES.AUTH.VERIFY);
+      await updatePassword(values.password);
+      notifySuccess("Successfully updated password");
+      setLocation(SITE_PAGES.ACCOUNT);
     } catch (err) {
-      handleError(err, "Signup failed");
+      handleError(err, "Password update failed");
     }
   }
 
-  return isAuthenticated === undefined ? null : (
+  return isAuthenticated === undefined || !isAuthenticated ? null : (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-xl">Sign Up</CardTitle>
+        <CardTitle className="text-2xl">Update Password</CardTitle>
         <CardDescription>
-          Enter your information to create an account
+          Enter your new password below to update your account
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -96,25 +101,12 @@ export function SignupPage() {
               <div className="grid gap-2">
                 <FormField
                   control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="email@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="grid gap-2">
-                <FormField
-                  control={form.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Password</FormLabel>
+                      </div>
                       <FormControl>
                         <div className="relative">
                           <Input
@@ -130,9 +122,9 @@ export function SignupPage() {
                             onClick={() => setShowPassword(!showPassword)}
                           >
                             {showPassword ? (
-                              <EyeOff className="h-4 w-4" />
+                              <EyeOffIcon className="h-4 w-4" />
                             ) : (
-                              <Eye className="h-4 w-4" />
+                              <EyeIcon className="h-4 w-4" />
                             )}
                           </Button>
                         </div>
@@ -148,7 +140,9 @@ export function SignupPage() {
                   name="confirm"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Confirm Password</FormLabel>
+                      </div>
                       <FormControl>
                         <div className="relative">
                           <Input
@@ -166,9 +160,9 @@ export function SignupPage() {
                             }
                           >
                             {showConfirmPassword ? (
-                              <EyeOff className="h-4 w-4" />
+                              <EyeOffIcon className="h-4 w-4" />
                             ) : (
-                              <Eye className="h-4 w-4" />
+                              <EyeIcon className="h-4 w-4" />
                             )}
                           </Button>
                         </div>
@@ -178,20 +172,12 @@ export function SignupPage() {
                   )}
                 />
               </div>
+
               <Button type="submit" className="w-full">
-                Create an account
+                Update Password
               </Button>
             </form>
           </Form>
-          {/* <Button variant="outline" className="w-full">
-              Sign up with Google
-            </Button> */}
-        </div>
-        <div className="mt-4 text-center text-sm">
-          Already have an account?{" "}
-          <Link href={SITE_PAGES.AUTH.LOGIN} className="underline">
-            Login
-          </Link>
         </div>
       </CardContent>
     </Card>
