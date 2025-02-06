@@ -72,6 +72,39 @@ export function AppLayout({ children }: AppLayoutProps) {
         <BackgroundCanvas />
         {children}
       </main>
+      <footer className="flex flex-col h-fit items-center gap-4 border-t bg-background p-4 text-muted-foreground text-sm">
+        <div className="flex justify-around md:justify-evenly w-full max-w-screen-2xl border-b pb-4">
+          <div className="flex flex-col items-start">
+            <Link
+              href={SITE_PAGES.HOME}
+              className="flex items-center gap-2 text-xl font-semibold pb-2"
+            >
+              <img src={logo} alt="KinQuest" className="size-[40px]" />
+              <span className="text-xl mr-10 ">KinQuest</span>
+            </Link>
+            <p className="self-start">Complete Tasks</p>
+            <p className="self-center">Earn Rewards</p>
+            <p className="self-end">Build the Future</p>
+          </div>
+          <div className="flex flex-col items-start gap-2">
+            <p className="font-semibold text-foreground pb-2">Links</p>
+            <Link href={SITE_PAGES.TASKS.LIST}>View Tasks</Link>
+            <Link href={SITE_PAGES.TASKS.CREATE}>Create Task</Link>
+            <Link href={SITE_PAGES.ACCOUNT}>My Account</Link>
+          </div>
+          {/* <div className="flex flex-col items-start">
+            <p className="font-semibold text-foreground">Community</p>
+            <p>8</p>
+            <p>9</p>
+          </div>
+          <div className="flex flex-col items-start">
+            <p className="font-semibold text-foreground">Social</p>
+            <p>8</p>
+            <p>9</p>
+          </div> */}
+        </div>
+        <p>&copy; {new Date().getFullYear()} KinQuest. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
