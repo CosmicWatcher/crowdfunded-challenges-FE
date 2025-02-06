@@ -169,7 +169,8 @@ export default function Profile() {
                     <FormLabel>Deposit Address</FormLabel>
                     <FormDescription>
                       Your Solana account or Kin token address where you want to
-                      receive your Kin earnings
+                      receive your Kin earnings (e.g. Code Wallet Deposit
+                      Address)
                     </FormDescription>
                     <FormControl>
                       <div className="relative">

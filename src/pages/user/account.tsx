@@ -8,10 +8,8 @@ import { getUserSession } from "@/lib/supabase";
 import Profile from "@/pages/user/account/components/profile";
 
 export default function UserAccountPage() {
-  const [_location, setLocation] = useLocation();
-  const [isAuthenticated, setAuthenticated] = useState<undefined | boolean>(
-    undefined,
-  );
+  const [, setLocation] = useLocation();
+  const [isAuthenticated, setAuthenticated] = useState<boolean>();
   const [page, setPage] = useState<"stats" | "profile">("profile");
 
   useEffect(() => {
@@ -40,6 +38,13 @@ export default function UserAccountPage() {
           onClick={() => setPage("profile")}
         >
           Profile
+        </Button>
+        <Button
+          variant="secondary"
+          className="text-lg"
+          onClick={() => setLocation(SITE_PAGES.AUTH.UPDATE_PASSWORD)}
+        >
+          Update Password
         </Button>
         <Button
           variant={page === "stats" ? "default" : "secondary"}
