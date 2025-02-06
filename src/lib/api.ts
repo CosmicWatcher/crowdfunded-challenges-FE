@@ -226,17 +226,22 @@ export async function updateUser(
   return resObj;
 }
 
-export async function createLoginIntent(): Promise<ResponseObject<string>> {
+export async function createCodeWalletLoginIntent(): Promise<
+  ResponseObject<string>
+> {
   const endpoint = "/code-wallet/login/create-intent";
-  const resObj = await apiCall<string>("POST", endpoint, false);
+  const resObj = await apiCall<string>("POST", endpoint);
 
   if (!resObj) throw new Error("No response object!");
   return resObj;
 }
 
+export async function verifyCodeWalletLogin(intentId: string): Promise<void> {
+  const endpoint = "/code-wallet/login/success/:id".replace(":id", intentId);
+  await apiCall("GET", endpoint);
+}
+
 // export async function testSecurity() {
-// (async () => {
-//   const { data, error } = await supabase.from("post").select();
+//   const { data, error } = await supabase.from("task_payout").select();
 //   console.log(error, data);
-// })();
 // }

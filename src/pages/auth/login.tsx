@@ -22,8 +22,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { APP_URL } from "@/configs/env";
 import { SITE_PAGES } from "@/configs/routes";
-import { createLoginIntent } from "@/lib/api";
+import { createCodeWalletLoginIntent } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
 import { getUserSession, login } from "@/lib/supabase";
@@ -167,17 +168,19 @@ function CodeWalletLogin() {
 
           login: {
             verifier: "DrAjE1JnYCttMubZ63vFejjTXbEkx5TtXFTS8DNtkUhY",
-            domain: "mydomain.local",
+            domain: "kinquest.app",
           },
 
           confirmParams: {
-            success: { url: `${"mydomain.local"}/success/{{INTENT_ID}}` },
-            cancel: { url: `${"mydomain.local"}/` },
+            success: {
+              url: `http://localhost:8090/code-wallet/login/success/{{INTENT_ID}}`,
+            },
+            cancel: { url: `http://localhost:8090${SITE_PAGES.HOME}` },
           },
         });
         if (codeElement.current && button !== undefined) {
           button.on("invoke", async () => {
-            const res = await createLoginIntent();
+            const res = await createCodeWalletLoginIntent();
             const clientSecret = res.data;
             console.log("clientSecret: ", clientSecret);
 

@@ -1,13 +1,15 @@
+import { useEffect } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useParams } from "wouter";
 
 import { MainErrorFallback } from "@/components/error/main-error";
 import { AppLayout } from "@/components/layout/main-layout";
 import { ThemeProvider } from "@/components/theme/provider";
 import NotFoundAlert from "@/components/ui/not-found";
 import { SITE_PAGES } from "@/configs/routes";
+import { verifyCodeWalletLogin } from "@/lib/api";
 import { LoginPage } from "@/pages/auth/login";
 import { SignupPage } from "@/pages/auth/signup";
 import VerifyEmailPage from "@/pages/auth/verify-email";
@@ -57,6 +59,9 @@ export default function App() {
             <Route path={SITE_PAGES.ACCOUNT}>
               <UserAccountPage />
             </Route>
+            <Route path={"/code-wallet/login/success/:id"}>
+              <CodeWalletLoginSuccessPage />
+            </Route>
             <Route>
               <NotFoundAlert
                 title="Page Not Found!"
@@ -68,4 +73,25 @@ export default function App() {
       </ThemeProvider>
     </ErrorBoundary>
   );
+}
+
+function CodeWalletLoginSuccessPage() {
+  const params = useParams();
+  const intentId = params.id;
+
+  useEffect(() => {
+    let ignore = false;
+    const verifyLogin = async () => {
+      if (ignore) return;
+      if (intentId) {
+        await verifyCodeWalletLogin(intentId);
+      }
+    };
+    void verifyLogin();
+    return () => {
+      ignore = true;
+    };
+  }, [intentId]);
+
+  return <div>INTENT_ID: {intentId}</div>;
 }
