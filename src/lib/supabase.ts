@@ -1,4 +1,4 @@
-import { Session, createClient } from "@supabase/supabase-js";
+import { Session, User, createClient } from "@supabase/supabase-js";
 
 import { APP_URL, SUPABASE_ANON_KEY, SUPABASE_URL } from "@/configs/env";
 import { SITE_PAGES } from "@/configs/routes";
@@ -7,10 +7,19 @@ import { SITE_PAGES } from "@/configs/routes";
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /** Get the user session if authenticated, otherwise null */
-export async function getUserSession(): Promise<Session | null> {
+export async function getSupabaseAuthSession(): Promise<Session | null> {
   const { data, error } = await supabase.auth.getSession();
   if (!error) {
     return data.session;
+  } else {
+    throw error;
+  }
+}
+
+export async function getSupabaseAuthUser(): Promise<User | null> {
+  const { data, error } = await supabase.auth.getUser();
+  if (!error) {
+    return data.user;
   } else {
     throw error;
   }
@@ -57,7 +66,7 @@ export async function updatePassword(password: string) {
   }
 }
 
-export async function logout() {
+export async function supabaseLogout() {
   const { error } = await supabase.auth.signOut();
   if (error) {
     throw error;

@@ -45,9 +45,9 @@ import { taskCreationFormSchema } from "@/configs/schema";
 import { createTask } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { notifyInfo } from "@/lib/notification";
-import { getUserSession } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { TaskCreationForm, TaskKind } from "@/types/misc.types";
+import { isUserLoggedIn } from "@/utils/auth";
 import { getTaskKindColor } from "@/utils/colors";
 
 export default function TaskCreationPage() {
@@ -63,9 +63,9 @@ export default function TaskCreationPage() {
 
     async function checkAuth() {
       try {
-        const session = await getUserSession();
+        const isLoggedIn = await isUserLoggedIn();
         if (!ignore) {
-          if (!session) {
+          if (!isLoggedIn) {
             notifyInfo("Please login to continue!");
             sessionStorage.setItem(
               "previousLocation",

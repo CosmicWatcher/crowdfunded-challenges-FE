@@ -1,9 +1,12 @@
 import { CurrencyCode } from "@code-wallet/currency";
+import { navigate } from "wouter/use-browser-location";
 
 import { SERVER_URL } from "@/configs/env";
-import { API_ROUTES } from "@/configs/routes";
-import { getUserSession } from "@/lib/supabase";
+import { API_ROUTES, SITE_PAGES } from "@/configs/routes";
+import { handleError } from "@/lib/error";
+import { notifySuccess } from "@/lib/notification";
 import {
+  CodeLoginResponse,
   CreateIntentResponse,
   ResponseObject,
   SolanaAddressValidationResponse,
@@ -18,6 +21,7 @@ import {
   TaskStatus,
 } from "@/types/misc.types";
 import { TaskKind } from "@/types/misc.types";
+import { getAccessToken, logout } from "@/utils/auth";
 
 interface ApiResponse<T = null> {
   success: boolean;
@@ -32,15 +36,21 @@ async function apiCall<T = null>(
   authRequired = false,
   body?: object,
 ): Promise<ApiResponse<T>["responseObject"]> {
-  const session = await getUserSession();
+  const accessToken = await getAccessToken();
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
 
-  if (authRequired) {
-    if (!session) throw new Error("User authentication failed!");
-    headers.Authorization = `Bearer ${session.access_token}`;
-  } else if (session) headers.Authorization = `Bearer ${session.access_token}`;
+  if (authRequired && !accessToken)
+    throw new Error("User authentication failed!");
+
+  if (accessToken) {
+    if (accessToken.loginMethod === "code-login")
+      headers.Authorization = `code-login ${accessToken.token}`;
+    else if (accessToken.loginMethod === "supabase") {
+      headers.Authorization = `supabase ${accessToken.token}`;
+    }
+  }
 
   let res: Response;
   try {
@@ -63,7 +73,20 @@ async function apiCall<T = null>(
     "color:lightgreen;",
     "color:white;",
   );
-  if (!resJson.success) throw new Error(resJson.message);
+  if (!resJson.success) {
+    if (resJson.statusCode == 401) {
+      try {
+        await logout();
+        notifySuccess("Successfully Logged Out");
+        navigate(SITE_PAGES.HOME, { replace: true });
+      } catch (err) {
+        handleError(err, "Logout Failed");
+      }
+      throw new Error(resJson.message);
+    } else {
+      throw new Error(resJson.message);
+    }
+  }
 
   return resJson.responseObject;
 }
@@ -231,10 +254,8 @@ export async function updateUser(
   return resObj;
 }
 
-export async function createCodeWalletLoginIntent(): Promise<
-  ResponseObject<string>
-> {
-  const endpoint = "/code-wallet/login/create-intent";
+export async function createCodeLoginIntent(): Promise<ResponseObject<string>> {
+  const endpoint = API_ROUTES.AUTH.CODE_LOGIN.CREATE_INTENT;
   const resObj = await apiCall<string>("POST", endpoint);
 
   if (!resObj) throw new Error("No response object!");
@@ -259,13 +280,16 @@ export async function createTaskFundingIntent(
   return resObj;
 }
 
-export async function verifyCodeWalletLogin(intentId: string): Promise<void> {
-  const endpoint = "/code-wallet/login/success/:id".replace(":id", intentId);
-  await apiCall("GET", endpoint);
+export async function verifyCodeLogin(
+  intentId: string,
+): Promise<ResponseObject<CodeLoginResponse>> {
+  const endpoint = API_ROUTES.AUTH.CODE_LOGIN.SUCCESS.replace(":id", intentId);
+  const resObj = await apiCall<CodeLoginResponse>("GET", endpoint);
+
+  if (!resObj) throw new Error("No response object!");
+  return resObj;
 }
 
-// export async function testSecurity() {
-//   const { data, error } = await supabase.from("task_payout").select();
 export async function validateSolanaAddress(
   address: string,
 ): Promise<ResponseObject<SolanaAddressValidationResponse>> {

@@ -4,7 +4,7 @@ import { useLocation } from "wouter";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { SITE_PAGES } from "@/configs/routes";
-import { getUserSession } from "@/lib/supabase";
+import { isUserLoggedIn } from "@/utils/auth";
 
 export default function VerifyEmailPage() {
   const [_location, setLocation] = useLocation();
@@ -14,8 +14,8 @@ export default function VerifyEmailPage() {
 
   useEffect(() => {
     async function checkAuth() {
-      const session = await getUserSession();
-      if (!session) setAuthenticated(false);
+      const isLoggedIn = await isUserLoggedIn();
+      if (!isLoggedIn) setAuthenticated(false);
       else setLocation(SITE_PAGES.ACCOUNT);
     }
     checkAuth().catch((err) =>

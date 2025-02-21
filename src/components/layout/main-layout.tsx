@@ -22,7 +22,7 @@ import {
 import { SITE_PAGES } from "@/configs/routes";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
-import { getUserSession, logout } from "@/lib/supabase";
+import { isUserLoggedIn, logout } from "@/utils/auth";
 
 import logo from "/logo.png";
 
@@ -157,8 +157,8 @@ function AccountDropdown() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const session = await getUserSession();
-        if (!session) setAuthenticated(false);
+        const isLoggedIn = await isUserLoggedIn();
+        if (!isLoggedIn) setAuthenticated(false);
         else setAuthenticated(true);
       } catch (err) {
         handleError(err);

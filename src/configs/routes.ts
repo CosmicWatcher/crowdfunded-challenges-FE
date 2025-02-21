@@ -5,6 +5,7 @@ export const SITE_PAGES = {
     LOGIN: "/auth/login",
     VERIFY: "/auth/welcome",
     UPDATE_PASSWORD: "/auth/update-password",
+    CODE_LOGIN: "/auth/code-login/:id",
   },
   ACCOUNT: "/account",
   TASKS: {
@@ -15,6 +16,13 @@ export const SITE_PAGES = {
 } as const;
 
 export const API_ROUTES = {
+  AUTH: {
+    CODE_LOGIN: {
+      GET_VERIFIER: "/code-login/verifier",
+      CREATE_INTENT: "/code-login/create-intent",
+      SUCCESS: "/code-login/success/:id",
+    },
+  },
   ACCOUNT: {
     GET: "/users/account",
     UPDATE: "/users",

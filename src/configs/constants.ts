@@ -16,3 +16,5 @@ export const FORM_LIMITS = {
 export const NO_USERNAME = "No-Name";
 
 export const DEFAULT_TASK_END_DAYS = 7;
+
+export const DOMAIN = "kinquest.app";

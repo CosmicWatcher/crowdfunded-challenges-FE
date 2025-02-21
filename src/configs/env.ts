@@ -16,3 +16,5 @@ export const SERVER_URL = removeTrailingSlash(
 export const APP_URL = removeTrailingSlash(
   import.meta.env.VITE_APP_URL as string,
 );
+
+export const JWT_PUBLIC_KEY = import.meta.env.VITE_JWT_PUBLIC_KEY as string;

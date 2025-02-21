@@ -32,12 +32,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { APP_URL } from "@/configs/env";
+import { DOMAIN } from "@/configs/constants";
 import { SITE_PAGES } from "@/configs/routes";
-import { createCodeWalletLoginIntent } from "@/lib/api";
+import { createCodeLoginIntent } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
-import { forgotPassword, getUserSession, login } from "@/lib/supabase";
+import { forgotPassword, login } from "@/lib/supabase";
+import { isUserLoggedIn } from "@/utils/auth";
 
 export function LoginPage() {
   const [_location, setLocation] = useLocation();
@@ -57,8 +58,8 @@ export function LoginPage() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const session = await getUserSession();
-        if (!session) setAuthenticated(false);
+        const isLoggedIn = await isUserLoggedIn();
+        if (!isLoggedIn) setAuthenticated(false);
         else setLocation(previousLocation.current);
       } catch (err) {
         handleError(err);
@@ -197,29 +198,26 @@ function CodeWalletLogin() {
 
           login: {
             verifier: "DrAjE1JnYCttMubZ63vFejjTXbEkx5TtXFTS8DNtkUhY",
-            domain: "kinquest.app",
+            domain: DOMAIN,
           },
 
           confirmParams: {
             success: {
-              url: `http://localhost:8090/code-wallet/login/success/{{INTENT_ID}}`,
+              url: `${window.location.origin}${SITE_PAGES.AUTH.CODE_LOGIN.replace(
+                ":id",
+                "{{INTENT_ID}}",
+              )}`,
             },
-            cancel: { url: `http://localhost:8090${SITE_PAGES.HOME}` },
+            cancel: { url: `${window.location.origin}${SITE_PAGES.HOME}` },
           },
         });
         if (codeElement.current && button !== undefined) {
           button.on("invoke", async () => {
-            const res = await createCodeWalletLoginIntent();
+            const res = await createCodeLoginIntent();
             const clientSecret = res.data;
-            console.log("clientSecret: ", clientSecret);
-
-            // Update the button with the new client secret so that our server
-            // can be notified once the payment is complete.
             button.update({ clientSecret });
           });
-
           button.mount(codeElement.current);
-          // codeBtnCreated.current = true;
         } else {
           console.error("codeElement.current is null or undefined");
         }

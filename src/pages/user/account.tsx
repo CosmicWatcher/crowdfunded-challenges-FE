@@ -4,8 +4,8 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { SITE_PAGES } from "@/configs/routes";
 import { handleError } from "@/lib/error";
-import { getUserSession } from "@/lib/supabase";
 import Profile from "@/pages/user/account/components/profile";
+import { isUserLoggedIn } from "@/utils/auth";
 
 export default function UserAccountPage() {
   const [, setLocation] = useLocation();
@@ -15,8 +15,8 @@ export default function UserAccountPage() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const session = await getUserSession();
-        if (session) {
+        const isLoggedIn = await isUserLoggedIn();
+        if (isLoggedIn) {
           setAuthenticated(true);
         } else {
           sessionStorage.setItem("previousLocation", window.location.pathname);

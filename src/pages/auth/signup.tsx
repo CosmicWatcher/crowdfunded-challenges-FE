@@ -25,7 +25,8 @@ import { Input } from "@/components/ui/input";
 import { SITE_PAGES } from "@/configs/routes";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
-import { getUserSession, signup } from "@/lib/supabase";
+import { signup } from "@/lib/supabase";
+import { isUserLoggedIn } from "@/utils/auth";
 
 export function SignupPage() {
   const [_location, setLocation] = useLocation();
@@ -38,8 +39,8 @@ export function SignupPage() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const session = await getUserSession();
-        if (!session) setAuthenticated(false);
+        const isLoggedIn = await isUserLoggedIn();
+        if (!isLoggedIn) setAuthenticated(false);
         else setLocation(SITE_PAGES.TASKS.LIST);
       } catch (err) {
         handleError(err);

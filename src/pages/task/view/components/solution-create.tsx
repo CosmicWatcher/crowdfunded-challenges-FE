@@ -21,8 +21,8 @@ import { SITE_PAGES } from "@/configs/routes";
 import { solutionFormSchema } from "@/configs/schema";
 import { createSolution } from "@/lib/api";
 import { handleError } from "@/lib/error";
-import { getUserSession } from "@/lib/supabase";
 import { SolutionResponse, TaskResponse } from "@/types/api.types";
+import { isUserLoggedIn } from "@/utils/auth";
 
 export default function SolutionCreator({
   taskId,
@@ -38,9 +38,9 @@ export default function SolutionCreator({
 
     async function checkAuth() {
       try {
-        const session = await getUserSession();
+        const isLoggedIn = await isUserLoggedIn();
         if (!ignore) {
-          if (!session) setAuthenticated(false);
+          if (!isLoggedIn) setAuthenticated(false);
           else setAuthenticated(true);
         }
       } catch (err) {

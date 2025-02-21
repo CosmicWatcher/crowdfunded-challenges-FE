@@ -25,7 +25,8 @@ import { Input } from "@/components/ui/input";
 import { SITE_PAGES } from "@/configs/routes";
 import { handleError } from "@/lib/error";
 import { notifySuccess } from "@/lib/notification";
-import { getUserSession, updatePassword } from "@/lib/supabase";
+import { updatePassword } from "@/lib/supabase";
+import { getAccessToken } from "@/utils/auth";
 
 export default function UpdatePasswordPage() {
   const [_location, setLocation] = useLocation();
@@ -37,10 +38,13 @@ export default function UpdatePasswordPage() {
 
   useEffect(() => {
     async function checkAuth() {
-      const session = await getUserSession();
-      if (!session) {
+      const accessToken = await getAccessToken();
+      if (!accessToken) {
         setAuthenticated(false);
         setLocation(SITE_PAGES.AUTH.LOGIN);
+      } else if (accessToken.loginMethod === "code-login") {
+        setAuthenticated(false);
+        setLocation(SITE_PAGES.ACCOUNT);
       } else {
         setAuthenticated(true);
       }
