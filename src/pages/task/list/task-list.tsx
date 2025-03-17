@@ -5,8 +5,8 @@ import { FeaturedTasks } from "@/components/layout/featured-tasks";
 import { TaskPreview } from "@/components/layout/task-preview";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Loading } from "@/components/ui/loading";
 import NotFoundAlert from "@/components/ui/not-found";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getTaskList } from "@/lib/api";
 import { handleError } from "@/lib/error";
 import { ResponseObject, TaskResponse } from "@/types/api.types";
@@ -156,15 +156,6 @@ export default function TaskListPage() {
     };
   }, [page, statusFilter]);
 
-  if (
-    loading &&
-    activeTasks.data.length === 0 &&
-    successfulTasks.data.length === 0 &&
-    failedTasks.data.length === 0
-  ) {
-    return <Loading />;
-  }
-
   if (isError) {
     return (
       <Alert className="max-w-lg mx-auto">
@@ -225,13 +216,17 @@ export default function TaskListPage() {
                 <TaskPreview key={task.id} task={task} />
               ),
           )
+        ) : loading ? (
+          <>
+            <Skeleton className="max-w-7xl mx-auto h-[10rem] rounded-3xl border-2" />
+            <Skeleton className="max-w-7xl mx-auto h-[10rem] rounded-3xl border-2" />
+          </>
         ) : (
           <NotFoundAlert
             title="No tasks found!"
             description="Try changing the filters above."
           />
         )}
-        {loading && <Loading />}
         {!loading && currentTasks.pagination?.next_page && (
           <ArrowBigDownDash
             className="size-10 mx-auto cursor-pointer animate-bounce"
